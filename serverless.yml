@@ -61,7 +61,6 @@ functions:
           method: get
           cors: true
 
-
 resources:
   Resources:
     #COGNITO
