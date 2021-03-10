@@ -1,0 +1,53 @@
+{
+  "name": "emporiolambda-be",
+  "version": "1.0.0",
+  "description": "backend module for the EmporioLambda project",
+  "scripts": {
+    "test": "sls invoke test --compilers ts-node/register",
+    "lint": "eslint  --ignore-path .gitignore .",
+    "lint:updated": "pipe-git-updated --ext=ts -- eslint --ignore-path .gitignore",
+    "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml,ts}\"",
+    "prettier-check:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=ts --ext=json --ext=md --ext=yaml --ext=yml -- prettier -c",
+    "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml,ts}\"",
+    "prettify:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=json --ext=ts --ext=md --ext=yaml --ext=yml -- prettier --write",
+    "coverage": "nyc --reporter=lcov npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OmicronSwe/EmporioLambda-BE.git"
+  },
+  "author": "Omicron Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OmicronSwe/EmporioLambda-BE/issues"
+  },
+  "homepage": "https://github.com/OmicronSwe/EmporioLambda-BE#readme",
+  "eslintConfig": {
+    "extends": "@serverless/eslint-config/node",
+    "root": true
+  },
+  "devDependencies": {
+    "-": "^0.0.1",
+    "@serverless/eslint-config": "^3.0.0",
+    "@types/mocha": "^8.2.0",
+    "@types/uuid": "^8.3.0",
+    "aws-lambda": "^1.0.6",
+    "codecov": "^3.8.1",
+    "eslint": "^7.19.0",
+    "eslint-plugin-import": "^2.22.1",
+    "git-list-updated": "^1.2.1",
+    "nyc": "^15.1.0",
+    "prettier": "^2.2.1",
+    "save-dev": "^0.0.1-security",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-mocha-plugin": "^1.12.0",
+    "serverless-offline": "^6.8.0",
+    "serverless-plugin-typescript": "^1.1.9",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.4"
+  },
+  "dependencies": {
+    "stripe": "^8.137.0",
+    "uuid": "^3.1.0"
+  }
+}

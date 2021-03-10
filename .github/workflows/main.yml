@@ -1,0 +1,74 @@
+name: Deploy Lambda functions
+
+on: push
+
+jobs:
+  deploy:
+    name: Deploy Lambda functions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository 🛎
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install NPM dependencies
+        run: npm install
+
+      - name: Check Prettier
+        run: npm run prettier-check
+
+      - name: Test ESLint 🛂
+        run: npm run lint
+
+      - name: Install Serverless
+        run: npm install -g serverless
+
+      - name: Install Java JRE for DynamoDB local
+        run: sudo apt install openjdk-8-jre
+
+      - name: Install DynamoDB local for test
+        run: serverless dynamodb install
+
+      - name: Test Lambda functions and produce coverage
+        run: npm run coverage
+
+      - name: Push coverage
+        run: npx codecov
+
+      - name: Set enviroment variables of GitHub
+        uses: rlespinasse/github-slug-action@v2.x
+
+      # - name: Clean Package
+      #  uses: serverless/github-action@master
+      #  with:
+      #    args: remove -s ${{env.GITHUB_REF_SLUG}}
+      #  env:
+      # SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      # or if using AWS credentials directly
+      #    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Deploy function to local 🚀⭐
+        if: env.GITHUB_REF_SLUG!='develop' && env.GITHUB_REF_SLUG!='master'
+        run: |
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          serverless deploy -s local
+
+      - name: Deploy function to test 🚀🌟
+        if: env.GITHUB_REF_SLUG=='develop'
+        run: |
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          serverless deploy -s test
+
+      - name: Deploy function to staging 🚀✨
+        if: env.GITHUB_REF_SLUG=='master'
+        run: |
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          serverless deploy -s staging

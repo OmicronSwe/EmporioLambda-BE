@@ -1,0 +1,197 @@
+service: emporiolambda-be
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-mocha-plugin
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  serverless-mocha-plugin:
+    preTestCommands:
+      - bash bashScript/startDynamoDBLocal.sh
+    postTestCommands:
+      - bash bashScript/stopDynamoDBLocal.sh
+
+  dynamodb:
+    # If you only want to use DynamoDB Local in some stages, declare them here
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    # Uncomment only if you already have a DynamoDB running locally
+    # noStart: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  # you can overwrite defaults here
+  # stage: dev
+  region: eu-central-1
+  environment:
+    NAMESPACE: ${opt:stage, self:provider.stage}
+    STRIPE_SECRET_KEY: ${ssm:STRIPE_KEY}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          cors: true
+
+
+resources:
+  Resources:
+    #COGNITO
+    #Cognito - User pool
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:provider.environment.NAMESPACE}-EML-user_pool
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 8
+            RequireLowercase: true
+            RequireNumbers: true
+            RequireSymbols: true
+            RequireUppercase: true
+
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes:
+          - email
+        Schema:
+          - AttributeDataType: String
+            Name: email
+            Required: true
+            Mutable: true
+            DeveloperOnlyAttribute: false
+          - AttributeDataType: String
+            Name: name
+            Required: true
+            Mutable: true
+            DeveloperOnlyAttribute: false
+          - AttributeDataType: String
+            Name: family_name
+            Required: true
+            DeveloperOnlyAttribute: false
+            Mutable: true
+          - AttributeDataType: String
+            Name: address
+            Required: true
+            DeveloperOnlyAttribute: false
+            Mutable: true
+
+    #Cognito - Client
+    CognitoPoolCLient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: ${self:provider.environment.NAMESPACE}-EML-user_pool_client
+        UserPoolId:
+          Ref: CognitoUserPool
+        AllowedOAuthFlowsUserPoolClient: true
+        SupportedIdentityProviders:
+          - COGNITO
+        AllowedOAuthFlows:
+          - code
+        AllowedOAuthScopes:
+          - email
+          - openid
+          - profile
+        CallbackURLs:
+          - http://localhost:3000/api/auth/callback/cognito #(indirizzo dopo il login o registrazione)
+        LogoutURLs:
+          - http://localhost:3000 #da modificare (indirizzo dopo il logout)
+        #DefaultRedirectURI: da inserire forse
+        GenerateSecret: false
+
+    #Cognito - ClienteGroup
+    CognitoGroupCliente:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        Description: Clienti che acquisteranno i prodotti
+        GroupName: Cliente
+        #Precedence: Double
+        #RoleArn: String
+        UserPoolId:
+          Ref: CognitoUserPool
+
+    #Cognito - VenditoreAdminGroup
+    CognitoGroupVenditoreAdmin:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        Description: Venditori e Admin che gestiscono il sito
+        GroupName: VenditoreAdmin
+        #Precedence: Double
+        #RoleArn: String
+        UserPoolId:
+          Ref: CognitoUserPool
+
+    #DYNAMO_DB
+    ProductTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NAMESPACE}-EML-product
+        GlobalSecondaryIndexes:
+          - IndexName: name_index
+            KeySchema:
+              - AttributeName: name
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+    CartTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NAMESPACE}-EML-cart
