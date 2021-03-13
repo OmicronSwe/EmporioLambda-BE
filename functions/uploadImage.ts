@@ -48,11 +48,11 @@ export const uploadImage: APIGatewayProxyHandler = async (event) => {
         Body: buffer,
         Key: key,
         ContentType: body.mime,
-        Bucket: process.env.NAMESPACE + '-EML-imageBucket',
+        Bucket: process.env.NAMESPACE + '-imagebucket',
         ACL: 'public-read',
       })
       .promise();
-    const url = `https://${process.env.NAMESPACE}-EML-imageBucket.s3-${process.env.REGION}.amazonaws.com/${key}`;
+    const url = `https://${process.env.NAMESPACE}-imagebucket.s3-${process.env.REGION}.amazonaws.com/${key}`;
     const response = {
       statusCode: 400,
       headers: {
