@@ -40,7 +40,7 @@ provider:
   environment:
     NAMESPACE: ${opt:stage, self:provider.stage}
     STRIPE_SECRET_KEY: ${ssm:STRIPE_KEY}
-
+    REGION: ${opt:region, self:provider.region}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -50,6 +50,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - s3:*
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
 
 functions:
@@ -63,6 +64,14 @@ functions:
 
 resources:
   Resources:
+    #BUCKET
+    #Bucket for images
+    BucketImage:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.NAMESPACE}-EML-imageBucket
+        AccessControl: PublicRead #da modificare forse
+        
     #COGNITO
     #Cognito - User pool
     CognitoUserPool:
@@ -194,3 +203,14 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-cart
+
+
+
+functions:
+  imageUpload:
+        handler: functions/uploadImage.uploadImage
+        events:
+            - http:
+                  path: image-upload
+                  method: POST
+                  cors: true
