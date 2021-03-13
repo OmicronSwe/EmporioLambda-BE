@@ -60,7 +60,7 @@ resources:
     BucketImage:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.NAMESPACE}-EML-imageBucket
+        BucketName: ${self:provider.environment.NAMESPACE}-imageBucket
         AccessControl: PublicRead #da modificare forse
 
     #COGNITO
