@@ -54,7 +54,7 @@ export const uploadImage: APIGatewayProxyHandler = async (event) => {
       .promise();
     const url = `https://${process.env.NAMESPACE}-imagebucket.s3-${process.env.REGION}.amazonaws.com/${key}`;
     const response = {
-      statusCode: 400,
+      statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Methods': '*',
