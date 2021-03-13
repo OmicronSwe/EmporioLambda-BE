@@ -53,15 +53,6 @@ provider:
         - s3:*
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
 
-functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: hello
-          method: get
-          cors: true
-
 resources:
   Resources:
     #BUCKET
@@ -71,7 +62,7 @@ resources:
       Properties:
         BucketName: ${self:provider.environment.NAMESPACE}-EML-imageBucket
         AccessControl: PublicRead #da modificare forse
-        
+
     #COGNITO
     #Cognito - User pool
     CognitoUserPool:
@@ -204,13 +195,19 @@ resources:
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-cart
 
-
-
 functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          cors: true
+
   imageUpload:
-        handler: functions/uploadImage.uploadImage
-        events:
-            - http:
-                  path: image-upload
-                  method: POST
-                  cors: true
+    handler: functions/uploadImage.uploadImage
+    events:
+      - http:
+          path: image-upload
+          method: POST
+          cors: true
