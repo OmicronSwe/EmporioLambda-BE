@@ -44,14 +44,9 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
+        - dynamodb:*
         - s3:*
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
+      Resource: '*'
 
 resources:
   Resources:
