@@ -1,30 +1,30 @@
-import { response, badRequest } from '../../lib/APIResponses';
+import { response, badResponse } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
-import { v4 as uuid } from 'uuid';
+import Product from '../../lib/model/product';
 
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
-    return badRequest('Body missing');
+    return badResponse('Body missing');
   }
 
-  const body = JSON.parse(event.body);
+  try {
+    const product = new Product(JSON.parse(event.body));
+    const data = product.getData();
 
-  const data = {
-    id: uuid(),
-    name: body.name,
-    description: body.description,
-  };
+    const newProduct = await Dynamo.write(data, tableName.product).catch((err) => {
+      console.log('error in Dynamo write', err);
+      return null;
+    });
 
-  const newProduct = await Dynamo.write(data, tableName.product).catch((err) => {
-    console.log('error in Dynamo write', err);
-    return null;
-  });
+    if (!newProduct) {
+      return badResponse('Failed to create product');
+    }
 
-  if (!newProduct) {
-    return badRequest('Failed to create product');
+    return response({ data: { message: 'Product "' + product.name + '" created correctly' } });
+  } catch (err) {
+    //handle logic error of product
+    return badResponse(err.name + ' ' + err.message);
   }
-
-  return response({ data: { message: 'Product "' + body.name + '" created correctly' } });
 };

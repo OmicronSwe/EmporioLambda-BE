@@ -216,3 +216,11 @@ functions:
           path: product
           method: post
           cors: true
+
+  listOfProduct:
+    handler: src/endpoints/product/list.index
+    events:
+      - http:
+          path: product
+          method: get
+          cors: true
