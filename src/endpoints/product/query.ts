@@ -1,11 +1,11 @@
-import { response, badResponse } from '../../lib/APIResponses';
+import { response, badRequest, notFound, badResponse } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
 
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
-    return badResponse('Body missing');
+    return badRequest('Body missing');
   }
 
   const body = JSON.parse(event.body);
@@ -17,7 +17,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
       break;
     }
     default: {
-      return badResponse('Condition not supported');
+      //console.log('not supported')
+      return badRequest('Condition not supported');
     }
   }
 
@@ -32,13 +33,18 @@ export const index: APIGatewayProxyHandler = async (event) => {
     Object.values(body),
     queryCondition
   ).catch((err) => {
-    console.log('error in Dynamo query: ', err);
+    console.log(err);
     return null;
   });
 
   if (!result) {
-    return badResponse('Failed to query product');
+    return badResponse('Failed to query products');
   }
 
+  if (result.length == 0) {
+    return notFound('Products not found');
+  }
+
+  //console.log(result);
   return response({ data: { result } });
 };

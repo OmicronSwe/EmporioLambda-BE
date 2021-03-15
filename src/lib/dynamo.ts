@@ -3,40 +3,48 @@ import { DynamoDB } from 'aws-sdk';
 const dynamoDb = new DynamoDB.DocumentClient();
 
 const Dynamo = {
-  get: async (id: string, TableName: string): Promise<DynamoDB.AttributeMap> => {
+  get: async (
+    primaryKey: string,
+    primaryKeyValue: string,
+    tableName: string
+  ): Promise<DynamoDB.AttributeMap> => {
     const params = {
-      TableName,
+      TableName: tableName,
       Key: {
-        id,
+        [primaryKey]: primaryKeyValue,
       },
     };
 
-    const data = await dynamoDb.get(params).promise();
-
-    if (!data || !data.Item) {
-      throw Error(`There was an error fetching the data for ID of ${id} from ${TableName}`);
-    }
+    const data = await dynamoDb
+      .get(params)
+      .promise()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(`Error in Dynamo get from table ${tableName}: ` + err);
+      });
 
     //console.log(data);
 
-    return data.Item;
+    return data.Item ? data.Item : {};
   },
 
-  write: async (data, TableName: string): Promise<object> => {
-    if (!data.id) {
-      throw Error('no ID on the data');
-    }
-
+  write: async (data, tableName: string): Promise<object> => {
     const params = {
-      TableName,
+      TableName: tableName,
       Item: data,
     };
 
-    const res = await dynamoDb.put(params).promise();
-
-    if (!res) {
-      throw Error(`There was an error inserting ID of ${data.id} in table ${TableName}`);
-    }
+    await dynamoDb
+      .put(params)
+      .promise()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(`Error in Dynamo write in table ${tableName}: ` + err);
+      });
 
     return data;
   },
@@ -49,7 +57,9 @@ const Dynamo = {
     updateValue: Array<string>
   ): Promise<DynamoDB.UpdateItemOutput> => {
     if (updateKey.length != updateValue.length) {
-      throw Error('Key element and value element must have the same number element');
+      throw Error(
+        `Error in Dynamo update in table ${tableName}: Key element and Value element must have the same number element`
+      );
     }
 
     let updateExpr: string = 'SET ';
@@ -80,11 +90,11 @@ const Dynamo = {
     return dynamoDb
       .update(params)
       .promise()
-      .then(function (data) {
+      .then((data) => {
         return data;
       })
-      .catch(function (err) {
-        throw Error(err);
+      .catch((err) => {
+        throw Error(`Error in Dynamo update in table ${tableName}: ` + err);
       });
   },
 
@@ -112,9 +122,17 @@ const Dynamo = {
       ExpressionAttributeValues: AttriValueExpr,
     };
 
-    console.log(params);
+    //console.log(params);
 
-    const res = await dynamoDb.query(params).promise();
+    const res = await dynamoDb
+      .query(params)
+      .promise()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(`Error in Dynamo query in table in table ${tableName}: ` + err);
+      });
 
     return res.Items || [];
   },
@@ -133,20 +151,49 @@ const Dynamo = {
 
     let params;
     if (filterExpression != '') {
+      //scan by condition
       params = {
         TableName: tableName,
         FilterExpression: filterExpression,
         ExpressionAttributeValues: AttriValueExpr,
       };
     } else {
+      //all scan
       params = {
         TableName: tableName,
       };
     }
 
-    const res = await dynamoDb.scan(params).promise();
+    const res = await dynamoDb
+      .scan(params)
+      .promise()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(`Error in Dynamo scan in table ${tableName}: ` + err);
+      });
 
     return res.Items || [];
+  },
+
+  delete: async (primaryKey: string, primaryKeyValue: string, tableName: string) => {
+    const params = {
+      TableName: tableName,
+      Key: {
+        [primaryKey]: primaryKeyValue,
+      },
+    };
+
+    return dynamoDb
+      .delete(params)
+      .promise()
+      .then(function (data) {
+        return data;
+      })
+      .catch(function (err) {
+        throw Error(`Error in Dynamo delete in table ${tableName}: ` + err);
+      });
   },
 };
 export default Dynamo;

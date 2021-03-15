@@ -1,11 +1,15 @@
-import { response, badResponse } from '../../lib/APIResponses';
+import { response, badRequest, badResponse } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
 
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
-    return badResponse('Body missing');
+    return badRequest('Body missing');
+  }
+
+  if (!event.pathParameters) {
+    return badRequest('PathParameters missing');
   }
 
   const body = JSON.parse(event.body);
@@ -17,7 +21,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     Object.keys(body),
     Object.values(body)
   ).catch((err) => {
-    console.log('error in Dynamo update: ', err);
+    console.log(err);
     return null;
   });
 

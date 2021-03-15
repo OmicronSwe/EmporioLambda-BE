@@ -224,3 +224,35 @@ functions:
           path: product
           method: get
           cors: true
+
+  getFromIdProduct:
+    handler: src/endpoints/product/getById.index
+    events:
+      - http:
+          path: product/{id}
+          method: get
+          cors: true
+
+  updateProduct:
+    handler: src/endpoints/product/update.index
+    events:
+      - http:
+          path: product/{id}
+          method: put
+          cors: true
+
+  deleteProduct:
+    handler: src/endpoints/product/delete.index
+    events:
+      - http:
+          path: product/{id}
+          method: delete
+          cors: true
+
+  queryProduct:
+    handler: src/endpoints/product/query.index
+    events:
+      - http:
+          path: product/query
+          method: get
+          cors: true

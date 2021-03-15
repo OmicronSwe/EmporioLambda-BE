@@ -16,4 +16,8 @@ export const response = ({ statusCode = 200, data = {}, cors = true }): APIGatew
   return response;
 };
 
-export const badResponse = (message: string) => response({ data: { message }, statusCode: 400 });
+export const badRequest = (error: string) => response({ data: { error }, statusCode: 400 });
+
+export const badResponse = (error: string) => response({ data: { error }, statusCode: 502 });
+
+export const notFound = (error: string) => response({ data: { error }, statusCode: 404 });
