@@ -23,4 +23,3 @@ describe('Authentication', () => {
     expect(response).to.not.be.empty;
   });
 });
-

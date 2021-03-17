@@ -188,7 +188,7 @@ functions:
       USER_POOL_ID2: !Ref CognitoUserPoolClient.UserPoolId
       USER_POOL_ID3: !GetAtt CognitoUserPoolClient.UserPoolId
       AWS_REGION: ${opt:region, self:provider.region}
-      
+
   hello:
     handler: handler.hello
     events:
@@ -198,4 +198,3 @@ functions:
           authorizer:
             name: auth
           cors: true
-          
