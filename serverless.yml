@@ -52,15 +52,6 @@ provider:
         - dynamodb:DeleteItem
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
 
-functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: hello
-          method: get
-          cors: true
-
 resources:
   Resources:
     #COGNITO
@@ -126,17 +117,6 @@ resources:
         #DefaultRedirectURI: da inserire forse
         GenerateSecret: false
 
-    #Cognito - ClienteGroup
-    CognitoGroupCliente:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        Description: Clienti che acquisteranno i prodotti
-        GroupName: Cliente
-        #Precedence: Double
-        #RoleArn: String
-        UserPoolId:
-          Ref: CognitoUserPool
-
     #Cognito - VenditoreAdminGroup
     CognitoGroupVenditoreAdmin:
       Type: AWS::Cognito::UserPoolGroup
@@ -194,3 +174,28 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-cart
+  Outputs:
+    UserPoolId:
+      Value: !Ref CognitoUserPool
+      Export:
+        Name: ${self:provider.stage}-UserPoolId
+
+functions:
+  auth:
+    handler: src/auth.handler
+    environment:
+      USER_POOL_ID: !ImportValue ${self:provider.stage}-UserPoolId
+      USER_POOL_ID2: !Ref CognitoUserPoolClient.UserPoolId
+      USER_POOL_ID3: !GetAtt CognitoUserPoolClient.UserPoolId
+      AWS_REGION: ${opt:region, self:provider.region}
+      
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          authorizer:
+            name: auth
+          cors: true
+          
