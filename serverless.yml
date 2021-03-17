@@ -185,7 +185,6 @@ functions:
     handler: src/auth.handler
     environment:
       USER_POOL_ID: !ImportValue ${self:provider.environment.NAMESPACE}-UserPoolId
-      USER_POOL_ID2: !Ref CognitoUserPoolClient.UserPoolId
       USER_POOL_ID3: !Ref CognitoUserPool
       AWS_REGION: ${opt:region, self:provider.region}
 
