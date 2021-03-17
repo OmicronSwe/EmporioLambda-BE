@@ -217,11 +217,11 @@ functions:
           method: post
           cors: true
 
-  listOfProduct:
-    handler: src/endpoints/product/list.index
+  seacrhOfProduct:
+    handler: src/endpoints/product/search.index
     events:
       - http:
-          path: product
+          path: product/{search?element}
           method: get
           cors: true
 
@@ -247,12 +247,4 @@ functions:
       - http:
           path: product/{id}
           method: delete
-          cors: true
-
-  queryProduct:
-    handler: src/endpoints/product/query.index
-    events:
-      - http:
-          path: product/query
-          method: get
           cors: true
