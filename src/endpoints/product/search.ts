@@ -16,46 +16,43 @@ export const index: APIGatewayProxyHandler = async (event) => {
       return badRequest('PathParameters missing');
     }
 
-    //console.log(event.pathParameters)
-    if (event.pathParameters.includes('search')) {
-      const dataSearch = JSON.parse(decodeURI(event.pathParameters));
+    const dataSearch = JSON.parse(decodeURI(event.pathParameters.search));
 
-      filterExpression = 'contains(#element0, :Value0)';
-      keys.push('name');
-      valueKeys.push(dataSearch.name);
+    filterExpression = 'contains(#element0, :Value0)';
+    keys.push('name');
+    valueKeys.push(dataSearch.name);
 
-      if (dataSearch.minprice || dataSearch.maxprice) {
-        keys.push('price');
+    if (dataSearch.minprice || dataSearch.maxprice) {
+      keys.push('price');
 
-        if (dataSearch.minprice) {
-          priceRange += ' AND #element1 >= :Value1';
-          valueKeys.push(dataSearch.minprice);
-        }
-
-        if (dataSearch.maxprice) {
-          priceRange += ' AND #element1 <= :Value2';
-          valueKeys.push(dataSearch.maxprice);
-        }
+      if (dataSearch.minprice) {
+        priceRange += ' AND #element1 >= :Value1';
+        valueKeys.push(dataSearch.minprice);
       }
 
-      if (dataSearch.category) {
-        keys.push('category');
-        category += ' AND (';
-        let categories: Array<string> = dataSearch.category.split(',');
-        //console.log(categories);
-
-        for (let index = 3; index < categories.length + 3; index++) {
-          category += 'contains(#element2, :Value' + index + ') OR ';
-          valueKeys.push(categories[index - 3]);
-        }
-
-        category = category.slice(0, -4);
-        category += ')';
+      if (dataSearch.maxprice) {
+        priceRange += ' AND #element1 <= :Value2';
+        valueKeys.push(dataSearch.maxprice);
       }
-
-      console.log(valueKeys);
-      filterExpression += priceRange + category;
     }
+
+    if (dataSearch.category) {
+      keys.push('category');
+      category += ' AND (';
+      let categories: Array<string> = dataSearch.category.split(',');
+      //console.log(categories);
+
+      for (let index = 3; index < categories.length + 3; index++) {
+        category += 'contains(#element2, :Value' + index + ') OR ';
+        valueKeys.push(categories[index - 3]);
+      }
+
+      category = category.slice(0, -4);
+      category += ')';
+    }
+
+    console.log(valueKeys);
+    filterExpression += priceRange + category;
   }
 
   console.log(filterExpression);

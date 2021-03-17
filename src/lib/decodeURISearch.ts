@@ -1,8 +1,4 @@
 export const decodeURI = (URI: string) =>
   '{"' +
-  decodeURIComponent(URI)
-    .replace('search?', '')
-    .replace(/"/g, '\\"')
-    .replace(/&/g, '","')
-    .replace(/=/g, '":"') +
+  decodeURIComponent(URI).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') +
   '"}';

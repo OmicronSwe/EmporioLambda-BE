@@ -65,9 +65,9 @@ describe('Product populated table', () => {
 
   it('product query function - should contains only item "test2"', async () => {
     const data: APIGatewayProxyEvent = {
-      pathParameters: encodeURIComponent(
-        'search?name=st2&minprice=10&maxprice=20&category=garden,house'
-      ),
+      pathParameters: {
+        search: encodeURIComponent('name=st2&minprice=10&maxprice=20&category=garden,house'),
+      },
     };
 
     //console.log(data);

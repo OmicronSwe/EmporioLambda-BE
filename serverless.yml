@@ -221,7 +221,7 @@ functions:
     handler: src/endpoints/product/search.index
     events:
       - http:
-          path: product/{search?element}
+          path: product/{search}
           method: get
           cors: true
 
