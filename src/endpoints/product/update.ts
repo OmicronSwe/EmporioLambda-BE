@@ -3,6 +3,9 @@ import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
 
+/**
+ * @param  {} event: event passed when lambda is triggered
+ */
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
     return badRequest('Body missing');
@@ -21,6 +24,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     Object.keys(body),
     Object.values(body)
   ).catch((err) => {
+    //handle dynamoDb error
     console.log(err);
     return null;
   });

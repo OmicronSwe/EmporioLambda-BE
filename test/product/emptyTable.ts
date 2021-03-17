@@ -1,4 +1,4 @@
-/*'use strict';
+'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
@@ -17,9 +17,9 @@ describe('Product empty table', () => {
   const expect = mochaPlugin.chai.expect;
 
   //functions of product
-  const list = mochaPlugin.getWrapper('list', '/src/endpoints/product/list.ts', 'index');
-  const query = mochaPlugin.getWrapper('query', '/src/endpoints/product/query.ts', 'index');
-  const get = mochaPlugin.getWrapper('get', '/src/endpoints/product/getById.ts', 'index');
+  const list = mochaPlugin.getWrapper('index', '/src/endpoints/product/list.ts', 'index');
+  const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
+  const get = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
 
   before((done) => {
     done();
@@ -31,34 +31,40 @@ describe('Product empty table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('Products not found');
   });
 
-  it('product query function - should be "Body missing"', async () => {
+  it('product search function - should be "PathParameters missing"', async () => {
     const data: APIGatewayProxyEvent = {
-      dummy: '{"name": "test", "condition": "getByName"}',
-      pathParameters: {
+      dummy: {
         id: 'test',
       },
     };
 
-    const response = await query.run(data);
+    const response = await search.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal('Body missing');
+    expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
   });
 
-  it('product query function - should be "Condition not supported"', async () => {
+  it('product search function - should be "Bad search path form"', async () => {
     const data: APIGatewayProxyEvent = {
-      body: '{"name": "test", "condition": "getByDescription"}',
       pathParameters: {
-        id: 'test',
+        search: 'dummy',
       },
     };
 
-    const response = await query.run(data);
+    //console.log(data);
+    const response = await search.run(data);
+
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal('Condition not supported');
+    expect(JSON.parse(response.body).error).to.be.equal('Bad search path form');
   });
 
-  it('product query function - should be "Products not found"', async () => {
-    const response = await query.run(data);
+  it('product search function - should be "Products not found"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        search: 'category=dummy',
+      },
+    };
+
+    const response = await search.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Products not found');
   });
@@ -70,10 +76,10 @@ describe('Product empty table', () => {
   });
 
   it('product get function - should be "PathParameters missing"', async () => {
-    const data={
+    const data = {
       dummy: {
         id: 'test',
-      }
+      },
     };
 
     const response = await get.run(data);
@@ -82,14 +88,14 @@ describe('Product empty table', () => {
   });
 
   it('product get function - should be "Failed to get product"', async () => {
-    const data={
+    const data = {
       pathParameters: {
         dummy: 'test',
-      }
+      },
     };
 
     const response = await get.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal('Failed to get product');
   });
-});*/
+});

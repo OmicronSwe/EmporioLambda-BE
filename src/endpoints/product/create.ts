@@ -4,6 +4,9 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
 import Product from '../../lib/model/product';
 
+/**
+ * @param  {} event: event passed when lambda is triggered
+ */
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
     return badRequest('Body missing');
@@ -13,7 +16,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     const product = new Product(JSON.parse(event.body));
     const data = product.getData();
 
-    const newProduct = await Dynamo.write(data, tableName.product).catch((err) => {
+    const newProduct = await Dynamo.write(tableName.product, data).catch((err) => {
+      //handle error of dynamoDB
       console.log(err);
       return null;
     });

@@ -4,15 +4,15 @@ const dynamoDb = new DynamoDB.DocumentClient();
 
 const Dynamo = {
   /**
+   * @param  {string} tableName: the table name
    * @param  {string} primaryKey: the key of the table
    * @param  {string} primaryKeyValue: the value of the key
-   * @param  {string} tableName: the table name
    * @returns Promise
    */
   get: async (
+    tableName: string,
     primaryKey: string,
-    primaryKeyValue: string,
-    tableName: string
+    primaryKeyValue: string
   ): Promise<DynamoDB.AttributeMap> => {
     const params: DynamoDB.DocumentClient.GetItemInput = {
       TableName: tableName,
@@ -31,17 +31,15 @@ const Dynamo = {
         throw Error(`Error in Dynamo get from table ${tableName}: ` + err);
       });
 
-    //console.log(data);
-
     return data.Item ? data.Item : {};
   },
 
   /**
-   * @param  {} data: data in the object JS form to write in the table
    * @param  {string} tableName: table name
+   * @param  {} data: data in the object JS form to write in the table
    * @returns Promise
    */
-  write: async (data, tableName: string): Promise<object> => {
+  write: async (tableName: string, data): Promise<object> => {
     const params: DynamoDB.DocumentClient.PutItemInput = {
       TableName: tableName,
       Item: data,
@@ -72,10 +70,10 @@ const Dynamo = {
     tableName: string,
     primaryKey: string,
     primaryKeyValue: string,
-    updateKey: Array<string>,
+    updateElement: Array<string>,
     updateValue: Array<string>
   ): Promise<DynamoDB.UpdateItemOutput> => {
-    if (updateKey.length != updateValue.length) {
+    if (updateElement.length != updateValue.length) {
       throw Error(
         `Error in Dynamo update in table ${tableName}: Key element and Value element must have the same number element`
       );
@@ -85,17 +83,22 @@ const Dynamo = {
     let AttriNameExpr: { [k: string]: string } = {};
     let AttriValueExpr: { [k: string]: any } = {};
 
-    //create string for update
-    for (let index = 0; index < updateKey.length; index++) {
-      updateExpr += '#element' + index + ' = :Value' + index + ',';
+    //create expression for update
+    for (let index = 0; index < updateElement.length; index++) {
+      updateExpr += '#element' + index + ' = :value' + index + ',';
     }
 
     updateExpr = updateExpr.slice(0, -1);
 
-    //create key and value element for update
-    updateKey.forEach((element, index) => {
+    //create element and value for update
+    updateElement.forEach((element, index) => {
       AttriNameExpr['#element' + index] = element;
-      AttriValueExpr[':Value' + index] = updateValue[index];
+
+      if (isNaN(+updateValue[index])) {
+        AttriValueExpr[':value' + index] = updateValue[index];
+      } else {
+        AttriValueExpr[':value' + index] = Number(updateValue[index]);
+      }
     });
 
     const params: DynamoDB.DocumentClient.UpdateItemInput = {
@@ -117,7 +120,8 @@ const Dynamo = {
       });
   },
 
-  /**
+  /** Usare solo se si conoscono le chiavi primarie, secondarie o gli indici della tabella, perchè almeno uno di questi è necessario
+   *  (più veloce della scan per questo motivo)
    * @param  {string} tableName: name of the table
    * @param  {string} index: index name in the table
    * @param  {Array<string>} element: name of the element (the first must be the key)
@@ -137,11 +141,12 @@ const Dynamo = {
     let AttriNameExpr: { [k: string]: string } = {};
     let AttriValueExpr: { [k: string]: any } = {};
 
-    //create key and value element for query
+    //create element for query
     element.forEach((element, index) => {
       AttriNameExpr['#element' + index] = element;
     });
 
+    //create value for query
     value.forEach((element, index) => {
       if (isNaN(+element)) {
         AttriValueExpr[':Value' + index] = element;
@@ -158,11 +163,10 @@ const Dynamo = {
       ExpressionAttributeValues: AttriValueExpr,
     };
 
+    //add filterExpression if not empty
     if (filterExpression != '') {
       params.FilterExpression = filterExpression;
     }
-
-    console.log(params);
 
     const res = await dynamoDb
       .query(params)
@@ -177,7 +181,8 @@ const Dynamo = {
     return res.Items || [];
   },
 
-  /**
+  /**Percorre tutta la tabella e poi applica le condizioni, per questo più lenta della query. Non serve identificare le
+   * chiavi primarie, secondarie o indici
    * @param  {string} tableName: name of the table
    * @param  {string=''} filterExpression: the expression filter for scan (optional)
    * @param  {Array<string>=[]} element: element of the expression filter (optional)
@@ -193,11 +198,12 @@ const Dynamo = {
     let AttriNameExpr: { [k: string]: string } = {};
     let AttriValueExpr: { [k: string]: any } = {};
 
-    //create key and value element for query
+    //create element for scan
     element.forEach((element, index) => {
       AttriNameExpr['#element' + index] = element;
     });
 
+    //create value for scan
     value.forEach((element, index) => {
       if (isNaN(+element)) {
         AttriValueExpr[':Value' + index] = element;
@@ -210,14 +216,13 @@ const Dynamo = {
       TableName: tableName,
     };
 
+    //add filterExpression if not empty
     if (filterExpression != '') {
       //scan by condition
       params.FilterExpression = filterExpression;
       params.ExpressionAttributeValues = AttriValueExpr;
       params.ExpressionAttributeNames = AttriNameExpr;
     }
-
-    console.log(params);
 
     const res = await dynamoDb
       .scan(params)
@@ -233,11 +238,11 @@ const Dynamo = {
   },
 
   /**
+   * @param  {string} tableName: the table name
    * @param  {string} primaryKey: the key of the table
    * @param  {string} primaryKeyValue: the value of the key
-   * @param  {string} tableName: the table name
    */
-  delete: async (primaryKey: string, primaryKeyValue: string, tableName: string) => {
+  delete: async (tableName: string, primaryKey: string, primaryKeyValue: string) => {
     const params: DynamoDB.DocumentClient.DeleteItemInput = {
       TableName: tableName,
       Key: {
