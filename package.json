@@ -38,11 +38,8 @@
     "eslint": "^7.19.0",
     "eslint-plugin-import": "^2.22.1",
     "git-list-updated": "^1.2.1",
-    "jsonwebtoken": "^8.5.1",
-    "jwk-to-pem": "^2.0.4",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
-    "request": "^2.88.2",
     "save-dev": "^0.0.1-security",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-export-env": "^1.4.1",
@@ -54,6 +51,9 @@
   },
   "dependencies": {
     "stripe": "^8.137.0",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "request": "^2.88.2",
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.4"
   }
 }
