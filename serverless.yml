@@ -174,17 +174,11 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-cart
-  Outputs:
-    UserPoolId:
-      Value: !Ref CognitoUserPool
-      Export:
-        Name: ${self:provider.environment.NAMESPACE}-UserPoolId
 
 functions:
   auth:
     handler: src/auth.handler
     environment:
-      USER_POOL_ID: !ImportValue ${self:provider.environment.NAMESPACE}-UserPoolId
       USER_POOL_ID3: !Ref CognitoUserPool
       AWS_REGION: ${opt:region, self:provider.region}
 

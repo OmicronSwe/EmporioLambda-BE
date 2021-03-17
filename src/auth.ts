@@ -12,8 +12,6 @@ var pems;
 
 exports.handler = function (event, context) {
   console.log(process.env.USER_POOL_ID);
-  console.log(process.env.USER_POOL_ID2);
-  console.log(process.env.USER_POOL_ID3);
   //Download PEM for your UserPool if not already downloaded
   if (!pems) {
     //Download the JWKs and save it as PEM
