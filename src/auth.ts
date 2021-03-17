@@ -2,8 +2,8 @@ console.log('Loading function');
 
 import { decode, verify } from 'jsonwebtoken';
 import { get } from 'request';
-import { jwkToPem } from 'jwk-to-pem';
 import { response, badRequest, badResponse } from './lib/APIResponses';
+import jwkToPem = require('jwk-to-pem');
 
 var userPoolId = process.env.USER_POOL_ID;
 var region = process.env.AWS_REGION;
