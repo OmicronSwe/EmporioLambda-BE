@@ -11,7 +11,7 @@ var iss = 'https://cognito-idp.' + region + '.amazonaws.com/' + userPoolId;
 var pems;
 
 exports.handler = function (event, context) {
-  console.log(process.env.USER_POOL_ID);
+  //console.log(process.env.USER_POOL_ID);
   //Download PEM for your UserPool if not already downloaded
   if (!pems) {
     //Download the JWKs and save it as PEM
@@ -112,13 +112,19 @@ function ValidateToken(pems, event, context) {
   }
   //For more information on specifics of generating policy, refer to blueprint for API Gateway's Custom authorizer in Lambda console
   var policy = new AuthPolicy(principalId, awsAccountId, apiOptions);
-  if (decodedJwt && decodedJwt.payload['cognito:groups'] == 'admin') {
-    policy.allowAllMethods();
+  if (principalId != 'unauthorizedUser') {
+    if (decodedJwt && decodedJwt.payload['cognito:groups'] == 'VenditoreAdmin') {
+      policy.allowAllMethods();
+    } else {
+      //API Accessibili a utenti autenticati
+      policy.allowMethod('GET', '/products');
+      policy.allowMethod('GET', '/products/*');
+    }
   } else {
-    policy.allowMethod('GET', '/pets');
-    policy.allowMethod('GET', '/pets/*');
+    //API Accessibili a utenti non autenticati
+    policy.allowMethod('GET', '/products');
   }
-  console.log(policy);
+  //console.log(policy);
   context.succeed(policy.build());
 }
 
