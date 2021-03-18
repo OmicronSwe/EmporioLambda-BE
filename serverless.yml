@@ -121,17 +121,6 @@ resources:
         #DefaultRedirectURI: da inserire forse
         GenerateSecret: false
 
-    #Cognito - ClienteGroup
-    CognitoGroupCliente:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        Description: Clienti che acquisteranno i prodotti
-        GroupName: Cliente
-        #Precedence: Double
-        #RoleArn: String
-        UserPoolId:
-          Ref: CognitoUserPool
-
     #Cognito - VenditoreAdminGroup
     CognitoGroupVenditoreAdmin:
       Type: AWS::Cognito::UserPoolGroup
@@ -208,12 +197,19 @@ resources:
         TableName: ${self:provider.environment.NAMESPACE}-EML-category
 
 functions:
+  auth:
+    handler: src/auth.handler
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+
   hello:
     handler: handler.hello
     events:
       - http:
           path: hello
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   #TO-DO remove this
