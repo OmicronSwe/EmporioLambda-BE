@@ -2,16 +2,20 @@ import { response, badResponse, badRequest } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
+import Category from '../../lib/model/category';
 
 /**
  * @param  {} event: event passed when lambda is triggered
  */
 export const index: APIGatewayProxyHandler = async (event) => {
-  if (!event.pathParameters) {
-    return badRequest('PathParameters missing');
+  if (!event.body) {
+    return badRequest('Body missing');
   }
 
-  const result = await Dynamo.delete(tableName.category, 'name', event.pathParameters.name).catch(
+  const category = new Category(JSON.parse(event.body));
+  const name = category.getName();
+
+  const result = await Dynamo.delete(tableName.category, 'name', name).catch(
     (err) => {
       //handle error of dynamoDB
       console.log(err);
