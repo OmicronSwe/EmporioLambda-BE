@@ -15,13 +15,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const category = new Category(JSON.parse(event.body));
   const name = category.getName();
 
-  const result = await Dynamo.delete(tableName.category, 'name', name).catch(
-    (err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
+  const result = await Dynamo.delete(tableName.category, 'name', name).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
   if (!result) {
     return badResponse('Failed to delete category');
