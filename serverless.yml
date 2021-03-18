@@ -190,6 +190,23 @@ resources:
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-cart
 
+    CategoryTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NAMESPACE}-EML-category
+
 functions:
   hello:
     handler: handler.hello
@@ -254,5 +271,30 @@ functions:
     events:
       - http:
           path: product/{id}
+          method: delete
+          cors: true
+
+  #CATEGORY
+  listOfCategories:
+    handler: src/endpoints/category/list.index
+    events:
+      - http:
+          path: category
+          method: get
+          cors: true
+
+  createCategory:
+    handler: src/endpoints/category/create.index
+    events:
+      - http:
+          path: category
+          method: post
+          cors: true
+
+  deleteCategory:
+    handler: src/endpoints/category/delete.index
+    events:
+      - http:
+          path: category/{name}
           method: delete
           cors: true
