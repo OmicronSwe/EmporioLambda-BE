@@ -212,15 +212,6 @@ functions:
             name: auth
           cors: true
 
-  #TO-DO remove this
-  imageUpload:
-    handler: functions/uploadImage.uploadImage
-    events:
-      - http:
-          path: image-upload
-          method: POST
-          cors: true
-
   #PRODUCT
   createProduct:
     handler: src/endpoints/product/create.index
