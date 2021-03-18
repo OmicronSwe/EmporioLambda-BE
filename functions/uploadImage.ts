@@ -41,8 +41,6 @@ export const uploadImage: APIGatewayProxyHandler = async (event) => {
     const name = uuid();
     const key = `${name}.${detectedExt}`;
 
-    console.log(`writing image to bucket called ${key}`);
-
     await s3
       .upload({
         Body: buffer,

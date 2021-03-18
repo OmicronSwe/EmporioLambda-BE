@@ -3,6 +3,14 @@ import { S3 } from 'aws-sdk';
 const s3 = new S3();
 
 const S3services = {
+  /**
+   * @param  {Buffer} data: data file that must be pushed to S3
+   * @param  {string} key: key of the data
+   * @param  {string} contentType: exstension of the file
+   * @param  {string} bucket: bucket name where to push file
+   * @param  {string='public-read'} ACL: Access Control List (optional)
+   * @returns Promise
+   */
   upload: async (
     data: Buffer,
     key: string,

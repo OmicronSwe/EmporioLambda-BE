@@ -31,6 +31,39 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.body).message).to.be.equal('Product "test" created correctly');
   });
 
+  it('product create function - should be "Error mime or image not found" with image', async () => {
+    const data: APIGatewayProxyEvent = {
+      body:
+        '{"name": "test", "description": "test_description", "price": 10, "category": ["electric","house"], "image": {"mime":"image/png"}}',
+    };
+
+    const response = await create.run(data);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('Error mime or image not found');
+  });
+
+  it('product create function - should be "Error mime is not allowed" with image', async () => {
+    const data: APIGatewayProxyEvent = {
+      body:
+        '{"name": "test", "description": "test_description", "price": 10, "category": ["electric","house"], "image": {"mime":"image/gif", "imageCode":"base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}',
+    };
+
+    const response = await create.run(data);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('Error mime is not allowed');
+  });
+
+  it('product create function - should be "Error mime types dont match" with image', async () => {
+    const data: APIGatewayProxyEvent = {
+      body:
+        '{"name": "test", "description": "test_description", "price": 10, "category": ["electric","house"], "image": {"mime":"image/jpg", "imageCode":"base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}',
+    };
+
+    const response = await create.run(data);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('Error mime types dont match');
+  });
+
   it('product create function - should be "Failed to create product"', async () => {
     const errorData: APIGatewayProxyEvent = {
       body: '{"name": 1, "description": 2}',

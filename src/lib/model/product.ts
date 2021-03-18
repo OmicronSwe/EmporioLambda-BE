@@ -4,7 +4,7 @@ class Product {
   id: string;
   name: string;
   description: string;
-  image: string;
+  imageURL: string;
   price: number;
   category: Array<string>;
 
@@ -21,7 +21,7 @@ class Product {
     this.name = body.name;
     this.description = body.description;
     this.price = body.price ? body.price : 0;
-    this.image = body.image ? body.image : null;
+    this.imageURL = body.image ? body.image : null;
     this.category = body.category ? body.category : [];
   }
 
@@ -30,7 +30,7 @@ class Product {
       id: this.id,
       name: this.name,
       description: this.description,
-      image: this.image,
+      image: this.imageURL,
       price: this.price,
       category: this.category,
     };

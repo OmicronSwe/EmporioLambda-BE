@@ -4,11 +4,17 @@ import S3services from './s3';
 
 const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 
-export async function ConvertImage(
-  image: string,
-  mime: string,
-  bucketName: string
-): Promise<string> {
+/**
+ * @param  {string} image: code of image (generally base64)
+ * @param  {string} mime: mime of the image (type)
+ * @param  {string} bucketName: bucket where to push the image
+ * @returns Promise
+ */
+export async function pushImage(image: string, mime: string, bucketName: string): Promise<string> {
+  if (!mime || !image) {
+    throw Error('mime or image not found');
+  }
+
   if (!allowedMimes.includes(mime)) {
     throw Error('mime is not allowed');
   }
