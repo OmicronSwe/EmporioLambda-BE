@@ -53,7 +53,7 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('Error mime is not allowed');
   });
 
-  it('product create function - should be "Error mime types dont match" with image', async () => {
+  it('product create function - should be "Error mime types don\'t match" with image', async () => {
     const data: APIGatewayProxyEvent = {
       body:
         '{"name": "test", "description": "test_description", "price": 10, "category": ["electric","house"], "image": {"mime":"image/jpg", "imageCode":"base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}',
@@ -61,7 +61,7 @@ describe('Product populate table', () => {
 
     const response = await create.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal('Error mime types dont match');
+    expect(JSON.parse(response.body).error).to.be.equal("Error mime types don't match");
   });
 
   it('product create function - should be "Failed to create product"', async () => {
@@ -142,19 +142,6 @@ describe('Product populate table', () => {
     expect(body.result.image).to.be.null;
   });
 
-  it('product update function - should be "Failed to update product"', async () => {
-    const errorData: APIGatewayProxyEvent = {
-      body: '{"name": 1, "description": 2}',
-      pathParameters: {
-        name: 'dummy',
-      },
-    };
-
-    const response = await update.run(errorData);
-    expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Failed to update product');
-  });
-
   it('product update function - should be "Body missing"', async () => {
     const errorData: APIGatewayProxyEvent = {
       dummy: '{"name": 1, "description": 2}',
@@ -176,6 +163,18 @@ describe('Product populate table', () => {
     const response = await update.run(errorData);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
+  });
+
+  it('product update function - should be "Product not found"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        id: 'dummy',
+      },
+    };
+
+    const response = await deleteFun.run(data);
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal('Product not found');
   });
 
   it('product delete function - should be "Product deleted correctly"', async () => {
@@ -217,15 +216,15 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
   });
 
-  it('product delete function - should be "Failed to delete product"', async () => {
+  it('product delete function - should be "Product not found"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        dummy: 45,
+        id: 'dummy',
       },
     };
 
     const response = await deleteFun.run(data);
-    expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Failed to delete product');
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal('Product not found');
   });
 });

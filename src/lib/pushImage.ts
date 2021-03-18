@@ -31,7 +31,7 @@ export async function pushImage(image: string, mime: string, bucketName: string)
   const detectedMime = fileInfo!.mime;
 
   if (detectedMime !== mime) {
-    throw Error('mime types dont match');
+    throw Error("mime types don't match");
   }
 
   const name = uuid();
@@ -40,7 +40,7 @@ export async function pushImage(image: string, mime: string, bucketName: string)
   const url = `https://${bucketName}.s3-${process.env.REGION}.amazonaws.com/${key}`;
 
   //upload to s3
-  await S3services.upload(buffer, key, mime, bucketName);
+  await S3services.upload(bucketName, buffer, key, mime);
 
   return url;
 }
