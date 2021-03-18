@@ -2,7 +2,9 @@ import { response, badRequest, badResponse } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
+import bucketName from '../../lib/bucketName';
 import Product from '../../lib/model/product';
+import { ConvertImage } from '../../lib/convertImage';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -10,6 +12,19 @@ import Product from '../../lib/model/product';
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
     return badRequest('Body missing');
+  }
+
+  if (event.body.image && event.body.mime) {
+    try {
+      event.body.image = await ConvertImage(
+        event.body.image,
+        event.body.mime,
+        bucketName.product_image
+      );
+    } catch (err) {
+      //handle logic error of product
+      return badResponse(err.name + ' ' + err.message);
+    }
   }
 
   try {

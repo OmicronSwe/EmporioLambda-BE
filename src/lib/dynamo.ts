@@ -39,13 +39,13 @@ const Dynamo = {
    * @param  {} data: data in the object JS form to write in the table
    * @returns Promise
    */
-  write: async (tableName: string, data): Promise<object> => {
+  write: async (tableName: string, data): Promise<DynamoDB.PutItemOutput> => {
     const params: DynamoDB.DocumentClient.PutItemInput = {
       TableName: tableName,
       Item: data,
     };
 
-    await dynamoDb
+    return await dynamoDb
       .put(params)
       .promise()
       .then((data) => {
@@ -54,8 +54,6 @@ const Dynamo = {
       .catch((err) => {
         throw Error(`Error in Dynamo write in table ${tableName}: ` + err);
       });
-
-    return data;
   },
 
   /**
@@ -242,7 +240,11 @@ const Dynamo = {
    * @param  {string} primaryKey: the key of the table
    * @param  {string} primaryKeyValue: the value of the key
    */
-  delete: async (tableName: string, primaryKey: string, primaryKeyValue: string) => {
+  delete: async (
+    tableName: string,
+    primaryKey: string,
+    primaryKeyValue: string
+  ): Promise<DynamoDB.DeleteItemOutput> => {
     const params: DynamoDB.DocumentClient.DeleteItemInput = {
       TableName: tableName,
       Key: {
