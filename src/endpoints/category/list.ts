@@ -11,11 +11,11 @@ export const index: APIGatewayProxyHandler = async () => {
   });
 
   if (!result) {
-    return badResponse('Failed to scan product');
+    return badResponse('Failed to scan categories');
   }
 
   if (result.length == 0) {
-    return notFound('Products not found');
+    return notFound('Categories not found');
   }
 
   return response({ data: { result } });
