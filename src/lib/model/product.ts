@@ -21,6 +21,7 @@ class Product {
     this.name = body.name;
     this.description = body.description;
     this.price = body.price ? body.price : 0;
+    this.image = body.image ? body.image : null;
     this.category = body.category ? body.category : [];
   }
 
