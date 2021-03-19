@@ -1,48 +1,52 @@
-console.log('Loading function');
-
 import { decode, verify } from 'jsonwebtoken';
-import { get } from 'request';
-import { response, badRequest, badResponse } from './lib/APIResponses';
+import { get, RequestOptions } from 'https';
 import jwkToPem = require('jwk-to-pem');
 
-var userPoolId = process.env.USER_POOL_ID;
-var region = process.env.AWS_REGION;
-var iss = 'https://cognito-idp.' + region + '.amazonaws.com/' + userPoolId;
+let userPoolId: string = process.env.USER_POOL_ID;
+let region: string = process.env.AWS_REGION;
+let iss: string = 'https://cognito-idp.' + region + '.amazonaws.com/' + userPoolId;
 var pems;
 
 exports.handler = function (event, context) {
-  //console.log(process.env.USER_POOL_ID);
   //Download PEM for your UserPool if not already downloaded
   if (!pems) {
     //Download the JWKs and save it as PEM
-    get(
-      {
-        url: iss + '/.well-known/jwks.json',
-        json: true,
-      },
-      function (error, response, body) {
-        //console.log(response);
-        if (!error && response.statusCode === 200) {
-          pems = {};
-          var keys = body['keys'];
-          for (var i = 0; i < keys.length; i++) {
-            //Convert each key to PEM
-            var key_id = keys[i].kid;
-            var modulus = keys[i].n;
-            var exponent = keys[i].e;
-            var key_type = keys[i].kty;
-            var jwk = { kty: key_type, n: modulus, e: exponent };
-            var pem = jwkToPem(jwk);
-            pems[key_id] = pem;
-          }
-          //Now continue with validating the token
-          ValidateToken(pems, event, context);
-        } else {
-          //Unable to download JWKs, fail the call
-          context.fail('error');
-        }
+    const options: RequestOptions = {
+      host: 'cognito-idp.' + region + '.amazonaws.com',
+      path: '/' + userPoolId + '/.well-known/jwks.json',
+    };
+    get(options, (response) => {
+      if (response.statusCode === 200) {
+        pems = {};
+        var data = '';
+        response.setEncoding('utf8');
+        response
+          .on('data', (chunk) => {
+            data += chunk;
+          })
+          .on('end', () => {
+            const json = JSON.parse(data);
+            var keys = json['keys'];
+            for (var i = 0; i < keys.length; i++) {
+              //Convert each key to PEM
+              var key_id = keys[i].kid;
+              var modulus = keys[i].n;
+              var exponent = keys[i].e;
+              var key_type = keys[i].kty;
+              var jwk = { kty: key_type, n: modulus, e: exponent };
+              var pem = jwkToPem(jwk);
+              pems[key_id] = pem;
+            }
+            ValidateToken(pems, event, context);
+          });
+      } else {
+        //Unable to download JWKs, fail the call
+        context.fail('JWKDownloadFail');
       }
-    );
+    }).on('error', (e) => {
+      //Unable to download JWKs, fail the call
+      context.fail('JWKDownloadFail');
+    });
   } else {
     //PEMs are already downloaded, continue with validating the token
     ValidateToken(pems, event, context);
@@ -58,43 +62,44 @@ function ValidateToken(pems, event, context) {
     //Fail if the token is not jwt
     decodedJwt = decode(token, { complete: true });
     if (!decodedJwt) {
-      console.log('Not a valid JWT token');
-      context.fail('Unauthorized');
+      //console.log('Not a valid JWT token');
+      context.fail('BadJWT');
       return;
     }
 
     //Fail if token is not from your UserPool
     if (decodedJwt.payload.iss != iss) {
-      console.log('invalid issuer');
-      context.fail('Unauthorized');
+      //console.log('invalid issuer');
+      context.fail('BadIss');
       return;
     }
 
     //Reject the jwt if it's not an 'Access Token'
     if (decodedJwt.payload.token_use != 'access') {
-      console.log('Not an access token');
-      context.fail('Unauthorized');
+      //console.log('Not an access token');
+      context.fail('BadTokenType');
       return;
     }
 
     //Get the kid from the token and retrieve corresponding PEM
     var kid = decodedJwt.header.kid;
     var pem = pems[kid];
+    console.log(kid, pems);
     if (!pem) {
-      console.log('Invalid access token');
-      context.fail('Unauthorized');
+      //console.log('Invalid access token');
+      context.fail('InvalidToken');
       return;
     }
 
     //Verify the signature of the JWT token to ensure it's really coming from your User Pool
     verify(token, pem, { issuer: iss }, function (err, payload) {
       if (err) {
-        context.fail('Unauthorized');
+        context.fail('ExpiredToken');
       }
     });
     principalId = decodedJwt.payload.sub;
   } else {
-    principalId = 'unauthorizedUser';
+    principalId = 'unauthenticadedUser';
   }
 
   //Get AWS AccountId and API Options
@@ -124,7 +129,6 @@ function ValidateToken(pems, event, context) {
     //API Accessibili a utenti non autenticati
     policy.allowMethod('GET', '/products');
   }
-  //console.log(policy);
   context.succeed(policy.build());
 }
 
