@@ -2,7 +2,7 @@
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
-import '../localDynamoDb';
+import './localDynamoDb';
 
 //test for populated table
 describe('Product populated table', () => {
@@ -12,7 +12,7 @@ describe('Product populated table', () => {
   //functions of product
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/product/list.ts', 'index');
   const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
-  const get = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
+  const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
 
   before(async () => {
@@ -31,8 +31,6 @@ describe('Product populated table', () => {
 
   it('product list function - should contains item "test" and "test 2"', async () => {
     const response = await list.run();
-
-    console.log(response);
 
     const body = JSON.parse(response.body);
 
@@ -231,7 +229,7 @@ describe('Product populated table', () => {
     expect(bodyExclusiveStartKey.result.items[0].name).to.not.be.equal(nameProductReturned);
   });
 
-  it('product get function - should return item "test"', async () => {
+  it('product getById function - should return item "test"', async () => {
     //get id
     const data: APIGatewayProxyEvent = {
       pathParameters: {
@@ -248,7 +246,7 @@ describe('Product populated table', () => {
       },
     };
 
-    const response = await get.run(dataSearch);
+    const response = await getById.run(dataSearch);
     const body = JSON.parse(response.body);
     //console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
