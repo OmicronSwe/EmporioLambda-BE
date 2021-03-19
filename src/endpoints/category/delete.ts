@@ -15,7 +15,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const result = await Dynamo.delete(
     tableName.category,
     'name',
-    decodeURI(event.pathParameters.id)
+    decodeURI(event.pathParameters.name)
   ).catch((err) => {
     //handle error of dynamoDB
     console.log(err);

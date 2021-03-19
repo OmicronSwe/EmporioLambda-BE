@@ -282,6 +282,6 @@ functions:
     handler: src/endpoints/category/delete.index
     events:
       - http:
-          path: category
+          path: category/{name}
           method: delete
           cors: true
