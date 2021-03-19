@@ -45,8 +45,6 @@ describe('Order populated table', () => {
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
-    expect(body.result.items.length).to.be.equal(3);
-
     let checkPrice: number = 0;
     let checkEmail: number = 0;
 

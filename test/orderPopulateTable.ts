@@ -23,7 +23,7 @@ describe('Order populate table', () => {
   it('order create function - should be "Order receive"', async () => {
     const data: APIGatewayProxyEvent = {
       body:
-        '{"email": "test@test.com", "products": [{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 10, "quantity": 2},{"id": "dummy_id_10", "name": "name product 2", "price" : 20, "quantity": 4, "description": "description product 2"}]}',
+        '{"email": "test3@test.com", "products": [{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 10, "quantity": 2},{"id": "dummy_id_10", "name": "name product 2", "price" : 20, "quantity": 4, "description": "description product 2"}]}',
     };
 
     const response = await create.run(data);
