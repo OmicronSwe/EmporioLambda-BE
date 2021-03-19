@@ -128,13 +128,13 @@ const Dynamo = {
    * @param  {string} filterExpression: the expression filter for query (optional)
    * @returns Promise
    */
-  query: async (
+  /*query: async (
     tableName: string,
-    index: string,
-    element: Array<string>,
-    value: Array<string>,
-    keyCondition: string,
-    filterExpression: string = ''
+    element: Array<string> = [],
+    value: Array<string> = [],
+    filterExpression: string = "",
+    limit?: number,
+    exclusiveStartKey?: string,
   ): Promise<DynamoDB.ItemList> => {
     let AttriNameExpr: { [k: string]: string } = {};
     let AttriValueExpr: { [k: string]: any } = {};
@@ -155,15 +155,22 @@ const Dynamo = {
 
     const params: DynamoDB.DocumentClient.QueryInput = {
       TableName: tableName,
-      IndexName: index,
       ExpressionAttributeNames: AttriNameExpr,
-      KeyConditionExpression: keyCondition,
       ExpressionAttributeValues: AttriValueExpr,
     };
 
     //add filterExpression if not empty
     if (filterExpression != '') {
       params.FilterExpression = filterExpression;
+    }
+
+
+    if(limit){
+      params.Limit=limit;
+    }
+
+    if (exclusiveStartKey) {
+      params.ExclusiveStartKey = { item_id: exclusiveStartKey};
     }
 
     const res = await dynamoDb
@@ -177,7 +184,7 @@ const Dynamo = {
       });
 
     return res.Items || [];
-  },
+  },*/
 
   /**Percorre tutta la tabella e poi applica le condizioni, per questo più lenta della query. Non serve identificare le
    * chiavi primarie, secondarie o indici
@@ -185,14 +192,26 @@ const Dynamo = {
    * @param  {string=''} filterExpression: the expression filter for scan (optional)
    * @param  {Array<string>=[]} element: element of the expression filter (optional)
    * @param  {Array<string>=[]} value: value of the expression filter (optional)
+   * @param  {number} limit? : limit of the item result
+   * @param  {object} startKey? key of item in order to get item after this element key (for pagination)
+   * @returns Promise
+   */
+  /**
+   * @param  {string} tableName
+   * @param  {string=""} filterExpression
+   * @param  {Array<string>=[]} element
+   * @param  {Array<string>=[]} value
+   
    * @returns Promise
    */
   scan: async (
     tableName: string,
     filterExpression: string = '',
     element: Array<string> = [],
-    value: Array<string> = []
-  ): Promise<DynamoDB.ItemList> => {
+    value: Array<string> = [],
+    limit?: number,
+    startKey?: object
+  ): Promise<object> => {
     let AttriNameExpr: { [k: string]: string } = {};
     let AttriValueExpr: { [k: string]: any } = {};
 
@@ -222,6 +241,16 @@ const Dynamo = {
       params.ExpressionAttributeNames = AttriNameExpr;
     }
 
+    if (startKey) {
+      //console.log(startKey);
+      params.ExclusiveStartKey = startKey;
+      //console.log(params.ExclusiveStartKey.id);
+    }
+
+    if (limit) {
+      params.Limit = limit;
+    }
+
     const res = await dynamoDb
       .scan(params)
       .promise()
@@ -232,7 +261,7 @@ const Dynamo = {
         throw Error(`Error in Dynamo scan in table ${tableName}: ` + err);
       });
 
-    return res.Items || [];
+    return { items: res.Items || [], lastEvaluatedKey: res.LastEvaluatedKey };
   },
 
   /**

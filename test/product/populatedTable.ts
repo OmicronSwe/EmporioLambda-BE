@@ -22,26 +22,28 @@ describe('Product populated table', () => {
     };
     const data2: APIGatewayProxyEvent = {
       body:
-        '{"name": "test2", "description": "test_description2", "price": 20, "category": ["garden"]}',
+        '{"name": "test 2", "description": "test_description2", "price": 20, "category": ["garden"]}',
     };
 
     await create.run(data);
     await create.run(data2);
   });
 
-  it('product list function - should contains item "test" and "test2"', async () => {
+  it('product list function - should contains item "test" and "test 2"', async () => {
     const response = await list.run();
+
+    console.log(response);
 
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
-    expect(body.result.length).to.be.equal(2);
+    expect(body.result.items.length).to.be.equal(2);
 
     let index_test: number;
     let index_test2: number;
 
-    if (body.result[0].name == 'test') {
+    if (body.result.items[0].name == 'test') {
       index_test = 0;
       index_test2 = 1;
     } else {
@@ -49,24 +51,24 @@ describe('Product populated table', () => {
       index_test2 = 0;
     }
 
-    expect(body.result[index_test].name).to.be.equal('test');
-    expect(body.result[index_test].description).to.be.equal('test_description');
-    expect(body.result[index_test].price).to.be.equal(10);
-    expect(body.result[index_test].category[0]).to.be.equal('electric');
-    expect(body.result[index_test].category[1]).to.be.equal('house');
-    expect(body.result[index_test].image).to.be.null;
+    expect(body.result.items[index_test].name).to.be.equal('test');
+    expect(body.result.items[index_test].description).to.be.equal('test_description');
+    expect(body.result.items[index_test].price).to.be.equal(10);
+    expect(body.result.items[index_test].category[0]).to.be.equal('electric');
+    expect(body.result.items[index_test].category[1]).to.be.equal('house');
+    expect(body.result.items[index_test].image).to.be.null;
 
-    expect(body.result[index_test2].name).to.be.equal('test2');
-    expect(body.result[index_test2].description).to.be.equal('test_description2');
-    expect(body.result[index_test2].price).to.be.equal(20);
-    expect(body.result[index_test2].category[0]).to.be.equal('garden');
-    expect(body.result[index_test2].image).to.be.null;
+    expect(body.result.items[index_test2].name).to.be.equal('test 2');
+    expect(body.result.items[index_test2].description).to.be.equal('test_description2');
+    expect(body.result.items[index_test2].price).to.be.equal(20);
+    expect(body.result.items[index_test2].category[0]).to.be.equal('garden');
+    expect(body.result.items[index_test2].image).to.be.null;
   });
 
-  it('product search function - should contains only item "test2"', async () => {
+  it('product search function - should contains only item "test 2"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        search: encodeURIComponent('name=st2&minprice=10&maxprice=20&category=garden,house'),
+        search: encodeURIComponent('name=st 2&minprice=10&maxprice=20&category=garden,house'),
       },
     };
 
@@ -75,16 +77,16 @@ describe('Product populated table', () => {
 
     const body = JSON.parse(response.body);
 
-    expect(body.result.length).to.be.equal(1);
+    expect(body.result.items.length).to.be.equal(1);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    expect(body.result[0].name).to.be.equal('test2');
-    expect(body.result[0].description).to.be.equal('test_description2');
-    expect(body.result[0].price).to.be.equal(20);
-    expect(body.result[0].category[0]).to.be.equal('garden');
-    expect(body.result[0].image).to.be.null;
+    expect(body.result.items[0].name).to.be.equal('test 2');
+    expect(body.result.items[0].description).to.be.equal('test_description2');
+    expect(body.result.items[0].price).to.be.equal(20);
+    expect(body.result.items[0].category[0]).to.be.equal('garden');
+    expect(body.result.items[0].image).to.be.null;
   });
 
-  it('product search function - should contains item "test" and "test2"', async () => {
+  it('product search function - should contains item "test" and "test 2"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         search: encodeURIComponent('minprice=10&maxprice=20&category=garden,house'),
@@ -98,12 +100,12 @@ describe('Product populated table', () => {
 
     const body = JSON.parse(response.body);
 
-    expect(body.result.length).to.be.equal(2);
+    expect(body.result.items.length).to.be.equal(2);
 
     let index_test: number;
     let index_test2: number;
 
-    if (body.result[0].name == 'test') {
+    if (body.result.items[0].name == 'test') {
       index_test = 0;
       index_test2 = 1;
     } else {
@@ -111,18 +113,18 @@ describe('Product populated table', () => {
       index_test2 = 0;
     }
 
-    expect(body.result[index_test].name).to.be.equal('test');
-    expect(body.result[index_test].description).to.be.equal('test_description');
-    expect(body.result[index_test].price).to.be.equal(10);
-    expect(body.result[index_test].category[0]).to.be.equal('electric');
-    expect(body.result[index_test].category[1]).to.be.equal('house');
-    expect(body.result[index_test].image).to.be.null;
+    expect(body.result.items[index_test].name).to.be.equal('test');
+    expect(body.result.items[index_test].description).to.be.equal('test_description');
+    expect(body.result.items[index_test].price).to.be.equal(10);
+    expect(body.result.items[index_test].category[0]).to.be.equal('electric');
+    expect(body.result.items[index_test].category[1]).to.be.equal('house');
+    expect(body.result.items[index_test].image).to.be.null;
 
-    expect(body.result[index_test2].name).to.be.equal('test2');
-    expect(body.result[index_test2].description).to.be.equal('test_description2');
-    expect(body.result[index_test2].price).to.be.equal(20);
-    expect(body.result[index_test2].category[0]).to.be.equal('garden');
-    expect(body.result[index_test2].image).to.be.null;
+    expect(body.result.items[index_test2].name).to.be.equal('test 2');
+    expect(body.result.items[index_test2].description).to.be.equal('test_description2');
+    expect(body.result.items[index_test2].price).to.be.equal(20);
+    expect(body.result.items[index_test2].category[0]).to.be.equal('garden');
+    expect(body.result.items[index_test2].image).to.be.null;
   });
 
   it('product search function - should contains only item "test" by max price', async () => {
@@ -137,14 +139,14 @@ describe('Product populated table', () => {
 
     const body = JSON.parse(response.body);
 
-    expect(body.result.length).to.be.equal(1);
+    expect(body.result.items.length).to.be.equal(1);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    expect(body.result[0].name).to.be.equal('test');
-    expect(body.result[0].description).to.be.equal('test_description');
-    expect(body.result[0].price).to.be.equal(10);
-    expect(body.result[0].category[0]).to.be.equal('electric');
-    expect(body.result[0].category[1]).to.be.equal('house');
-    expect(body.result[0].image).to.be.null;
+    expect(body.result.items[0].name).to.be.equal('test');
+    expect(body.result.items[0].description).to.be.equal('test_description');
+    expect(body.result.items[0].price).to.be.equal(10);
+    expect(body.result.items[0].category[0]).to.be.equal('electric');
+    expect(body.result.items[0].category[1]).to.be.equal('house');
+    expect(body.result.items[0].image).to.be.null;
   });
 
   it('product search function - should contains item "test" by category', async () => {
@@ -159,17 +161,17 @@ describe('Product populated table', () => {
 
     const body = JSON.parse(response.body);
 
-    expect(body.result.length).to.be.equal(1);
+    expect(body.result.items.length).to.be.equal(1);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    expect(body.result[0].name).to.be.equal('test');
-    expect(body.result[0].description).to.be.equal('test_description');
-    expect(body.result[0].price).to.be.equal(10);
-    expect(body.result[0].category[0]).to.be.equal('electric');
-    expect(body.result[0].category[1]).to.be.equal('house');
-    expect(body.result[0].image).to.be.null;
+    expect(body.result.items[0].name).to.be.equal('test');
+    expect(body.result.items[0].description).to.be.equal('test_description');
+    expect(body.result.items[0].price).to.be.equal(10);
+    expect(body.result.items[0].category[0]).to.be.equal('electric');
+    expect(body.result.items[0].category[1]).to.be.equal('house');
+    expect(body.result.items[0].image).to.be.null;
   });
 
-  it('product search function - should contains item "test2" by min price', async () => {
+  it('product search function - should contains item "test 2" by min price', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         search: encodeURIComponent('minprice=12'),
@@ -181,13 +183,52 @@ describe('Product populated table', () => {
 
     const body = JSON.parse(response.body);
 
-    expect(body.result.length).to.be.equal(1);
+    expect(body.result.items.length).to.be.equal(1);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    expect(body.result[0].name).to.be.equal('test2');
-    expect(body.result[0].description).to.be.equal('test_description2');
-    expect(body.result[0].price).to.be.equal(20);
-    expect(body.result[0].category[0]).to.be.equal('garden');
-    expect(body.result[0].image).to.be.null;
+    expect(body.result.items[0].name).to.be.equal('test 2');
+    expect(body.result.items[0].description).to.be.equal('test_description2');
+    expect(body.result.items[0].price).to.be.equal(20);
+    expect(body.result.items[0].category[0]).to.be.equal('garden');
+    expect(body.result.items[0].image).to.be.null;
+  });
+
+  it('product search function - should contains one item by limit 1 and different item next lastEvaluatedKey', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        search: encodeURIComponent('limit=1'),
+      },
+    };
+
+    //limit1
+    const response = await search.run(data);
+
+    const body = JSON.parse(response.body);
+
+    //console.log(response);
+
+    expect(body.result.items.length).to.be.equal(1);
+
+    const lastEvaluatedKey = body.result.lastEvaluatedKey;
+
+    const nameProductReturned = body.result.items[0].name;
+
+    //ExclusiveStartKey
+    const dataExclusiveStartKey: APIGatewayProxyEvent = {
+      pathParameters: {
+        search: encodeURIComponent('lastEvaluatedKey=' + JSON.stringify(lastEvaluatedKey)),
+      },
+    };
+
+    //console.log(dataExclusiveStartKey)
+
+    const responseExclusiveStartKey = await search.run(dataExclusiveStartKey);
+
+    const bodyExclusiveStartKey = JSON.parse(responseExclusiveStartKey.body);
+
+    //console.log(responseExclusiveStartKey);
+
+    expect(bodyExclusiveStartKey.result.items.length).to.be.equal(1);
+    expect(bodyExclusiveStartKey.result.items[0].name).to.not.be.equal(nameProductReturned);
   });
 
   it('product get function - should return item "test"', async () => {
@@ -199,7 +240,7 @@ describe('Product populated table', () => {
     };
 
     const responseSearch = await search.run(data);
-    const id = JSON.parse(responseSearch.body).result[0].id;
+    const id = JSON.parse(responseSearch.body).result.items[0].id;
 
     const dataSearch: APIGatewayProxyEvent = {
       pathParameters: {
