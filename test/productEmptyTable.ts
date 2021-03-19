@@ -2,7 +2,7 @@
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
-import '../localDynamoDb';
+import './localDynamoDb';
 
 //test for empty table
 describe('Product empty table', () => {
@@ -19,7 +19,7 @@ describe('Product empty table', () => {
   //functions of product
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/product/list.ts', 'index');
   const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
-  const get = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
+  const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
 
   before((done) => {
     done();
@@ -71,32 +71,32 @@ describe('Product empty table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('Products not found');
   });
 
-  it('product get function - should be "Product not found"', async () => {
-    const response = await get.run(data);
+  it('product getById function - should be "Product not found"', async () => {
+    const response = await getById.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Product not found');
   });
 
-  it('product get function - should be "PathParameters missing"', async () => {
+  it('product getById function - should be "PathParameters missing"', async () => {
     const data = {
       dummy: {
         id: 'test',
       },
     };
 
-    const response = await get.run(data);
+    const response = await getById.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
   });
 
-  it('product get function - should be "Failed to get product"', async () => {
+  it('product getById function - should be "Failed to get product"', async () => {
     const data = {
       pathParameters: {
         dummy: 'test',
       },
     };
 
-    const response = await get.run(data);
+    const response = await getById.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal('Failed to get product');
   });

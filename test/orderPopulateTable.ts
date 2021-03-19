@@ -2,7 +2,7 @@
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
-import '../localDynamoDb';
+import './localDynamoDb';
 
 //test for populate table
 describe('Order populate table', () => {
@@ -28,11 +28,8 @@ describe('Order populate table', () => {
 
     const response = await create.run(data);
 
-    console.log(response);
+    //console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(JSON.parse(response.body).message).to.be.equal('Order receive');
   });
-
-
-  
 });

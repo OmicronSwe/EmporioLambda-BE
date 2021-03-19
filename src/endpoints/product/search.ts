@@ -13,9 +13,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   let keys: Array<string> = [];
+  let valueKeys: Array<string> = [];
   let countElement: number = 0;
   let countValue: number = 0;
-  let valueKeys: Array<string> = [];
   let limit: number;
   let dataSearch;
 

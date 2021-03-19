@@ -1,8 +1,8 @@
-/*'use strict';
+'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
-import '../localDynamoDb';
+import './localDynamoDb';
 
 //test for populate table
 describe('Product populate table', () => {
@@ -13,7 +13,7 @@ describe('Product populate table', () => {
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
   const update = mochaPlugin.getWrapper('index', '/src/endpoints/product/update.ts', 'index');
   const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
-  const get = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
+  const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
   const deleteFun = mochaPlugin.getWrapper('index', '/src/endpoints/product/delete.ts', 'index');
 
   before((done) => {
@@ -129,7 +129,7 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.body).message).to.be.equal('Product updated correctly');
 
     //check if item is updated in db
-    const responseAfterUpdate = await get.run(dataSearch);
+    const responseAfterUpdate = await getById.run(dataSearch);
     const body = JSON.parse(responseAfterUpdate.body);
 
     //console.log(body.result);
@@ -199,7 +199,7 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.body).message).to.be.equal('Product deleted correctly');
 
     //check if item is deleted in db
-    const responseAfterUpdate = await get.run(dataSearch);
+    const responseAfterUpdate = await getById.run(dataSearch);
     expect(JSON.parse(responseAfterUpdate.statusCode)).to.be.equal(404);
     expect(JSON.parse(responseAfterUpdate.body).error).to.be.equal('Product not found');
   });
@@ -227,4 +227,4 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Product not found');
   });
-});*/
+});

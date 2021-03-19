@@ -128,14 +128,16 @@ const Dynamo = {
    * @param  {string} filterExpression: the expression filter for query (optional)
    * @returns Promise
    */
-  /*query: async (
+  query: async (
     tableName: string,
-    element: Array<string> = [],
-    value: Array<string> = [],
-    filterExpression: string = "",
+    indexName: string,
+    element: Array<string>,
+    value: Array<string>,
+    keyCondition: string,
+    filterExpression: string = '',
     limit?: number,
-    exclusiveStartKey?: string,
-  ): Promise<DynamoDB.ItemList> => {
+    exclusiveStartKey?: string
+  ): Promise<object> => {
     let AttriNameExpr: { [k: string]: string } = {};
     let AttriValueExpr: { [k: string]: any } = {};
 
@@ -155,6 +157,8 @@ const Dynamo = {
 
     const params: DynamoDB.DocumentClient.QueryInput = {
       TableName: tableName,
+      IndexName: indexName,
+      KeyConditionExpression: keyCondition,
       ExpressionAttributeNames: AttriNameExpr,
       ExpressionAttributeValues: AttriValueExpr,
     };
@@ -164,13 +168,12 @@ const Dynamo = {
       params.FilterExpression = filterExpression;
     }
 
-
-    if(limit){
-      params.Limit=limit;
+    if (limit) {
+      params.Limit = limit;
     }
 
     if (exclusiveStartKey) {
-      params.ExclusiveStartKey = { item_id: exclusiveStartKey};
+      params.ExclusiveStartKey = { item_id: exclusiveStartKey };
     }
 
     const res = await dynamoDb
@@ -183,8 +186,8 @@ const Dynamo = {
         throw Error(`Error in Dynamo query in table in table ${tableName}: ` + err);
       });
 
-    return res.Items || [];
-  },*/
+    return { items: res.Items || [], lastEvaluatedKey: res.LastEvaluatedKey };
+  },
 
   /**Percorre tutta la tabella e poi applica le condizioni, per questo più lenta della query. Non serve identificare le
    * chiavi primarie, secondarie o indici

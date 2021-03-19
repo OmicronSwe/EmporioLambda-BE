@@ -146,16 +146,20 @@ resources:
             AttributeType: S
           - AttributeName: name
             AttributeType: S
+          - AttributeName: date
+            AttributeType: S
 
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-product
         GlobalSecondaryIndexes:
-          - IndexName: name_index
+          - IndexName: name_date_index
             KeySchema:
               - AttributeName: name
                 KeyType: HASH
+              - AttributeName: date
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:

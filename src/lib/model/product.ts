@@ -16,7 +16,7 @@ class Product {
       throw Error('description value not found');
     }
 
-    this.id = uuid();
+    this.id = body.id ? body.id : uuid();
     this.name = body.name;
     this.description = body.description;
     this.price = body.price ? body.price : 0;
