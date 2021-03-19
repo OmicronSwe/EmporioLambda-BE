@@ -14,7 +14,7 @@ export const index: APIGatewayProxyHandler = async () => {
     return badResponse('Failed to scan product');
   }
 
-  if (result.length == 0) {
+  if (result.items.length == 0) {
     return notFound('Products not found');
   }
 

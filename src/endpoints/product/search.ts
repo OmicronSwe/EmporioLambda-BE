@@ -16,7 +16,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   let countElement: number = 0;
   let countValue: number = 0;
   let valueKeys: Array<string> = [];
-
+  let limit: number;
   let dataSearch;
 
   try {
@@ -81,19 +81,34 @@ export const index: APIGatewayProxyHandler = async (event) => {
     filterExpression = filterExpression.slice(0, -4);
   }
 
-  const result = await Dynamo.scan(tableName.product, filterExpression, keys, valueKeys).catch(
-    (err) => {
-      //handle dynamoDb error
-      console.log(err);
-      return null;
-    }
-  );
+  //check if limit of result is present
+  if (dataSearch.limit) {
+    limit = dataSearch.limit;
+  }
+
+  //check if is present lastEvaluatedKEy of product (for pagination)
+  if (dataSearch.lastEvaluatedKey) {
+    dataSearch.lastEvaluatedKey = JSON.parse(dataSearch.lastEvaluatedKey);
+  }
+
+  const result = await Dynamo.scan(
+    tableName.product,
+    filterExpression,
+    keys,
+    valueKeys,
+    limit,
+    dataSearch.lastEvaluatedKey
+  ).catch((err) => {
+    //handle dynamoDb error
+    console.log(err);
+    return null;
+  });
 
   if (!result) {
     return badResponse('Failed to search products');
   }
 
-  if (result.length == 0) {
+  if (result.items.length == 0) {
     return notFound('Products not found');
   }
 

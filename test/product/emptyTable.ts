@@ -27,6 +27,7 @@ describe('Product empty table', () => {
 
   it('product list function - should be "Products not found"', async () => {
     const response = await list.run();
+
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Products not found');
   });
@@ -65,6 +66,7 @@ describe('Product empty table', () => {
     };
 
     const response = await search.run(data);
+
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Products not found');
   });
