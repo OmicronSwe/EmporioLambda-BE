@@ -8,14 +8,14 @@ import { decodeURI } from '../../lib/decodeURISearch';
  * @param  {} event: event passed when lambda is triggered
  */
 export const index: APIGatewayProxyHandler = async (event) => {
-  if (!event.body) {
-    return badRequest('Body missing');
+  if (!event.pathParameters) {
+    return badRequest('PathParameters missing');
   }
 
   const result = await Dynamo.delete(
     tableName.category,
     'name',
-    decodeURI(event.pathParameters.name)
+    decodeURIComponent(event.pathParameters.name)
   ).catch((err) => {
     //handle error of dynamoDB
     console.log(err);
