@@ -19,7 +19,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const result = await Dynamo.query(
     tableName.order,
-    'email_index',
+    'email_date_index',
     keys,
     valueKeys,
     '#element0 = :Value0'

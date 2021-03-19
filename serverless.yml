@@ -146,20 +146,16 @@ resources:
             AttributeType: S
           - AttributeName: name
             AttributeType: S
-          - AttributeName: date
-            AttributeType: S
 
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-product
         GlobalSecondaryIndexes:
-          - IndexName: name_date_index
+          - IndexName: name_index
             KeySchema:
               - AttributeName: name
                 KeyType: HASH
-              - AttributeName: date
-                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
@@ -213,16 +209,20 @@ resources:
             AttributeType: S
           - AttributeName: email
             AttributeType: S
+          - AttributeName: date
+            AttributeType: S
 
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-order
         GlobalSecondaryIndexes:
-          - IndexName: email_index
+          - IndexName: email_date_index
             KeySchema:
               - AttributeName: email
                 KeyType: HASH
+              - AttributeName: date
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
@@ -270,7 +270,7 @@ functions:
           method: get
           cors: true
 
-  getFromIdProduct:
+  getByIdProduct:
     handler: src/endpoints/product/getById.index
     events:
       - http:
@@ -317,4 +317,37 @@ functions:
       - http:
           path: category/{name}
           method: delete
+          cors: true
+
+  #ORDER
+  createOrder:
+    handler: src/endpoints/order/create.index
+    events:
+      - http:
+          path: order
+          method: post
+          cors: true
+
+  listOfOrder:
+    handler: src/endpoints/order/list.index
+    events:
+      - http:
+          path: order
+          method: get
+          cors: true
+
+  getByEmailOrder:
+    handler: src/endpoints/order/getByEmail.index
+    events:
+      - http:
+          path: order/getByEmail/{email}
+          method: get
+          cors: true
+
+  getByIdOrder:
+    handler: src/endpoints/order/getById.index
+    events:
+      - http:
+          path: order/{id}
+          method: get
           cors: true

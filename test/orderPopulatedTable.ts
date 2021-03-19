@@ -39,8 +39,6 @@ describe('Order populated table', () => {
   it('order list function - should contains 3 orders (2 of "test@test.com" and 1 of "test2@test.com")', async () => {
     const response = await list.run();
 
-    //console.log(response);
-
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
