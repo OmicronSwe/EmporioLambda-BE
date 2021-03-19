@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
@@ -227,4 +227,4 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Product not found');
   });
-});
+});*/

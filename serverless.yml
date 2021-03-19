@@ -196,6 +196,35 @@ resources:
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-category
 
+    OrderTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NAMESPACE}-EML-order
+        GlobalSecondaryIndexes:
+          - IndexName: email_index
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
 functions:
   auth:
     handler: src/auth.handler
