@@ -351,3 +351,12 @@ functions:
           path: order/{id}
           method: get
           cors: true
+
+  #CART
+  createCart:
+    handler: src/endpoints/cart/create.index
+    events:
+      - http:
+          path: cart
+          method: post
+          cors: true
