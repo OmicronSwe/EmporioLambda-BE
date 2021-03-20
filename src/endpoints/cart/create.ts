@@ -2,7 +2,7 @@ import { response, badRequest, badResponse } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
-import Cart from '../../lib/model/Cart';
+import Cart from '../../lib/model/cart';
 
 /**
  * @param  {} event: event passed when lambda is triggered
