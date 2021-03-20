@@ -360,3 +360,11 @@ functions:
           path: cart
           method: post
           cors: true
+
+  deleteCart:
+    handler: src/endpoints/cart/delete.index
+    events:
+      - http:
+          path: cart/{email}
+          method: delete
+          cors: true
