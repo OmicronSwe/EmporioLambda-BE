@@ -15,7 +15,24 @@ describe('Product populated table', () => {
   const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
 
+  const createCategory = mochaPlugin.getWrapper(
+    'index',
+    '/src/endpoints/category/create.ts',
+    'index'
+  );
+
   before(async () => {
+    const dataCategory: APIGatewayProxyEvent = {
+      body: '{"name": "garden"}',
+    };
+
+    const dataCategory2: APIGatewayProxyEvent = {
+      body: '{"name": "electric"}',
+    };
+
+    await createCategory.run(dataCategory);
+    await createCategory.run(dataCategory2);
+
     const data: APIGatewayProxyEvent = {
       body:
         '{"name": "test", "description": "test_description", "price": 10, "category": "electric"}',

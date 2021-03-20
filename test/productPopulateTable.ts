@@ -31,6 +31,16 @@ describe('Product populate table', () => {
     expect(JSON.parse(response.body).message).to.be.equal('Product "test" created correctly');
   });
 
+  it('product create function - should be "Category not exist"', async () => {
+    const data: APIGatewayProxyEvent = {
+      body: '{"name": "test", "description": "test_description", "price": 10, "category": "house"}',
+    };
+
+    const response = await create.run(data);
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal('Category not exist');
+  });
+
   it('product create function - should be "Error mime or image not found" with image', async () => {
     const data: APIGatewayProxyEvent = {
       body:

@@ -72,7 +72,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       }
 
       //build condition by category (category == example OR category ==example2)
-      filterExpression += '#element' + countElement + ' = :Value' + (countValue++) + or;
+      filterExpression += '#element' + countElement + ' = :Value' + countValue++ + or;
       valueKeys.push(categories[index]);
     }
     filterExpression += ')';

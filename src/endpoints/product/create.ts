@@ -1,4 +1,4 @@
-import { response, badRequest, badResponse } from '../../lib/APIResponses';
+import { response, badRequest, badResponse, notFound } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
@@ -30,6 +30,25 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     const product = new Product(body);
     const data = product.getData();
+
+    //check if category is in Db
+    if (product.getCategory()) {
+      const category = await Dynamo.get(tableName.category, 'name', product.getCategory()).catch(
+        (err) => {
+          //handle error of dynamoDB
+          console.log(err);
+          return null;
+        }
+      );
+
+      if (!category) {
+        return badResponse('Failed to check category existence');
+      }
+
+      if (Object.keys(category).length === 0) {
+        return notFound('Category not exist');
+      }
+    }
 
     const newProduct = await Dynamo.write(tableName.product, data).catch((err) => {
       //handle error of dynamoDB
