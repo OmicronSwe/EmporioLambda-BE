@@ -13,15 +13,16 @@ describe('Product populated table', () => {
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/product/list.ts', 'index');
   const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
   const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
-  const create = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
-
-  const createCategory = mochaPlugin.getWrapper(
-    'index',
-    '/src/endpoints/category/create.ts',
-    'index'
-  );
 
   before(async () => {
+    const createCategory = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/category/create.ts',
+      'index'
+    );
+
+    const create = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
+
     const dataCategory: APIGatewayProxyEvent = {
       body: '{"name": "garden"}',
     };

@@ -16,8 +16,23 @@ describe('Product populate table', () => {
   const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
   const deleteFun = mochaPlugin.getWrapper('index', '/src/endpoints/product/delete.ts', 'index');
 
-  before((done) => {
-    done();
+  before(async () => {
+    const createCategory = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/category/create.ts',
+      'index'
+    );
+
+    const dataCategory: APIGatewayProxyEvent = {
+      body: '{"name": "electric"}',
+    };
+
+    const dataCategory2: APIGatewayProxyEvent = {
+      body: '{"name": "house"}',
+    };
+
+    await createCategory.run(dataCategory);
+    await createCategory.run(dataCategory2);
   });
 
   it('product create function - should be "Product "test" created correctly"', async () => {
@@ -33,7 +48,8 @@ describe('Product populate table', () => {
 
   it('product create function - should be "Category not exist"', async () => {
     const data: APIGatewayProxyEvent = {
-      body: '{"name": "test", "description": "test_description", "price": 10, "category": "house"}',
+      body:
+        '{"name": "test", "description": "test_description", "price": 10, "category": "domotic"}',
     };
 
     const response = await create.run(data);
