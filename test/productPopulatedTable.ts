@@ -18,11 +18,11 @@ describe('Product populated table', () => {
   before(async () => {
     const data: APIGatewayProxyEvent = {
       body:
-        '{"name": "test", "description": "test_description", "price": 10, "category": ["electric","house"]}',
+        '{"name": "test", "description": "test_description", "price": 10, "category": "electric"}',
     };
     const data2: APIGatewayProxyEvent = {
       body:
-        '{"name": "test 2", "description": "test_description2", "price": 20, "category": ["garden"]}',
+        '{"name": "test 2", "description": "test_description2", "price": 20, "category": "garden"}',
     };
 
     await create.run(data);
@@ -52,21 +52,20 @@ describe('Product populated table', () => {
     expect(body.result.items[index_test].name).to.be.equal('test');
     expect(body.result.items[index_test].description).to.be.equal('test_description');
     expect(body.result.items[index_test].price).to.be.equal(10);
-    expect(body.result.items[index_test].category[0]).to.be.equal('electric');
-    expect(body.result.items[index_test].category[1]).to.be.equal('house');
+    expect(body.result.items[index_test].category).to.be.equal('electric');
     expect(body.result.items[index_test].image).to.be.null;
 
     expect(body.result.items[index_test2].name).to.be.equal('test 2');
     expect(body.result.items[index_test2].description).to.be.equal('test_description2');
     expect(body.result.items[index_test2].price).to.be.equal(20);
-    expect(body.result.items[index_test2].category[0]).to.be.equal('garden');
+    expect(body.result.items[index_test2].category).to.be.equal('garden');
     expect(body.result.items[index_test2].image).to.be.null;
   });
 
   it('product search function - should contains only item "test 2"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        search: encodeURIComponent('name=st 2&minprice=10&maxprice=20&category=garden,house'),
+        search: encodeURIComponent('name=st 2&minprice=10&maxprice=20&category=garden,electric'),
       },
     };
 
@@ -80,14 +79,14 @@ describe('Product populated table', () => {
     expect(body.result.items[0].name).to.be.equal('test 2');
     expect(body.result.items[0].description).to.be.equal('test_description2');
     expect(body.result.items[0].price).to.be.equal(20);
-    expect(body.result.items[0].category[0]).to.be.equal('garden');
+    expect(body.result.items[0].category).to.be.equal('garden');
     expect(body.result.items[0].image).to.be.null;
   });
 
   it('product search function - should contains item "test" and "test 2"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        search: encodeURIComponent('minprice=10&maxprice=20&category=garden,house'),
+        search: encodeURIComponent('minprice=10&maxprice=20&category=garden,electric'),
       },
     };
 
@@ -114,14 +113,13 @@ describe('Product populated table', () => {
     expect(body.result.items[index_test].name).to.be.equal('test');
     expect(body.result.items[index_test].description).to.be.equal('test_description');
     expect(body.result.items[index_test].price).to.be.equal(10);
-    expect(body.result.items[index_test].category[0]).to.be.equal('electric');
-    expect(body.result.items[index_test].category[1]).to.be.equal('house');
+    expect(body.result.items[index_test].category).to.be.equal('electric');
     expect(body.result.items[index_test].image).to.be.null;
 
     expect(body.result.items[index_test2].name).to.be.equal('test 2');
     expect(body.result.items[index_test2].description).to.be.equal('test_description2');
     expect(body.result.items[index_test2].price).to.be.equal(20);
-    expect(body.result.items[index_test2].category[0]).to.be.equal('garden');
+    expect(body.result.items[index_test2].category).to.be.equal('garden');
     expect(body.result.items[index_test2].image).to.be.null;
   });
 
@@ -142,15 +140,14 @@ describe('Product populated table', () => {
     expect(body.result.items[0].name).to.be.equal('test');
     expect(body.result.items[0].description).to.be.equal('test_description');
     expect(body.result.items[0].price).to.be.equal(10);
-    expect(body.result.items[0].category[0]).to.be.equal('electric');
-    expect(body.result.items[0].category[1]).to.be.equal('house');
+    expect(body.result.items[0].category).to.be.equal('electric');
     expect(body.result.items[0].image).to.be.null;
   });
 
   it('product search function - should contains item "test" by category', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        search: encodeURIComponent('category=house'),
+        search: encodeURIComponent('category=electric'),
       },
     };
 
@@ -159,13 +156,12 @@ describe('Product populated table', () => {
 
     const body = JSON.parse(response.body);
 
-    expect(body.result.items.length).to.be.equal(1);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
+    expect(body.result.items.length).to.be.equal(1);
     expect(body.result.items[0].name).to.be.equal('test');
     expect(body.result.items[0].description).to.be.equal('test_description');
     expect(body.result.items[0].price).to.be.equal(10);
-    expect(body.result.items[0].category[0]).to.be.equal('electric');
-    expect(body.result.items[0].category[1]).to.be.equal('house');
+    expect(body.result.items[0].category).to.be.equal('electric');
     expect(body.result.items[0].image).to.be.null;
   });
 
@@ -186,7 +182,7 @@ describe('Product populated table', () => {
     expect(body.result.items[0].name).to.be.equal('test 2');
     expect(body.result.items[0].description).to.be.equal('test_description2');
     expect(body.result.items[0].price).to.be.equal(20);
-    expect(body.result.items[0].category[0]).to.be.equal('garden');
+    expect(body.result.items[0].category).to.be.equal('garden');
     expect(body.result.items[0].image).to.be.null;
   });
 
@@ -254,8 +250,7 @@ describe('Product populated table', () => {
     expect(body.result.name).to.be.equal('test');
     expect(body.result.description).to.be.equal('test_description');
     expect(body.result.price).to.be.equal(10);
-    expect(body.result.category[0]).to.be.equal('electric');
-    expect(body.result.category[1]).to.be.equal('house');
+    expect(body.result.category).to.be.equal('electric');
     expect(body.result.image).to.be.null;
   });
 });

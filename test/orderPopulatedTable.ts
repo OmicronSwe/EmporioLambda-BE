@@ -80,7 +80,7 @@ describe('Order populated table', () => {
     expect(body.result.items[0].products[0].description).to.be.equal('description product 14');
     expect(body.result.items[0].products[0].price).to.be.equal(12.89);
     expect(body.result.items[0].products[0].quantity).to.be.equal(2);
-    expect(body.result.items[0].products[0].category).to.be.empty;
+    expect(body.result.items[0].products[0].category).to.be.null;
     expect(body.result.items[0].products[0].image).to.be.null;
   });
 
@@ -116,7 +116,7 @@ describe('Order populated table', () => {
     expect(body.result.products[0].description).to.be.equal('description product 14');
     expect(body.result.products[0].price).to.be.equal(12.89);
     expect(body.result.products[0].quantity).to.be.equal(2);
-    expect(body.result.products[0].category).to.be.empty;
+    expect(body.result.products[0].category).to.be.null;
     expect(body.result.products[0].image).to.be.null;
   });
 });
