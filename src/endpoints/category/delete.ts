@@ -1,4 +1,4 @@
-import { response, badResponse, badRequest } from '../../lib/APIResponses';
+import { response, badResponse, badRequest, notFound } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
@@ -10,6 +10,23 @@ import { decodeURI } from '../../lib/decodeURISearch';
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.pathParameters) {
     return badRequest('PathParameters missing');
+  }
+
+  const scanCategory = await Dynamo.scan(
+    tableName.product,
+    '#element0 = :Value0',
+    ['category'],
+    [event.pathParameters.name]
+  ).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
+
+  console.log(scanCategory);
+
+  if (scanCategory.items.length >= 1) {
+    return badRequest('Category is being used');
   }
 
   const result = await Dynamo.delete(
