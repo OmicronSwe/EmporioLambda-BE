@@ -351,7 +351,6 @@ functions:
           path: order/{id}
           method: get
           cors: true
-
   #CART
   createCart:
     handler: src/endpoints/cart/create.index
@@ -367,4 +366,36 @@ functions:
       - http:
           path: cart/{email}
           method: delete
+          cors: true
+
+  removeProduct:
+    handler: src/endpoints/cart/removeProduct.index
+    events:
+      - http:
+          path: cart/removeProduct/{email}
+          method: put
+          cors: true
+
+  addProduct:
+    handler: src/endpoints/cart/addProduct.index
+    events:
+      - http:
+          path: cart/addProduct/{email}
+          method: put
+          cors: true
+
+  getByEmail:
+    handler: src/endpoints/cart/getByEmail.index
+    events:
+      - http:
+          path: cart/{email}
+          method: get
+          cors: true
+
+  toEmpty:
+    handler: src/endpoints/cart/toEmpty.index
+    events:
+      - http:
+          path: cart/toEmpty/{email}
+          method: put
           cors: true

@@ -11,17 +11,20 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('PathParameters missing');
   }
 
-  const result = await Dynamo.delete(tableName.cart, 'email', event.pathParameters.email).catch(
-    (err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
+  const data = {
+    email: event.pathParameters.email,
+    products: [],
+  };
+
+  const result = await Dynamo.write(tableName.cart, data).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
   if (!result) {
-    return badResponse('Failed to delete the cart');
+    return badResponse('Failed to empty the cart');
   }
 
-  return response({ data: { message: 'Cart deleted' } });
+  return response({ data: { message: 'Cart emptied' } });
 };

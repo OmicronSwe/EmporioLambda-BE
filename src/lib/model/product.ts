@@ -42,6 +42,21 @@ class Product {
   public getCategory(): string {
     return this.category;
   }
+
+  public isDifference(prod: Product): boolean {
+    if (
+      this.price != prod.price ||
+      this.id != prod.id ||
+      this.imageURL != prod.imageURL ||
+      this.category != prod.category ||
+      this.description != prod.description ||
+      this.name != prod.name
+    ) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
 export default Product;

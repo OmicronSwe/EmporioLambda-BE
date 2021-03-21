@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
@@ -11,19 +11,31 @@ describe('Cart populate table', () => {
 
   //functions of order
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
-  /*const update = mochaPlugin.getWrapper('index', '/src/endpoints/product/update.ts', 'index');
-  const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
-  const get = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');*/
+  const addProduct = mochaPlugin.getWrapper('index', '/src/endpoints/cart/addProduct.ts', 'index');
+  const getByEmail = mochaPlugin.getWrapper('index', '/src/endpoints/cart/getByEmail.ts', 'index');
   const deleteFun = mochaPlugin.getWrapper('index', '/src/endpoints/cart/delete.ts', 'index');
 
-  before((done) => {
-    done();
+  before(async () => {
+
+    const createProd = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
+
+    const data: APIGatewayProxyEvent = {
+      body:
+        '{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 11}',
+    };
+    const data2: APIGatewayProxyEvent = {
+      body:
+        '{"id": "dummy_id_10", "name": "name product 2", "price" : 21,"description": "description product 2"}',
+    };
+
+    await createProd.run(data);
+    await createProd.run(data2);
   });
 
   it('cart create function - should be "Cart saved"', async () => {
     const data: APIGatewayProxyEvent = {
       body:
-        '{"email": "test3@test.com", "products": [{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 11, "quantity": 2},{"id": "dummy_id_10", "name": "name product 2", "price" : 20, "quantity": 4, "description": "description product 2"}]}',
+        '{"email": "test3@test.com", "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
     };
 
     const response = await create.run(data);
@@ -33,7 +45,95 @@ describe('Cart populate table', () => {
     expect(JSON.parse(response.body).message).to.be.equal('Cart saved');
   });
 
-  it('cart delete function - should be "Cart emptied"', async () => {
+  it('cart addProduct function - should be add item to "test3@test.com"', async () => {
+
+    const data: APIGatewayProxyEvent = {
+      body:
+      '{"id": "dummy_id_10", "quantity": 2}',
+      pathParameters: {
+        email: 'test3@test.com',
+      },
+    };
+
+
+    const response = await addProduct.run(data);
+
+    //console.log(response);
+    expect(JSON.parse(response.body).message).to.be.equal('Product "name product 2" added to cart');
+  });
+
+  it('cart addProduct function - should be "Body missing"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      dummy: '{"name": 1, "description": 2}',
+      pathParameters: {
+        name: 'dummy',
+      },
+    };
+
+    const response = await addProduct.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('Body missing');
+  });
+
+  it('cart addProduct function - should be "PathParameters missing"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      body: '{"id": "dummy_id_9", quantity": 2}',
+    };
+
+    const response = await addProduct.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
+  });
+
+  it('cart removeProduct function - should be remove item "dummy_id_10" from "test3@test.com"', async () => {
+
+    const data: APIGatewayProxyEvent = {
+      body:
+      '{"id": "dummy_id_10", "quantity": 2}',
+      pathParameters: {
+        email: 'test3@test.com',
+      },
+    };
+
+
+    const response = await addProduct.run(data);
+
+    const data2: APIGatewayProxyEvent = {
+      pathParameters: {
+          email: 'test3@test.com',
+      },
+  };
+
+    const response2 = await getByEmail.run(data2);
+
+    //console.log(response2);
+    expect(JSON.parse(response.body).message).to.be.equal('Product "name product 2" added to cart');
+  });
+
+  it('cart removeProduct function - should be "Body missing"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      dummy: '{"name": 1, "description": 2}',
+      pathParameters: {
+        name: 'dummy',
+      },
+    };
+
+    const response = await addProduct.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('Body missing');
+  });
+
+  it('cart removeProduct function - should be "PathParameters missing"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      body: '{"id": "dummy_id_9", quantity": 2}',
+    };
+
+    const response = await addProduct.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
+  });
+
+  it('cart delete function - should be "Cart deleted"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         email: 'test3@test.com',
@@ -42,7 +142,7 @@ describe('Cart populate table', () => {
 
     const response = await deleteFun.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    expect(JSON.parse(response.body).message).to.be.equal('Cart emptied');
+    expect(JSON.parse(response.body).message).to.be.equal('Cart deleted');
   });
 
   it('cart delete function - should be "PathParameters missing"', async () => {
@@ -57,7 +157,7 @@ describe('Cart populate table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
   });
 
-  it('cart delete function - should be "Failed to empty the cart"', async () => {
+  it('cart delete function - should be "Failed to delete the cart"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         id: 'dummy',
@@ -66,6 +166,6 @@ describe('Cart populate table', () => {
 
     const response = await deleteFun.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Failed to empty the cart');
+    expect(JSON.parse(response.body).error).to.be.equal('Failed to delete the cart');
   });
-});
+});*/
