@@ -23,7 +23,7 @@ describe('Product populate table', () => {
       'index'
     );
 
-    const dataCategory: APIGatewayProxyEvent = {
+    const dataCategory1: APIGatewayProxyEvent = {
       body: '{"name": "electric"}',
     };
 
@@ -31,7 +31,7 @@ describe('Product populate table', () => {
       body: '{"name": "house"}',
     };
 
-    await createCategory.run(dataCategory);
+    await createCategory.run(dataCategory1);
     await createCategory.run(dataCategory2);
   });
 
@@ -251,5 +251,31 @@ describe('Product populate table', () => {
     const response = await deleteFun.run(data);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Product not found');
+  });
+
+  after(async () => {
+    //functions
+    const deleteCategory = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/category/delete.ts',
+      'index'
+    );
+
+    //data
+    const dataCategory1: APIGatewayProxyEvent = {
+      pathParameters: {
+        name: 'electric',
+      },
+    };
+
+    const dataCategory2: APIGatewayProxyEvent = {
+      pathParameters: {
+        name: 'house',
+      },
+    };
+
+    //delete category
+    await deleteCategory.run(dataCategory1);
+    await deleteCategory.run(dataCategory2);
   });
 });

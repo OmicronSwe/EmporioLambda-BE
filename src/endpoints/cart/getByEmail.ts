@@ -68,7 +68,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     };
   }
 
-  console.log(result);
+  //console.log(result);
 
   return response({ data: { result } });
 };

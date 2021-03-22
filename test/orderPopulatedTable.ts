@@ -13,27 +13,28 @@ describe('Order populated table', () => {
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/order/list.ts', 'index');
   const getById = mochaPlugin.getWrapper('index', '/src/endpoints/order/getById.ts', 'index');
   const getByEmail = mochaPlugin.getWrapper('index', '/src/endpoints/order/getByEmail.ts', 'index');
-  const create = mochaPlugin.getWrapper('index', '/src/endpoints/order/create.ts', 'index');
 
   before(async () => {
-    const data: APIGatewayProxyEvent = {
+    const create = mochaPlugin.getWrapper('index', '/src/endpoints/order/create.ts', 'index');
+
+    const dataOrder1: APIGatewayProxyEvent = {
       body:
         '{"email": "test@test.com", "products": [{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 10, "quantity": 2},{"id": "dummy_id_10", "name": "name product 2", "price" : 20, "quantity": 4, "description": "description product 2"}]}',
     };
 
-    const data2: APIGatewayProxyEvent = {
+    const dataOrder2: APIGatewayProxyEvent = {
       body:
         '{"email": "test@test.com", "products": [{"id": "dummy_id_12","description": "description product 10" ,"name": "name product 10", "price" : 30, "quantity": 1},{"id": "dummy_id_13", "name": "name product 11", "price" : 40, "quantity": 5, "description": "description product 11"}]}',
     };
 
-    const data3: APIGatewayProxyEvent = {
+    const dataOrder3: APIGatewayProxyEvent = {
       body:
         '{"email": "test2@test.com", "products": [{"id": "dummy_id_14","description": "description product 14" ,"name": "name product 14", "price" : 12.89, "quantity": 2}]}',
     };
 
-    await create.run(data);
-    await create.run(data2);
-    await create.run(data3);
+    await create.run(dataOrder1);
+    await create.run(dataOrder2);
+    await create.run(dataOrder3);
   });
 
   it('order list function - should contains 3 orders (2 of "test@test.com" and 1 of "test2@test.com")', async () => {

@@ -15,15 +15,21 @@ describe('Product populated table', () => {
   const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
 
   before(async () => {
+    //functions
     const createCategory = mochaPlugin.getWrapper(
       'index',
       '/src/endpoints/category/create.ts',
       'index'
     );
 
-    const create = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
+    const createProduct = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/product/create.ts',
+      'index'
+    );
 
-    const dataCategory: APIGatewayProxyEvent = {
+    //data
+    const dataCategory1: APIGatewayProxyEvent = {
       body: '{"name": "garden"}',
     };
 
@@ -31,20 +37,22 @@ describe('Product populated table', () => {
       body: '{"name": "electric"}',
     };
 
-    await createCategory.run(dataCategory);
-    await createCategory.run(dataCategory2);
-
-    const data: APIGatewayProxyEvent = {
+    const dataProduct1: APIGatewayProxyEvent = {
       body:
         '{"name": "test", "description": "test_description", "price": 10, "category": "electric"}',
     };
-    const data2: APIGatewayProxyEvent = {
+    const dataProduct2: APIGatewayProxyEvent = {
       body:
         '{"name": "test 2", "description": "test_description2", "price": 20, "category": "garden"}',
     };
 
-    await create.run(data);
-    await create.run(data2);
+    //create category
+    await createCategory.run(dataCategory1);
+    await createCategory.run(dataCategory2);
+
+    //create product
+    await createProduct.run(dataProduct1);
+    await createProduct.run(dataProduct2);
   });
 
   it('product list function - should contains item "test" and "test 2"', async () => {
@@ -270,5 +278,73 @@ describe('Product populated table', () => {
     expect(body.result.price).to.be.equal(10);
     expect(body.result.category).to.be.equal('electric');
     expect(body.result.image).to.be.null;
+  });
+
+  after(async () => {
+    //functions
+    const deleteCategory = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/category/delete.ts',
+      'index'
+    );
+
+    const deleteProduct = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/product/delete.ts',
+      'index'
+    );
+
+    //data
+    const dataProduct1: APIGatewayProxyEvent = {
+      pathParameters: {
+        search: encodeURIComponent('name=test 2'),
+      },
+    };
+
+    const dataProduct2: APIGatewayProxyEvent = {
+      pathParameters: {
+        search: encodeURIComponent('category=electric'),
+      },
+    };
+
+    const dataCategory1: APIGatewayProxyEvent = {
+      pathParameters: {
+        name: 'garden',
+      },
+    };
+
+    const dataCategory2: APIGatewayProxyEvent = {
+      pathParameters: {
+        name: 'electric',
+      },
+    };
+
+    //delete product 1
+    let responseSearch = await search.run(dataProduct1);
+    let id = JSON.parse(responseSearch.body).result.items[0].id;
+
+    let dataSearch: APIGatewayProxyEvent = {
+      pathParameters: {
+        id: id,
+      },
+    };
+
+    await deleteProduct.run(dataSearch);
+
+    //delete product 2
+    responseSearch = await search.run(dataProduct2);
+    id = JSON.parse(responseSearch.body).result.items[0].id;
+
+    dataSearch = {
+      pathParameters: {
+        id: id,
+      },
+    };
+
+    await deleteProduct.run(dataSearch);
+
+    //delete category
+    await deleteCategory.run(dataCategory1);
+    await deleteCategory.run(dataCategory2);
   });
 });

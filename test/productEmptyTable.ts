@@ -21,10 +21,6 @@ describe('Product empty table', () => {
   const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
   const getById = mochaPlugin.getWrapper('index', '/src/endpoints/product/getById.ts', 'index');
 
-  before((done) => {
-    done();
-  });
-
   it('product list function - should be "Products not found"', async () => {
     const response = await list.run();
 
