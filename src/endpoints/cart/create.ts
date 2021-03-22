@@ -15,14 +15,18 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body = JSON.parse(event.body);
 
-  const prodData: Array<object> = new Array<object>();
-
   const dataCart = {
     email: body.email,
   };
 
-  const cart: Cart = new Cart(dataCart);
+  let cart: Cart;
 
+  try {
+    cart = new Cart(dataCart);
+  } catch (err) {
+    //handle logic error of cart
+    return badRequest(err.name + ' ' + err.message);
+  }
   //get info of product
 
   //check if products exist and are modify
@@ -40,27 +44,23 @@ export const index: APIGatewayProxyHandler = async (event) => {
     if (Object.keys(result).length !== 0) {
       const prod: Product = new Product(result);
 
-      cart.addProduct(prod, body.quantity);
+      cart.addProduct(prod, productCart.quantity);
     }
   }
 
   const data = cart.getData();
 
   //push data to dynamodb
-  try {
-    const newCart = await Dynamo.write(tableName.cart, data).catch((err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    });
 
-    if (!newCart) {
-      return badResponse('Failed to save cart');
-    }
+  const newCart = await Dynamo.write(tableName.cart, data).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
-    return response({ data: { message: 'Cart saved' } });
-  } catch (err) {
-    //handle logic error of cart
-    return badRequest(err.name + ' ' + err.message);
+  if (!newCart) {
+    return badResponse('Failed to save cart');
   }
+
+  return response({ data: { message: 'Cart saved' } });
 };

@@ -40,26 +40,25 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const prod: Product = cartFromDB.getProductFromId(body.id);
 
+  if (!prod) {
+    return notFound('Product not found in the cart');
+  }
+
   if (body.quantity) {
     cartFromDB.removeProductByQuantity(prod, body.quantity);
   } else {
     cartFromDB.removeProductTotally(prod);
   }
 
-  try {
-    const newCart = await Dynamo.write(tableName.cart, cartFromDB.getData()).catch((err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    });
+  const newCart = await Dynamo.write(tableName.cart, cartFromDB.getData()).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
-    if (!newCart) {
-      return badResponse('Failed to remove product "' + prod.name + '" from cart');
-    }
-
-    return response({ data: { message: 'Product "' + prod.name + '" removed from cart' } });
-  } catch (err) {
-    //handle logic error of cart
-    return badRequest(err.name + ' ' + err.message);
+  if (!newCart) {
+    return badResponse('Failed to remove product "' + prod.name + '" from cart');
   }
+
+  return response({ data: { message: 'Product "' + prod.name + '" removed from cart' } });
 };

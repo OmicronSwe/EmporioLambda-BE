@@ -36,8 +36,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return notFound('Cart not found');
   }
 
-  const cartFromDB: Cart = new Cart(resultGetCart);
-
   //get info from product id
   const resultGetProduct = await Dynamo.get(tableName.product, 'id', body.id).catch((err) => {
     //handle error of dynamoDB
@@ -55,22 +53,19 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const prod: Product = new Product(resultGetProduct);
 
+  const cartFromDB: Cart = new Cart(resultGetCart);
+
   cartFromDB.addProduct(prod, body.quantity ? body.quantity : 1);
 
-  try {
-    const newCart = await Dynamo.write(tableName.cart, cartFromDB.getData()).catch((err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    });
+  const newCart = await Dynamo.write(tableName.cart, cartFromDB.getData()).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
-    if (!newCart) {
-      return badResponse('Failed to add product "' + prod.name + '" to cart');
-    }
-
-    return response({ data: { message: 'Product "' + prod.name + '" added to cart' } });
-  } catch (err) {
-    //handle logic error of cart
-    return badRequest(err.name + ' ' + err.message);
+  if (!newCart) {
+    return badResponse('Failed to add product "' + prod.name + '" to cart');
   }
+
+  return response({ data: { message: 'Product "' + prod.name + '" added to cart' } });
 };
