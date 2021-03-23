@@ -5,12 +5,11 @@ import { APIGatewayProxyEvent } from 'aws-lambda';
 import './localDynamoDb';
 
 //test for populate table
-describe('Cart populate table', () => {
+describe('Cart populated table', () => {
   const mochaPlugin = require('serverless-mocha-plugin');
   const expect = mochaPlugin.chai.expect;
 
-  //functions of order
-
+  //functions of caart
   const getByEmail = mochaPlugin.getWrapper('index', '/src/endpoints/cart/getByEmail.ts', 'index');
 
   before(async () => {
@@ -23,6 +22,7 @@ describe('Cart populate table', () => {
       body:
         '{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
+
     const dataProduct2: APIGatewayProxyEvent = {
       body:
         '{"id": "dummy_id_10", "name": "name product 2 new", "price" : 21,"description": "description product 2"}',
@@ -39,9 +39,24 @@ describe('Cart populate table', () => {
 
     //create cart
     await createCart.run(dataCart);
+
+    //delete product after create cart
+    const deleteProduct = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/product/delete.ts',
+      'index'
+    );
+
+    const dataProductDelete2: APIGatewayProxyEvent = {
+      pathParameters: {
+        id: 'dummy_id_10',
+      },
+    };
+
+    await deleteProduct.run(dataProductDelete2);
   });
 
-  it('cart getByEmail function - should be return cart "test3@test.com"', async () => {
+  it('cart getByEmail function - should be return cart "test3@test.com" without producy "name product new 2"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         email: 'test3@test.com',
@@ -50,9 +65,58 @@ describe('Cart populate table', () => {
 
     const response = await getByEmail.run(data);
 
-    //console.log(response);
+    const body = JSON.parse(response.body);
+
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    //expect(JSON.parse(response.body).message).to.be.equal('Cart saved');
+    expect(body.result.totalPrice).to.be.equal(22);
+    expect(body.result.email).to.be.equal('test3@test.com');
+    //manage taxes TO-DO
+    expect(body.result.taxesApplied).to.be.equal(0);
+    expect(body.result.products.length).to.be.equal(1);
+    expect(body.result.products[0].id).to.be.equal('dummy_id_9');
+    expect(body.result.products[0].name).to.be.equal('name product 1');
+    expect(body.result.products[0].description).to.be.equal('description product 1');
+    expect(body.result.products[0].price).to.be.equal(11);
+    expect(body.result.products[0].quantity).to.be.equal(2);
+    expect(body.result.products[0].image).to.be.null;
+    expect(body.result.products[0].category).to.be.null;
+    expect(body.result.change.products[0]).to.be.equal(
+      'Product "name product 2 new" no longer available'
+    );
+  });
+
+  it('cart getByEmail function - should be "PathParameters missing"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      body: '{"id": "dummy_id_9", "quantity": 2}',
+    };
+
+    const response = await getByEmail.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
+  });
+
+  it('cart getByEmail function - should be "Failed to get cart"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      pathParameters: {
+        name: 'dummy',
+      },
+    };
+
+    const response = await getByEmail.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(502);
+    expect(JSON.parse(response.body).error).to.be.equal('Failed to get cart');
+  });
+
+  it('cart getByEmail function - should be "Cart not found"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      pathParameters: {
+        email: 'dummy@test.com',
+      },
+    };
+
+    const response = await getByEmail.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal('Cart not found');
   });
 
   after(async () => {
@@ -64,16 +128,9 @@ describe('Cart populate table', () => {
     );
     const deleteCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/delete.ts', 'index');
 
-    //data
     const dataProduct1: APIGatewayProxyEvent = {
       pathParameters: {
         id: 'dummy_id_9',
-      },
-    };
-
-    const dataProduct2: APIGatewayProxyEvent = {
-      pathParameters: {
-        id: 'dummy_id_10',
       },
     };
 
@@ -85,9 +142,8 @@ describe('Cart populate table', () => {
 
     //delete product
     await deleteProduct.run(dataProduct1);
-    await deleteProduct.run(dataProduct2);
 
     //delete cart
-    const response = await deleteCart.run(dataCart);
+    await deleteCart.run(dataCart);
   });
 });

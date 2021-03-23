@@ -33,7 +33,7 @@ class Cart {
   }
 
   public getData(): object {
-    let productsCart = Array.from(this.products.keys());
+    let productsCart = this.getProducts();
     let productsCartObject;
     let productCartArray = [];
 
@@ -56,7 +56,7 @@ class Cart {
   }
 
   public getProductFromId(id: string): Product {
-    for (const element of Array.from(this.products.keys())) {
+    for (const element of this.getProducts()) {
       if (element.id == id) {
         return element;
       }
@@ -70,7 +70,7 @@ class Cart {
     this.products.delete(oldProduct);
     this.products.set(newProduct, quantity);
 
-    let productsCart = Array.from(this.products.keys());
+    let productsCart = this.getProducts();
 
     this.taxesApplied = 0;
     this.totalPrice = 0;
@@ -81,24 +81,49 @@ class Cart {
     });
   }
 
+  public updateTotalPrice(price: number) {
+    this.totalPrice += price;
+
+    if (this.totalPrice < 0) {
+      this.totalPrice = 0;
+    }
+  }
+
+  public updateTaxes(price: number) {
+    this.taxesApplied += price;
+
+    if (this.taxesApplied < 0) {
+      this.taxesApplied = 0;
+    }
+  }
+
   public removeProductTotally(product: Product) {
+    this.updateTotalPrice(-(product.price * this.products.get(product)));
+    //manage taxes TO-DO
     this.products.delete(product);
   }
 
   public removeProductByQuantity(product: Product, quantity: number = 1) {
-    if (this.products.get(product) - quantity > 0)
+    if (this.products.get(product) - quantity > 0) {
+      this.updateTotalPrice(-(product.price * quantity));
+      //manage taxes TO-DO
       this.products.set(product, this.products.get(product) - quantity);
-    else {
+    } else {
       this.removeProductTotally(product);
     }
   }
 
   public addProduct(product: Product, quantity: number = 1) {
-    if (this.products.has(product)) {
-      this.products.set(product, quantity + this.products.get(product));
+    const prod = this.getProductFromId(product.id);
+
+    if (prod) {
+      this.products.set(prod, quantity + this.products.get(prod));
     } else {
       this.products.set(product, quantity);
     }
+
+    this.updateTotalPrice(product.price * quantity);
+    //manage taxes TO-DO
   }
 }
 
