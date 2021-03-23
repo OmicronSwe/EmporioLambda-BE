@@ -8,17 +8,11 @@ import Cognito from '../../lib/cognito';
  * @param  {} event: event passed when lambda is triggered
  */
 export const index: APIGatewayProxyHandler = async (event) => {
-  if (!event.body) {
-    return badRequest('Body missing');
-  }
-  let accessToken: string;
-  try {
-    accessToken = JSON.parse(event.body).accessToken;
-  } catch (err) {
-    return badRequest(err.name + ' ' + err.message);
+  if (!event.pathParameters) {
+    return badRequest('PathParameters missing');
   }
 
-  const result = await Cognito.deleteUser(accessToken).catch((err) => {
+  const result = await Cognito.deleteUser(event.pathParameters.username).catch((err) => {
     //handle error of dynamoDB
     console.log(err);
     return null;

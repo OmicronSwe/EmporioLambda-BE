@@ -1,54 +1,58 @@
 import { CognitoIdentityServiceProvider } from 'aws-sdk';
 
-let userPoolId: string = process.env.USER_POOL_ID;
+/*let userPoolId: string = process.env.USER_POOL_ID;
 let region: string = process.env.AWS_REGION;
 
 const CognitoService = new CognitoIdentityServiceProvider({
   endpoint: 'https://cognito-idp.' + region + '.amazonaws.com/' + userPoolId,
   region: region,
   apiVersion: '2016-04-18',
-});
+});*/
+
+const CognitoService = new CognitoIdentityServiceProvider();
 
 const Cognito = {
   /**
-   * @param  {string} accessToken: user access token
+   * @param  {string} username: username of the user
    * @returns Promise
    */
   getUserAttributes: async (
-    accessToken: string
+    username: string
   ): Promise<CognitoIdentityServiceProvider.AttributeListType> => {
-    console.log(accessToken);
-
-    const params: CognitoIdentityServiceProvider.GetUserRequest = {
-      AccessToken: accessToken,
+    const params: CognitoIdentityServiceProvider.AdminGetUserRequest = {
+      Username: username,
+      UserPoolId: process.env.USER_POOL_ID,
     };
 
-    const data = await CognitoService.getUser(params)
+    const data = await CognitoService.adminGetUser(params)
       .promise()
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in Cognito getUser: ` + err);
+        throw Error(`Error in Cognito adminGetUser: ` + err);
       });
-
-    console.log(data);
 
     return data.UserAttributes ? data.UserAttributes : null;
   },
 
-  getUsername: async (accessToken: string): Promise<string> => {
-    const params: CognitoIdentityServiceProvider.GetUserRequest = {
-      AccessToken: accessToken,
+  /**
+   * @param  {string} username: username of the user
+   * @returns Promise
+   */
+  getUsername: async (username: string): Promise<string> => {
+    const params: CognitoIdentityServiceProvider.AdminGetUserRequest = {
+      Username: username,
+      UserPoolId: process.env.USER_POOL_ID,
     };
 
-    const data = await CognitoService.getUser(params)
+    const data = await CognitoService.adminGetUser(params)
       .promise()
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in Cognito getUser: ` + err);
+        throw Error(`Error in Cognito adminGetUser: ` + err);
       });
 
     return data.Username ? data.Username : null;
@@ -65,7 +69,7 @@ const Cognito = {
   ): Promise<CognitoIdentityServiceProvider.AdminUpdateUserAttributesResponse> => {
     const params: CognitoIdentityServiceProvider.AdminUpdateUserAttributesRequest = {
       UserAttributes: userAttributes,
-      UserPoolId: process.env.NAMESPACE + '-EML-user_pool',
+      UserPoolId: process.env.USER_POOL_ID,
       Username: username,
     };
 
@@ -79,12 +83,17 @@ const Cognito = {
       });
   },
 
-  deleteUser: async (accessToken: string): Promise<{}> => {
-    const params: CognitoIdentityServiceProvider.DeleteUserRequest = {
-      AccessToken: accessToken,
+  /**
+   * @param  {string} username: username of the user
+   * @returns Promise
+   */
+  deleteUser: async (username: string): Promise<{}> => {
+    const params: CognitoIdentityServiceProvider.AdminDeleteUserRequest = {
+      Username: username,
+      UserPoolId: process.env.USER_POOL_ID,
     };
 
-    return await CognitoService.deleteUser()
+    return await CognitoService.adminDeleteUser(params)
       .promise()
       .then((data) => {
         return data;
