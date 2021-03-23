@@ -7,6 +7,7 @@ plugins:
   - serverless-mocha-plugin
   - serverless-dynamodb-local
   - serverless-offline
+  - '@haftahave/serverless-ses-template'
 
 custom:
   serverless-mocha-plugin:
@@ -14,6 +15,9 @@ custom:
       - bash bashScript/startDynamoDBLocal.sh
     postTestCommands:
       - bash bashScript/stopDynamoDBLocal.sh
+
+  sesTemplates:
+    configFile: './lib/orderTemplateEmail.js' # Config file path (default './ses-email-templates/index.js')
 
   dynamodb:
     # If you only want to use DynamoDB Local in some stages, declare them here
@@ -47,6 +51,7 @@ provider:
         - dynamodb:*
         - s3:*
         - cognito-idp:*
+        - ses:*
       Resource: '*'
 
 resources:
@@ -231,6 +236,17 @@ resources:
               WriteCapacityUnits: 1
 
 functions:
+
+  #TEST EMAIL (TO REMOVE)
+
+  testEmail:
+    handler: src/endpoints/order/testEmail.index
+    events:
+      - http:
+          path: testemail
+          method: get
+          cors: true
+
   auth:
     handler: src/auth.handler
     environment:

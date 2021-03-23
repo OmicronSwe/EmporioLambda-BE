@@ -29,6 +29,7 @@ class Cart {
       });
     }
 
+    this.totalPrice+=this.taxesApplied;
     this.email = body.email;
   }
 
