@@ -236,7 +236,6 @@ resources:
               WriteCapacityUnits: 1
 
 functions:
-
   #TEST EMAIL (TO REMOVE)
 
   testEmail:

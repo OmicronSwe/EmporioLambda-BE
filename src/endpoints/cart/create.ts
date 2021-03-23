@@ -1,4 +1,4 @@
-import { response, badRequest, badResponse} from '../../lib/APIResponses';
+import { response, badRequest, badResponse } from '../../lib/APIResponses';
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';

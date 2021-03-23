@@ -3,12 +3,11 @@
 3 * @param {Object} options - runtime options
 4 * @returns {Promise<{name: string, subject: string, html: string, text}[]>}
 5 */
-module.exports = async (serverless, options) => [{
-
-  
-  name: 'orderTemplateEmail',
-  subject: 'EmporioLambda company',
-  html: `<h1>Hi {{name}}, this is your order</h1>
+module.exports = async (serverless, options) => [
+  {
+    name: 'orderTemplateEmail',
+    subject: 'EmporioLambda company',
+    html: `<h1>Hi {{name}}, this is your order</h1>
   <table width="100%" style="max-width:640px;">
     <tr>
       <th></th>
@@ -26,9 +25,10 @@ module.exports = async (serverless, options) => [{
     {{/each}}
   </table>
   <h2>Total price: {{totalPrice}}</h2>`,
-  text: `Hi {{name}}, this is your order:\n\n
+    text: `Hi {{name}}, this is your order:\n\n
     {{#each products}}
       - Product: {{name}} | Price: {{price}} EUR | Quantity: {{quantity}}\n
     {{/each}}
     \nTotal price: {{totalPrice}}`,
-}];
+  },
+];
