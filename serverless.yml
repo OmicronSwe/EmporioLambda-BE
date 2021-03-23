@@ -46,6 +46,7 @@ provider:
       Action:
         - dynamodb:*
         - s3:*
+        - cognito-idp:*
       Resource: '*'
 
 resources:
@@ -398,4 +399,29 @@ functions:
       - http:
           path: cart/toEmpty/{email}
           method: put
+          cors: true
+
+  #USER
+  getUser:
+    handler: src/endpoints/user/getUser.index
+    events:
+      - http:
+          path: user
+          method: post
+          cors: true
+
+  deleteUser:
+    handler: src/endpoints/user/delete.index
+    events:
+      - http:
+          path: user/delete
+          method: delete
+          cors: true
+
+  updateUser:
+    handler: src/endpoints/user/update.index
+    events:
+      - http:
+          path: user/update
+          method: post
           cors: true

@@ -2,7 +2,6 @@ import { response, badResponse, badRequest, notFound } from '../../lib/APIRespon
 import Dynamo from '../../lib/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../lib/tableName';
-import { decodeURI } from '../../lib/decodeURISearch';
 
 /**
  * @param  {} event: event passed when lambda is triggered
