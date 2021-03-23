@@ -20,7 +20,7 @@ module.exports = async (serverless, options) => [
         <td><img src="{{image}}" alt="{{name}}" width="100%"/></td>
         <td><p>{{name}}</p></td>
         <td><p>{{price}} EUR</p></td>
-        <td><p>{{qantity}}</p></td>
+        <td><p>{{quantity}}</p></td>
       </tr>
     {{/each}}
   </table>
