@@ -34,8 +34,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
   let html: string =
     `<h1>Hi ` +
     params.name +
-    ` , this is your order</h1>'
-  <table width="100%" style="max-width:640px;">
+    `,</h1><h2>this is your order</h2><br>
+  <table style="text-align: center;width: 80%;border-spacing: 0 1em;">
     <tr>
       <th></th>
       <th>Product</th>
@@ -46,11 +46,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   params.products.forEach((element) => {
     html +=
-      `<tr><td><img src="` +
+      `<tr><td width="30%"><img width="100%" src="` +
       element.image +
       `" alt="` +
       element.name +
-      `width="100%"/></td>
+      `" /></td>
     <td><p>` +
       element.name +
       `</p></td>
@@ -59,7 +59,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       ` EUR</p></td>
     <td><p>` +
       element.quantity +
-      `</p></td></tr></table>`;
+      `</p></td></tr>`;
 
     text +=
       '- Product: ' +
@@ -70,8 +70,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
       element.quantity +
       '\n';
   });
-  html += '<h2>Total price:' + params.totalPrice + '</h2>';
-  text += '\nTotal price:' + params.totalPrice;
+  html += '</table><br><h2>Total price: ' + params.totalPrice + ' EUR</h2>';
+  text += '\nTotal price: ' + params.totalPrice + ' EUR';
 
   var nodemailer = require('nodemailer');
 
@@ -94,16 +94,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
   };
 
   // send mail with defined transport object
-  let info = await transporter.sendMail(mailOptions, function (error) {
+  return await transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log(error);
-      return null;
+      return badResponse('Failed to send email');
+    } else {
+      return response({ data: { message: 'Email send' } });
     }
   });
-
-  if (info) {
-    return response({ data: { message: 'Email send' } });
-  } else {
-    return badResponse('Failed to send email');
-  }
 };
