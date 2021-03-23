@@ -32,9 +32,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
     ],
   };
 
-  await Ses.sendEmailTemplate(
-    'nicomanto49@gmail.com',
-    'orderTemplateEmail',
-    JSON.stringify(params)
-  );
+  try {
+    await Ses.sendEmailTemplate(
+      'nicomanto49@gmail.com',
+      'orderTemplateEmail',
+      JSON.stringify(params)
+    );
+
+    return response({ data: { message: 'Email inviata' } });
+  } catch (err) {
+    return badResponse(err.name + ' ' + err.message);
+  }
 };
