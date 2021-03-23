@@ -404,24 +404,30 @@ functions:
   #USER
   getUser:
     handler: src/endpoints/user/getUser.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
     events:
       - http:
-          path: user
-          method: post
+          path: user/{username}/
+          method: get
           cors: true
 
   deleteUser:
     handler: src/endpoints/user/delete.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
     events:
       - http:
-          path: user/delete
+          path: user/{username}/delete
           method: delete
           cors: true
 
   updateUser:
     handler: src/endpoints/user/update.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
     events:
       - http:
-          path: user/update
+          path: user/{username}/update
           method: post
           cors: true

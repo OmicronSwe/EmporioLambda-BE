@@ -124,6 +124,7 @@ function ValidateToken(pems, event, context) {
       //API Accessibili a utenti autenticati
       policy.allowMethod('GET', '/products');
       policy.allowMethod('GET', '/products/*');
+      policy.allowMethod('GET', '/user/' + decodedJwt.payload['sub'] + '/*');
     }
   } else {
     //API Accessibili a utenti non autenticati
