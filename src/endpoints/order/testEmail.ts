@@ -1,6 +1,5 @@
-import { response, notFound, badResponse, badRequest } from '../../lib/APIResponses';
+import { response, badRequest, badResponse } from '../../lib/APIResponses';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import Ses from '../../lib/ses';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -32,15 +31,79 @@ export const index: APIGatewayProxyHandler = async (event) => {
     ],
   };
 
-  try {
-    await Ses.sendEmailTemplate(
-      'nicomanto49@gmail.com',
-      'orderTemplateEmail',
-      JSON.stringify(params)
-    );
+  let html: string =
+    `<h1>Hi ` +
+    params.name +
+    ` , this is your order</h1>'
+  <table width="100%" style="max-width:640px;">
+    <tr>
+      <th></th>
+      <th>Product</th>
+      <th>Price</th>
+      <th>Quantity</th>
+    </tr>`;
+  let text: string = 'Hi ' + params.name + ', this is your order:\n\n';
 
-    return response({ data: { message: 'Email inviata' } });
-  } catch (err) {
-    return badResponse(err.name + ' ' + err.message);
+  params.products.forEach((element) => {
+    html +=
+      `<tr><td><img src="` +
+      element.image +
+      `" alt="` +
+      element.name +
+      `width="100%"/></td>
+    <td><p>` +
+      element.name +
+      `</p></td>
+    <td><p>` +
+      element.price +
+      ` EUR</p></td>
+    <td><p>` +
+      element.quantity +
+      `</p></td></tr></table>`;
+
+    text +=
+      '- Product: ' +
+      element.name +
+      ' | Price: ' +
+      element.price +
+      ' EUR | Quantity: ' +
+      element.quantity +
+      '\n';
+  });
+  html += '<h2>Total price:' + params.totalPrice + '</h2>';
+  text += '\nTotal price:' + params.totalPrice;
+
+  var nodemailer = require('nodemailer');
+
+  // create reusable transporter object using the default SMTP transport
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASS_EMAIL,
+    },
+  });
+
+  // setup e-mail data with unicode symbols
+  var mailOptions = {
+    from: '"EmporioLambda company" <omicronswe@gmail.com>', // sender address
+    to: 'nicomanto49@gmail.com', // list of receivers
+    subject: 'Order', // Subject line
+    text: text, // plaintext body
+    html: html, // html body
+  };
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail(mailOptions, function (error) {
+    if (error) {
+      console.log(error);
+      return null;
+    }
+  });
+
+  if (info) {
+    return response({ data: { message: 'Email send' } });
+  } else {
+    return badResponse('Failed to send email');
   }
 };

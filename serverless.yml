@@ -7,7 +7,6 @@ plugins:
   - serverless-mocha-plugin
   - serverless-dynamodb-local
   - serverless-offline
-  - '@haftahave/serverless-ses-template'
 
 custom:
   serverless-mocha-plugin:
@@ -44,6 +43,8 @@ provider:
   environment:
     NAMESPACE: ${opt:stage, self:provider.stage}
     STRIPE_SECRET_KEY: ${ssm:STRIPE_KEY}
+    EMAIL: ${ssm:EMAIL}
+    PASS_EMAIL: ${ssm:PASS_EMAIL}
     REGION: ${opt:region, self:provider.region}
   iamRoleStatements:
     - Effect: Allow
@@ -51,7 +52,6 @@ provider:
         - dynamodb:*
         - s3:*
         - cognito-idp:*
-        - ses:*
       Resource: '*'
 
 resources:
