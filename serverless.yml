@@ -17,7 +17,7 @@ custom:
       - bash bashScript/stopDynamoDBLocal.sh
 
   sesTemplates:
-    configFile: './lib/orderTemplateEmail.js' # Config file path (default './ses-email-templates/index.js')
+    configFile: './src/lib/orderTemplateEmail.js' # Config file path (default './ses-email-templates/index.js')
 
   dynamodb:
     # If you only want to use DynamoDB Local in some stages, declare them here
