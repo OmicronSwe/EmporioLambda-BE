@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
@@ -150,4 +150,4 @@ describe('Cart populated table', () => {
     //delete cart
     await deleteCart.run(dataCart);
   });
-});
+});*/
