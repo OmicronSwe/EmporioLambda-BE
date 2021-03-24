@@ -86,20 +86,28 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // setup e-mail data with unicode symbols
   var mailOptions = {
-    from: '"EmporioLambda company" <omicronswe@gmail.com>', // sender address
+    from: '"EmporioLambda company" <' + process.env.EMAIL + '>', // sender address
     to: 'nicomanto49@gmail.com', // list of receivers
-    subject: 'Order', // Subject line
+    subject: 'Order details', // Subject line
     text: text, // plaintext body
     html: html, // html body
   };
 
   // send mail with defined transport object
-  return await transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-      return badResponse('Failed to send email');
-    } else {
-      return response({ data: { message: 'Email send' } });
-    }
+  let resp = await new Promise((resolve) => {
+    transporter.sendMail(mailOptions, (error) => {
+      if (error) {
+        console.log(error);
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
   });
+
+  if (resp) {
+    return response({ data: { message: 'Email send' } });
+  } else {
+    return badResponse('Failed to send email');
+  }
 };
