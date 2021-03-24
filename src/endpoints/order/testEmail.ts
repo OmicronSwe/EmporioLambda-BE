@@ -98,7 +98,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     transporter.sendMail(mailOptions, (error) => {
       if (error) {
         console.log(error);
-        resolve(false);
+        resolve(error);
       } else {
         resolve(true);
       }
@@ -106,8 +106,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
   });
 
   if (resp) {
+    return badResponse('nooooo ' + resp + ' email: ' + process.env.EMAIL);
     return response({ data: { message: 'Email send' } });
   } else {
-    return badResponse('Failed to send email');
   }
 };
