@@ -20,13 +20,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const body = JSON.parse(event.body);
 
   //get Informations cart
-  const resultGetCart = await Dynamo.get(tableName.cart, 'email', event.pathParameters.email).catch(
-    (err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
+  const resultGetCart = await Dynamo.get(
+    tableName.cart,
+    'username',
+    event.pathParameters.username
+  ).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
   if (!resultGetCart) {
     return badResponse('Failed to get cart');

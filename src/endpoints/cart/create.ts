@@ -16,7 +16,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const body = JSON.parse(event.body);
 
   const dataCart = {
-    email: body.email,
+    username: body.username,
   };
 
   let cart: Cart;

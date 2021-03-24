@@ -12,7 +12,11 @@ describe('Cart populate table', () => {
   //functions of cart
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
   const addProduct = mochaPlugin.getWrapper('index', '/src/endpoints/cart/addProduct.ts', 'index');
-  const getByEmail = mochaPlugin.getWrapper('index', '/src/endpoints/cart/getByEmail.ts', 'index');
+  const getByUsername = mochaPlugin.getWrapper(
+    'index',
+    '/src/endpoints/cart/getByUsername.ts',
+    'index'
+  );
   const deleteFun = mochaPlugin.getWrapper('index', '/src/endpoints/cart/delete.ts', 'index');
   const removeProduct = mochaPlugin.getWrapper(
     'index',
@@ -40,7 +44,7 @@ describe('Cart populate table', () => {
   it('cart create function - should be "Cart saved"', async () => {
     const data: APIGatewayProxyEvent = {
       body:
-        '{"email": "test3@test.com", "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
+        '{"username": "username-string", "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
     };
 
     const response = await create.run(data);
@@ -53,7 +57,7 @@ describe('Cart populate table', () => {
   it('cart create function - should be "Body missing"', async () => {
     const data: APIGatewayProxyEvent = {
       dummy:
-        '{"email": "test3@test.com", "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
+        '{"username": "username-string", "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
     };
 
     const response = await create.run(data);
@@ -63,23 +67,23 @@ describe('Cart populate table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('Body missing');
   });
 
-  it('cart create function - should be "Error email value not found"', async () => {
+  it('cart create function - should be "Error username value not found"', async () => {
     const data: APIGatewayProxyEvent = {
       body:
-        '{"dummy": "test3@test.com", "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
+        '{"dummy": "username-string", "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
     };
 
     const response = await create.run(data);
 
     //console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal('Error email value not found');
+    expect(JSON.parse(response.body).error).to.be.equal('Error username value not found');
   });
 
   it('cart create function - should be "Failed to save cart"', async () => {
     const errorData: APIGatewayProxyEvent = {
       body:
-        '{"email": 1, "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
+        '{"username": 1, "products": [{"id": "dummy_id_9","quantity": 2},{"id": "dummy_id_10","quantity": 4}]}',
     };
 
     const response = await create.run(errorData);
@@ -87,29 +91,29 @@ describe('Cart populate table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('Failed to save cart');
   });
 
-  it('cart getByEmail function - should be return "test3@test.com" cart', async () => {
+  it('cart getByUsername function - should be return "username-string" cart', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
-    const response = await getByEmail.run(data);
+    const response = await getByUsername.run(data);
 
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(body.result.totalPrice).to.be.equal(106);
-    expect(body.result.email).to.be.equal('test3@test.com');
+    expect(body.result.username).to.be.equal('username-string');
     //manage taxes TO-DO
     expect(body.result.taxesApplied).to.be.equal(0);
   });
 
-  it('cart addProduct function - should be add item to "test3@test.com"', async () => {
+  it('cart addProduct function - should be add item to "username-string"', async () => {
     const data: APIGatewayProxyEvent = {
       body: '{"id": "dummy_id_10", "quantity": 2}',
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
@@ -119,20 +123,20 @@ describe('Cart populate table', () => {
     expect(JSON.parse(response.body).message).to.be.equal('Product "name product 2" added to cart');
   });
 
-  it('cart getByEmail function - should be return "test3@test.com" with updated price after add', async () => {
+  it('cart getByUsername function - should be return "username-string" with updated price after add', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
-    const response = await getByEmail.run(data);
+    const response = await getByUsername.run(data);
 
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(body.result.totalPrice).to.be.equal(148);
-    expect(body.result.email).to.be.equal('test3@test.com');
+    expect(body.result.username).to.be.equal('username-string');
     //manage taxes TO-DO
     expect(body.result.taxesApplied).to.be.equal(0);
     expect(body.result.products.length).to.be.equal(2);
@@ -178,7 +182,7 @@ describe('Cart populate table', () => {
     const errorData: APIGatewayProxyEvent = {
       body: '{"id": "dummy_id_9", "quantity": 2}',
       pathParameters: {
-        email: 'dummy@test.com',
+        username: 'dummy-string',
       },
     };
 
@@ -191,7 +195,7 @@ describe('Cart populate table', () => {
     const errorData: APIGatewayProxyEvent = {
       body: '{"dummy": "dummy_id_9", "quantity": 2}',
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
@@ -204,7 +208,7 @@ describe('Cart populate table', () => {
     const errorData: APIGatewayProxyEvent = {
       body: '{"id": "dummy_id_dummy", "quantity": 2}',
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
@@ -217,7 +221,7 @@ describe('Cart populate table', () => {
     const data: APIGatewayProxyEvent = {
       body: '{"id": "dummy_id_9", "quantity": 2}',
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
@@ -229,20 +233,20 @@ describe('Cart populate table', () => {
     );
   });
 
-  it('cart getByEmail function - should be return "test3@test.com" with updated price after remove', async () => {
+  it('cart getByUsername function - should be return "username-string" with updated price after remove', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
-    const response = await getByEmail.run(data);
+    const response = await getByUsername.run(data);
 
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(body.result.totalPrice).to.be.equal(126);
-    expect(body.result.email).to.be.equal('test3@test.com');
+    expect(body.result.username).to.be.equal('username-string');
     //manage taxes TO-DO
     expect(body.result.taxesApplied).to.be.equal(0);
     expect(body.result.products.length).to.be.equal(1);
@@ -255,7 +259,7 @@ describe('Cart populate table', () => {
     expect(body.result.products[0].category).to.be.null;
   });
 
-  it('cart getByEmail function - should be return "test3@test.com" with update product', async () => {
+  it('cart getByUsername function - should be return "username-string" with update product', async () => {
     //update product
     const updateProduct = mochaPlugin.getWrapper(
       'index',
@@ -276,17 +280,17 @@ describe('Cart populate table', () => {
     //get cart
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
-    const response = await getByEmail.run(data);
+    const response = await getByUsername.run(data);
 
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(body.result.totalPrice).to.be.equal(120);
-    expect(body.result.email).to.be.equal('test3@test.com');
+    expect(body.result.username).to.be.equal('username-string');
     //manage taxes TO-DO
     expect(body.result.taxesApplied).to.be.equal(0);
     expect(body.result.products.length).to.be.equal(1);
@@ -306,7 +310,7 @@ describe('Cart populate table', () => {
     const data: APIGatewayProxyEvent = {
       body: '{"id": "dummy_id_25", "quantity": 2}',
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
@@ -342,7 +346,7 @@ describe('Cart populate table', () => {
   it('cart toEmpty function - should be "PathParameters missing"', async () => {
     const data: APIGatewayProxyEvent = {
       dummy: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
@@ -354,7 +358,7 @@ describe('Cart populate table', () => {
   it('cart toEmpty function - should be "Failed to empty the cart"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 1,
+        username: 1,
       },
     };
 
@@ -366,7 +370,7 @@ describe('Cart populate table', () => {
   it('cart toEmpty function - should be "Cart emptied"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 
@@ -378,7 +382,7 @@ describe('Cart populate table', () => {
   it('cart delete function - should be "Cart deleted"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 'test3@test.com',
+        username: 'username-string',
       },
     };
 

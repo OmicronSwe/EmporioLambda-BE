@@ -170,11 +170,11 @@ resources:
       DeletionPolicy: Retain
       Properties:
         KeySchema:
-          - AttributeName: email
+          - AttributeName: username
             KeyType: HASH
 
         AttributeDefinitions:
-          - AttributeName: email
+          - AttributeName: username
             AttributeType: S
 
         ProvisionedThroughput:
@@ -377,7 +377,7 @@ functions:
     handler: src/endpoints/cart/delete.index
     events:
       - http:
-          path: cart/{email}
+          path: cart/{username}
           method: delete
           cors: true
 
@@ -385,7 +385,7 @@ functions:
     handler: src/endpoints/cart/removeProduct.index
     events:
       - http:
-          path: cart/removeProduct/{email}
+          path: cart/removeProduct/{username}
           method: put
           cors: true
 
@@ -393,15 +393,15 @@ functions:
     handler: src/endpoints/cart/addProduct.index
     events:
       - http:
-          path: cart/addProduct/{email}
+          path: cart/addProduct/{username}
           method: put
           cors: true
 
-  getByEmail:
-    handler: src/endpoints/cart/getByEmail.index
+  getByUsername:
+    handler: src/endpoints/cart/getByUsername.index
     events:
       - http:
-          path: cart/{email}
+          path: cart/{username}
           method: get
           cors: true
 
@@ -409,7 +409,7 @@ functions:
     handler: src/endpoints/cart/toEmpty.index
     events:
       - http:
-          path: cart/toEmpty/{email}
+          path: cart/toEmpty/{username}
           method: put
           cors: true
 

@@ -12,7 +12,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   const data = {
-    email: event.pathParameters.email,
+    username: event.pathParameters.username,
     products: [],
   };
 

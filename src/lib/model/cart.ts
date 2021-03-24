@@ -1,14 +1,14 @@
 import Product from './product';
 
 class Cart {
-  email: string;
+  username: string;
   products: Map<Product, number>;
   totalPrice: number;
   taxesApplied: number;
 
   constructor(body) {
-    if (!body.email) {
-      throw Error('email value not found');
+    if (!body.username) {
+      throw Error('username value not found');
     }
 
     //console.log(body);
@@ -30,7 +30,7 @@ class Cart {
     }
 
     this.totalPrice += this.taxesApplied;
-    this.email = body.email;
+    this.username = body.username;
   }
 
   public getData(): object {
@@ -45,7 +45,7 @@ class Cart {
     });
 
     return {
-      email: this.email,
+      username: this.username,
       products: productCartArray,
       totalPrice: this.totalPrice,
       taxesApplied: this.taxesApplied,
