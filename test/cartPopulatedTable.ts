@@ -60,7 +60,7 @@ describe('Cart populated table', () => {
     await deleteProduct.run(dataProductDelete2);
   });
 
-  it('cart getByUsername function - should be return cart "username-string" without producy "name product new 2"', async () => {
+  it('cart getByUsername function - should be return cart "username-string" without product "name product new 2"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         username: 'username-string',

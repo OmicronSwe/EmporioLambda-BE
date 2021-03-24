@@ -258,6 +258,15 @@ functions:
             name: auth
           cors: true
 
+  #CHECKOUT
+  createSessionIDStripe:
+    handler: src/endpoints/checkout/createSessionStripe.index
+    events:
+      - http:
+          path: createSessionStripe
+          method: post
+          cors: true
+
   #PRODUCT
   createProduct:
     handler: src/endpoints/product/create.index

@@ -66,6 +66,10 @@ class Cart {
     return null;
   }
 
+  public getProductQuantity(product: Product): number {
+    return this.products.get(product);
+  }
+
   public updateProduct(oldProduct: Product, newProduct: Product) {
     let quantity: number = this.products.get(oldProduct);
     this.products.delete(oldProduct);
@@ -125,6 +129,25 @@ class Cart {
 
     this.updateTotalPrice(product.price * quantity);
     //manage taxes TO-DO
+  }
+
+  public getProductsInfoCheckout(): Array<object> {
+    const lineItems: Array<object> = new Array<object>();
+
+    this.getProducts().forEach((element) => {
+      const prodCheckout = {
+        name: element.name,
+        description: element.description,
+        image: element.imageURL,
+        amount: element.price,
+        currency: 'EUR',
+        quantity: this.getProductQuantity(element),
+      };
+
+      lineItems.push(prodCheckout);
+    });
+
+    return lineItems;
   }
 }
 

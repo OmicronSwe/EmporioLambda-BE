@@ -1,38 +1,36 @@
 import { v4 as uuid } from 'uuid';
 import Product from './product';
+import Cart from './cart';
 
 class Order {
   id: string;
+  username: string;
   email: string;
   products: Map<Product, number>;
   totalPrice: number;
   taxesApplied: number;
   date: Date;
 
-  constructor(body) {
-    if (!body.email) {
+  constructor(cart: Cart, email: string) {
+    if (!cart.username) {
+      throw Error('username value not found');
+    }
+
+    if (!email) {
       throw Error('email value not found');
     }
-    if (!body.products) {
+
+    if (cart.products.size <= 0) {
       throw Error('products list not found');
     }
 
     //console.log(body);
 
-    this.products = new Map<Product, number>();
-    this.taxesApplied = 0;
-    this.totalPrice = 0;
-
-    body.products.forEach((element) => {
-      const prod = new Product(element);
-      this.products.set(prod, element.quantity);
-      this.totalPrice += prod.getPrice() * element.quantity;
-
-      //manage taxes TO-DO
-    });
-
-    this.id = body.id ? body.id : uuid();
-    this.email = body.email;
+    this.products = cart.products;
+    this.taxesApplied = cart.taxesApplied;
+    this.totalPrice = cart.totalPrice;
+    this.id = uuid();
+    this.username = cart.username;
     this.date = new Date();
   }
 
@@ -49,7 +47,7 @@ class Order {
 
     return {
       id: this.id,
-      email: this.email,
+      username: this.username,
       products: productOrderArray,
       totalPrice: this.totalPrice,
       taxesApplied: this.taxesApplied,

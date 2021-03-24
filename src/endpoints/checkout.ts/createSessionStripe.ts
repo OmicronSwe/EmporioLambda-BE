@@ -5,6 +5,7 @@ import tableName from '../../lib/tableName';
 import Order from '../../lib/model/order';
 import Cart from '../../lib/model/cart';
 import Product from '../../lib/model/product';
+import Stripe from '../../lib/stripe';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -14,13 +15,13 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('Body missing');
   }
 
-  let result = await Dynamo.get(tableName.cart, 'username', event.pathParameters.username).catch(
-    (err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
+  const body = JSON.parse(event.body);
+
+  let result = await Dynamo.get(tableName.cart, 'username', body.username).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
   if (!result) {
     return badResponse('Failed to get cart');
@@ -59,24 +60,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   }
 
-  //push data to dynamodb
+  //create stripe session
   try {
-    let order: Order = new Order(cart, 'dummy');
-    const data = order.getData();
+    const sessionStripeId = await Stripe.createSession(cart, body.successurl, body.cancelurl);
 
-    const newOrder = await Dynamo.write(tableName.order, data).catch((err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    });
-
-    if (!newOrder) {
-      return badResponse('Failed to receive order');
-    }
-
-    return response({ data: { message: 'Order receive' } });
+    return response({ data: { sessionid: sessionStripeId } });
   } catch (err) {
-    //handle logic error of order
-    return badRequest(err.name + ' ' + err.message);
+    //handle error of stripe
+    console.log(err);
+    return badResponse('Enable to create sessione of Stripe');
   }
 };
