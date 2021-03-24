@@ -86,7 +86,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // setup e-mail data with unicode symbols
   var mailOptions = {
-    from: '"EmporioLambda Company" <' + process.env.EMAIL + '>', // sender address
+    from: '"EmporioLambda company" <' + process.env.EMAIL + '>', // sender address
     to: 'nicomanto49@gmail.com', // list of receivers
     subject: 'Order details', // Subject line
     text: text, // plaintext body
@@ -98,8 +98,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
     transporter.sendMail(mailOptions, (error) => {
       if (error) {
         console.log(error);
-        console.log(process.env.EMAIL);
-        console.log(process.env.PASS_EMAIL);
         resolve(false);
       } else {
         resolve(true);
