@@ -165,23 +165,6 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
 
-    CartTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        KeySchema:
-          - AttributeName: username
-            KeyType: HASH
-
-        AttributeDefinitions:
-          - AttributeName: username
-            AttributeType: S
-
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.NAMESPACE}-EML-cart
-
     CategoryTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
