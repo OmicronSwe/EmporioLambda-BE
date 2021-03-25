@@ -1,34 +1,56 @@
-/**
-2 * @param {Object} serverless - Serverless instance
-3 * @param {Object} options - runtime options
-4 * @returns {Promise<{name: string, subject: string, html: string, text}[]>}
-5 */
-module.exports = async (serverless, options) => [
-  {
-    name: 'orderTemplateEmail',
-    subject: 'EmporioLambda company',
-    html: `<h1>Hi {{name}}, this is your order</h1>
-  <table width="100%" style="max-width:640px;">
+import Product from './model/product';
+
+export const HMTLTemplate = (
+  productList: Map<Product, number>,
+  totalPrice: number,
+  nameCustomer: string
+): string => {
+  let html: string =
+    `<h1>Hi ` +
+    nameCustomer +
+    `,</h1><h2>this is your order</h2><br>
+  <table style="text-align: center;width: 80%;border-spacing: 0 1em;">
     <tr>
       <th></th>
       <th>Product</th>
       <th>Price</th>
       <th>Quantity</th>
-    </tr>
-    {{#each products}}
-      <tr>
-        <td><img src="{{image}}" alt="{{name}}" width="100%"/></td>
-        <td><p>{{name}}</p></td>
-        <td><p>{{price}} EUR</p></td>
-        <td><p>{{quantity}}</p></td>
-      </tr>
-    {{/each}}
-  </table>
-  <h2>Total price: {{totalPrice}}</h2>`,
-    text: `Hi {{name}}, this is your order:\n\n
-    {{#each products}}
-      - Product: {{name}} | Price: {{price}} EUR | Quantity: {{quantity}}\n
-    {{/each}}
-    \nTotal price: {{totalPrice}}`,
-  },
-];
+    </tr>`;
+
+  productList.forEach((value: number, key: Product) => {
+    html +=
+      `<tr><td width="30%"><img width="100%" src="` +
+      key.imageURL +
+      `" alt="` +
+      key.name +
+      `" /></td>
+    <td><p>` +
+      key.name +
+      `</p></td>
+    <td><p>` +
+      key.price +
+      ` EUR</p></td>
+    <td><p>` +
+      value +
+      `</p></td></tr>`;
+  });
+  html += '</table><br><h2>Total price: ' + totalPrice + ' EUR</h2>';
+
+  return html;
+};
+
+export const TXTTemplate = (
+  productList: Map<Product, number>,
+  totalPrice: number,
+  nameCustomer: string
+): string => {
+  let text: string = 'Hi ' + nameCustomer + ', this is your order:\n\n';
+
+  productList.forEach((value: number, key: Product) => {
+    text +=
+      '- Product: ' + key.name + ' | Price: ' + key.price + ' EUR | Quantity: ' + value + '\n';
+  });
+  text += '\nTotal price: ' + totalPrice + ' EUR';
+
+  return text;
+};

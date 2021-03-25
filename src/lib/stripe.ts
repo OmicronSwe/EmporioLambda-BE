@@ -10,7 +10,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
 const Stripe = {
   createSession: async (cart: Cart, successUrl: string, cancelUrl: string): Promise<string> => {
     try {
-      const session = await stripe.checkout.sessions.create({
+      const params = {
         payment_method_types: ['card'],
         mode: 'payment',
         customer: cart.username,
@@ -19,7 +19,10 @@ const Stripe = {
         cancel_url: cancelUrl,
         amount_subtotal: cart.totalPrice - cart.taxesApplied,
         amount_total: cart.totalPrice,
-      });
+      };
+
+      console.log(params);
+      const session = await stripe.checkout.sessions.create(params);
 
       return session.id;
     } catch (err) {

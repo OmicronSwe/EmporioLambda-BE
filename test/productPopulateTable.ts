@@ -158,7 +158,7 @@ describe('Product populate table', () => {
     const responseAfterUpdate = await getById.run(dataSearch);
     const body = JSON.parse(responseAfterUpdate.body);
 
-    //console.log(body.result);
+    console.log(body.result);
     expect(JSON.parse(responseAfterUpdate.statusCode)).to.be.equal(200);
     expect(body.result.name).to.be.equal('test_update');
     expect(body.result.description).to.be.equal('test_description_update');
