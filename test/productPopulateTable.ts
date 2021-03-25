@@ -164,7 +164,7 @@ describe('Product populate table', () => {
     expect(body.result.description).to.be.equal('test_description_update');
     expect(body.result.price).to.be.equal(20);
     expect(body.result.category).to.be.equal('garden');
-    expect(body.result.image).to.be.null;
+    expect(body.result.imageUrl).to.be.null;
   });
 
   it('product update function - should be "Body missing"', async () => {

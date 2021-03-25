@@ -79,13 +79,13 @@ describe('Product populated table', () => {
     expect(body.result.items[index_test].description).to.be.equal('test_description');
     expect(body.result.items[index_test].price).to.be.equal(10);
     expect(body.result.items[index_test].category).to.be.equal('electric');
-    expect(body.result.items[index_test].image).to.be.null;
+    expect(body.result.items[index_test].imageUrl).to.be.null;
 
     expect(body.result.items[index_test2].name).to.be.equal('test 2');
     expect(body.result.items[index_test2].description).to.be.equal('test_description2');
     expect(body.result.items[index_test2].price).to.be.equal(20);
     expect(body.result.items[index_test2].category).to.be.equal('garden');
-    expect(body.result.items[index_test2].image).to.be.null;
+    expect(body.result.items[index_test2].imageUrl).to.be.null;
   });
 
   it('product search function - should contains only item "test 2"', async () => {
@@ -106,7 +106,7 @@ describe('Product populated table', () => {
     expect(body.result.items[0].description).to.be.equal('test_description2');
     expect(body.result.items[0].price).to.be.equal(20);
     expect(body.result.items[0].category).to.be.equal('garden');
-    expect(body.result.items[0].image).to.be.null;
+    expect(body.result.items[0].imageUrl).to.be.null;
   });
 
   it('product search function - should contains item "test" and "test 2"', async () => {
@@ -140,13 +140,13 @@ describe('Product populated table', () => {
     expect(body.result.items[index_test].description).to.be.equal('test_description');
     expect(body.result.items[index_test].price).to.be.equal(10);
     expect(body.result.items[index_test].category).to.be.equal('electric');
-    expect(body.result.items[index_test].image).to.be.null;
+    expect(body.result.items[index_test].imageUrl).to.be.null;
 
     expect(body.result.items[index_test2].name).to.be.equal('test 2');
     expect(body.result.items[index_test2].description).to.be.equal('test_description2');
     expect(body.result.items[index_test2].price).to.be.equal(20);
     expect(body.result.items[index_test2].category).to.be.equal('garden');
-    expect(body.result.items[index_test2].image).to.be.null;
+    expect(body.result.items[index_test2].imageUrl).to.be.null;
   });
 
   it('product search function - should contains only item "test" by max price', async () => {
@@ -167,7 +167,7 @@ describe('Product populated table', () => {
     expect(body.result.items[0].description).to.be.equal('test_description');
     expect(body.result.items[0].price).to.be.equal(10);
     expect(body.result.items[0].category).to.be.equal('electric');
-    expect(body.result.items[0].image).to.be.null;
+    expect(body.result.items[0].imageUrl).to.be.null;
   });
 
   it('product search function - should contains item "test" by category', async () => {
@@ -188,7 +188,7 @@ describe('Product populated table', () => {
     expect(body.result.items[0].description).to.be.equal('test_description');
     expect(body.result.items[0].price).to.be.equal(10);
     expect(body.result.items[0].category).to.be.equal('electric');
-    expect(body.result.items[0].image).to.be.null;
+    expect(body.result.items[0].imageUrl).to.be.null;
   });
 
   it('product search function - should contains item "test 2" by min price', async () => {
@@ -209,7 +209,7 @@ describe('Product populated table', () => {
     expect(body.result.items[0].description).to.be.equal('test_description2');
     expect(body.result.items[0].price).to.be.equal(20);
     expect(body.result.items[0].category).to.be.equal('garden');
-    expect(body.result.items[0].image).to.be.null;
+    expect(body.result.items[0].imageUrl).to.be.null;
   });
 
   it('product search function - should contains one item by limit 1 and different item next lastEvaluatedKey', async () => {
@@ -277,7 +277,7 @@ describe('Product populated table', () => {
     expect(body.result.description).to.be.equal('test_description');
     expect(body.result.price).to.be.equal(10);
     expect(body.result.category).to.be.equal('electric');
-    expect(body.result.image).to.be.null;
+    expect(body.result.imageUrl).to.be.null;
   });
 
   after(async () => {

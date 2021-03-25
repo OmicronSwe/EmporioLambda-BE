@@ -80,44 +80,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
 
     //send email;
-
-    var nodemailer = require('nodemailer');
-
-    // create reusable transporter object using the default SMTP transport
-    var transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASS_EMAIL,
-      },
-    });
-
-    // setup e-mail data with unicode symbols
-    var mailOptions = {
-      from: '"EmporioLambda company" <' + process.env.EMAIL + '>', // sender address
-      to: order.email, // list of receivers
-      subject: 'Order details', // Subject line
-      text: text, // plaintext body
-      html: html, // html body
-    };
-
-    // send mail with defined transport object
-    let resp = await new Promise((resolve) => {
-      transporter.sendMail(mailOptions, (error) => {
-        if (error) {
-          console.log(error);
-          resolve(false);
-        } else {
-          resolve(true);
-        }
-      });
-    });
-
-    if (resp) {
-      return response({ data: { message: 'Order receive' } });
-    } else {
-      return badResponse('Failed to send email of order');
-    }
   } else {
     return badResponse('Failed to create order');
   }

@@ -29,7 +29,7 @@ class Product {
       id: this.id,
       name: this.name,
       description: this.description,
-      image: this.imageURL,
+      imageUrl: this.imageURL,
       price: this.price,
       category: this.category,
     };

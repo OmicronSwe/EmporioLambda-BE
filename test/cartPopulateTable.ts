@@ -255,7 +255,7 @@ describe('Cart populate table', () => {
     expect(body.result.products[0].description).to.be.equal('description product 2');
     expect(body.result.products[0].price).to.be.equal(21);
     expect(body.result.products[0].quantity).to.be.equal(6);
-    expect(body.result.products[0].image).to.be.null;
+    expect(body.result.products[0].imageUrl).to.be.null;
     expect(body.result.products[0].category).to.be.null;
   });
 
@@ -301,7 +301,7 @@ describe('Cart populate table', () => {
     expect(body.result.products[0].description).to.be.equal('test_description_update');
     expect(body.result.products[0].price).to.be.equal(20);
     expect(body.result.products[0].quantity).to.be.equal(6);
-    expect(body.result.products[0].image).to.be.null;
+    expect(body.result.products[0].imageUrl).to.be.null;
     expect(body.result.products[0].category).to.be.equal('garden');
     expect(body.result.change.products[0]).to.be.equal(
       '"name product 2" product has been modified'

@@ -84,7 +84,7 @@ describe('Order populated table', () => {
     expect(body.result.items[0].products[0].price).to.be.equal(12.89);
     expect(body.result.items[0].products[0].quantity).to.be.equal(2);
     expect(body.result.items[0].products[0].category).to.be.null;
-    expect(body.result.items[0].products[0].image).to.be.null;
+    expect(body.result.items[0].products[0].imageUrl).to.be.null;
   });
 
   it('order getById function - should return item "test2@test.com"', async () => {
@@ -120,6 +120,6 @@ describe('Order populated table', () => {
     expect(body.result.products[0].price).to.be.equal(12.89);
     expect(body.result.products[0].quantity).to.be.equal(2);
     expect(body.result.products[0].category).to.be.null;
-    expect(body.result.products[0].image).to.be.null;
+    expect(body.result.products[0].imageUrl).to.be.null;
   });
 });*/

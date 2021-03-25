@@ -1,4 +1,4 @@
-const nodemailer = require('nodemailer');
+/*const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -39,4 +39,4 @@ const Nodemailer = {
       return badResponse('Failed to send email of order');
     }
   },
-};
+};*/
