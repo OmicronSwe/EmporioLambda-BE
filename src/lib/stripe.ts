@@ -13,12 +13,10 @@ const Stripe = {
       const params = {
         payment_method_types: ['card'],
         mode: 'payment',
-        customer: cart.username,
+        client_reference_id: cart.username,
         line_items: cart.getProductsInfoCheckout(),
         success_url: successUrl,
         cancel_url: cancelUrl,
-        amount_subtotal: cart.totalPrice - cart.taxesApplied,
-        amount_total: cart.totalPrice,
       };
 
       console.log(params);

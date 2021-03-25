@@ -20,7 +20,7 @@ export const HMTLTemplate = (
   productList.forEach((value: number, key: Product) => {
     html +=
       `<tr><td width="30%"><img width="100%" src="` +
-      key.imageURL +
+      key.imageUrl +
       `" alt="` +
       key.name +
       `" /></td>

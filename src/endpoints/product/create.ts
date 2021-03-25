@@ -16,15 +16,17 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body = JSON.parse(event.body);
 
+  console.log(body);
+
   //if image is present, get URL and push it to s3
-  if (body.image) {
+  if (body.imageFile) {
     try {
       body.imageUrl = await pushImage(
-        body.image.imageCode,
-        body.image.mime,
+        body.imageFile.imageCode,
+        body.imageFile.mime,
         bucketName.product_image
       );
-      delete body.image;
+      delete body.imageFile;
     } catch (err) {
       //handle logic error of push image
       return badRequest(err.name + ' ' + err.message);

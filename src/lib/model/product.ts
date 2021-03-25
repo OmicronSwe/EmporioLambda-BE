@@ -4,7 +4,7 @@ class Product {
   id: string;
   name: string;
   description: string;
-  imageURL: string;
+  imageUrl: string;
   price: number;
   category: string;
 
@@ -20,7 +20,7 @@ class Product {
     this.name = data.name;
     this.description = data.description;
     this.price = data.price ? data.price : 0;
-    this.imageURL = data.image ? data.image : null;
+    this.imageUrl = data.imageUrl ? data.imageUrl : null;
     this.category = data.category ? data.category : null;
   }
 
@@ -29,7 +29,7 @@ class Product {
       id: this.id,
       name: this.name,
       description: this.description,
-      imageUrl: this.imageURL,
+      imageUrl: this.imageUrl,
       price: this.price,
       category: this.category,
     };
@@ -47,7 +47,7 @@ class Product {
     if (
       this.price != prod.price ||
       this.id != prod.id ||
-      this.imageURL != prod.imageURL ||
+      this.imageUrl != prod.imageUrl ||
       this.category != prod.category ||
       this.description != prod.description ||
       this.name != prod.name
