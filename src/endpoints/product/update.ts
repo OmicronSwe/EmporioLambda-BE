@@ -34,8 +34,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return notFound('Product not found');
   }
 
-  if (getProduct.image) {
-    const keyImage: string = getProduct.image.split('/').pop();
+  if (getProduct.imageUrl) {
+    const keyImage: string = getProduct.imageUrl.split('/').pop();
 
     await S3services.delete(bucketName.product_image, keyImage);
   }
@@ -43,7 +43,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
   //if image is present, get URL and push it to s3
   if (body.image) {
     try {
-      body.image = await pushImage(body.image.imageCode, body.image.mime, bucketName.product_image);
+      body.imageUrl = await pushImage(
+        body.image.imageCode,
+        body.image.mime,
+        bucketName.product_image
+      );
+      delete body.image;
     } catch (err) {
       //handle logic error of push image
       return badRequest(err.name + ' ' + err.message);

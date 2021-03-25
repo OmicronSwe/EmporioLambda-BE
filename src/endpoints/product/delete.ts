@@ -27,7 +27,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   if (getProduct.image) {
-    const keyImage: string = getProduct.image.split('/').pop();
+    const keyImage: string = getProduct.imageUrl.split('/').pop();
 
     await S3services.delete(bucketName.product_image, keyImage);
   }
