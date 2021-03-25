@@ -10,6 +10,7 @@ import Product from '../../lib/model/product';
  * @param  {} event: event passed when lambda is triggered
  */
 export const index: APIGatewayProxyHandler = async (event) => {
+  console.log(event);
   if (!event.body) {
     return badRequest('Body missing');
   }
