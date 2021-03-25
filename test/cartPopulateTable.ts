@@ -119,7 +119,7 @@ describe('Cart populate table', () => {
 
     const response = await addProduct.run(data);
 
-    //console.log(response);
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(JSON.parse(response.body).message).to.be.equal('Product "name product 2" added to cart');
   });
 
@@ -178,17 +178,17 @@ describe('Cart populate table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('Failed to get cart');
   });
 
-  it('cart addProduct function - should be "Cart not found"', async () => {
-    const errorData: APIGatewayProxyEvent = {
+  it('cart addProduct function - should be add item to "username-string2" without have a cart before', async () => {
+    const data: APIGatewayProxyEvent = {
       body: '{"id": "dummy_id_9", "quantity": 2}',
       pathParameters: {
-        username: 'dummy-string',
+        username: 'username-string2',
       },
     };
 
-    const response = await addProduct.run(errorData);
-    expect(JSON.parse(response.statusCode)).to.be.equal(404);
-    expect(JSON.parse(response.body).error).to.be.equal('Cart not found');
+    const response = await addProduct.run(data);
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
+    expect(JSON.parse(response.body).message).to.be.equal('Product "name product 1" added to cart');
   });
 
   it('cart addProduct function - should be "Failed to get product"', async () => {

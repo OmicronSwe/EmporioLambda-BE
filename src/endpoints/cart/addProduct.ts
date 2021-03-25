@@ -35,7 +35,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   if (Object.keys(resultGetCart).length === 0) {
-    return notFound('Cart not found');
+    resultGetCart.username = event.pathParameters.username;
   }
 
   //get info from product id
