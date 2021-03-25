@@ -19,7 +19,6 @@ const Stripe = {
         cancel_url: cancelUrl,
       };
 
-      console.log(params);
       const session = await stripe.checkout.sessions.create(params);
 
       return session.id;

@@ -64,7 +64,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     const sessionStripeId = await Stripe.createSession(cart, body.successurl, body.cancelurl);
 
-    return response({ data: { sessionid: sessionStripeId } });
+    return response({ data: { sessionId: sessionStripeId } });
   } catch (err) {
     //handle error of stripe
     console.log(err);

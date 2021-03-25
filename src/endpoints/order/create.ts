@@ -26,13 +26,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
       return badResponse('Failed to get session from stripe');
     }
 
-    let result = await Dynamo.get(tableName.cart, 'username', dataSessionStripe.costumer).catch(
-      (err) => {
-        //handle error of dynamoDB
-        console.log(err);
-        return null;
-      }
-    );
+    let result = await Dynamo.get(
+      tableName.cart,
+      'username',
+      webhookStripe.client_reference_id
+    ).catch((err) => {
+      //handle error of dynamoDB
+      console.log(err);
+      return null;
+    });
 
     if (!result) {
       return badResponse('Failed to get cart');
@@ -43,7 +45,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
 
     let cart: Cart = new Cart(result);
-    let order: Order = new Order(cart, dataSessionStripe.customer_email);
+    let order: Order = new Order(cart, webhookStripe.customer_details.email);
 
     //push data to dynamodb
     try {
