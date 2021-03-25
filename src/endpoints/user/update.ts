@@ -1,15 +1,7 @@
 import { response, notFound, badResponse, badRequest } from '../../lib/APIResponses';
 import Cognito from '../../lib/cognito';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-
-interface Request {
-  UserAttributes: [
-    {
-      Name: string;
-      Value: string;
-    }
-  ];
-}
+import User, { DynamoFormat } from '../../lib/model/user';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -22,15 +14,22 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('Body missing');
   }
 
-  let requestBody: Request;
+  let requestBody;
   try {
     requestBody = JSON.parse(event.body);
   } catch (err) {
     return badRequest(err.name + ' ' + err.message);
   }
 
+  let user = new User(
+    requestBody.email,
+    requestBody.name,
+    requestBody.family_name,
+    requestBody.address
+  );
+
   const result = await Cognito.updateUser(
-    requestBody.UserAttributes,
+    user.toDynamoFormat(),
     event.pathParameters.username
   ).catch((err) => {
     //handle error of dynamoDB
