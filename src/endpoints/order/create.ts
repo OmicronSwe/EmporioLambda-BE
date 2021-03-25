@@ -18,7 +18,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body = JSON.parse(event.body);
 
-  const data = await Stripe.retrieveDataCheckout(body.id);
+  const data = await Stripe.retrieveDataCheckout(body.data.id);
 
   console.log(data);
 
