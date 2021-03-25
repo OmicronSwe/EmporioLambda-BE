@@ -18,5 +18,11 @@ export const index: APIGatewayProxyHandler = async () => {
     return notFound('Categories not found');
   }
 
-  return response({ data: { result } });
+  let categoriesList: string[] = [];
+
+  result.items.forEach((item) => {
+    categoriesList.push(item.name);
+  });
+
+  return response({ data: { result: { items: categoriesList } } });
 };
