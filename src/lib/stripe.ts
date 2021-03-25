@@ -17,8 +17,6 @@ const Stripe = {
         line_items: cart.getProductsInfoCheckout(),
         success_url: successUrl,
         cancel_url: cancelUrl,
-        amount_subtotal: cart.totalPrice - cart.taxesApplied,
-        amount_total: cart.totalPrice,
       };
 
       console.log(params);
