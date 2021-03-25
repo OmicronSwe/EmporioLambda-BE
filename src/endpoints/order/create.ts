@@ -16,7 +16,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('Body missing');
   }
 
-  const data = await Stripe.retrieveDataCheckout(event.body.id);
+  const body = JSON.parse(event.body);
+
+  const data = await Stripe.retrieveDataCheckout(body.id);
 
   console.log(data);
 
