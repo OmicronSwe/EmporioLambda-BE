@@ -138,7 +138,7 @@ class Cart {
       const prodCheckout = {
         name: element.name,
         description: element.description,
-        image: element.imageURL,
+        image: element.imageUrl,
         amount: element.price,
         currency: 'EUR',
         quantity: this.getProductQuantity(element),
