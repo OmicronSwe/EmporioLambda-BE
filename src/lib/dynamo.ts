@@ -107,6 +107,8 @@ const Dynamo = {
       ExpressionAttributeValues: AttriValueExpr,
     };
 
+    console.log(params);
+
     return dynamoDb
       .update(params)
       .promise()

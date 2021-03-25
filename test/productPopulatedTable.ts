@@ -39,11 +39,11 @@ describe('Product populated table', () => {
 
     const dataProduct1: APIGatewayProxyEvent = {
       body:
-        '{"name": "test", "description": "test_description", "price": 10, "category": "electric"}',
+        '{"name": "test", "description": "test_description", "price": 10, "category": {"name": "electric"}}',
     };
     const dataProduct2: APIGatewayProxyEvent = {
       body:
-        '{"name": "test 2", "description": "test_description2", "price": 20, "category": "garden"}',
+        '{"name": "test 2", "description": "test_description2", "price": 20, "category": {"name": "garden"}}',
     };
 
     //create category

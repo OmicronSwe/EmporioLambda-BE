@@ -5,6 +5,7 @@ import tableName from '../../lib/tableName';
 import bucketName from '../../lib/bucketName';
 import S3services from '../../lib/s3';
 import { pushImage } from '../../lib/pushImage';
+import Product from '../../lib/model/product'
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -49,6 +50,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   }
 
+
+  body.category=body.category.name
+
+  console.log( Object.keys(body));
+  console.log(Object.values(body));
   //update product
   const result = await Dynamo.update(
     tableName.product,

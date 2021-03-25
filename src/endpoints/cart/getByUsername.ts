@@ -51,6 +51,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       messageChange.push('Product "' + productCart.name + '" no longer available');
       cart.removeProductTotally(productCart);
     } else {
+      console.log(result);
       const prodFromDb = new Product(result);
 
       if (productCart.isDifference(prodFromDb)) {

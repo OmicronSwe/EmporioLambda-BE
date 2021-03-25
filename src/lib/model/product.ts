@@ -21,7 +21,7 @@ class Product {
     this.description = body.description;
     this.price = body.price ? body.price : 0;
     this.imageURL = body.image ? body.image : null;
-    this.category = body.category ? body.category : null;
+    this.category = body.category ? body.category.name : null;
   }
 
   public getData(): object {
