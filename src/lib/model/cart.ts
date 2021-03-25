@@ -6,19 +6,19 @@ class Cart {
   totalPrice: number;
   taxesApplied: number;
 
-  constructor(body) {
-    if (!body.username) {
+  constructor(data) {
+    if (!data.username) {
       throw Error('username value not found');
     }
 
-    //console.log(body);
+    //console.log(data);
 
     this.products = new Map<Product, number>();
     this.taxesApplied = 0;
     this.totalPrice = 0;
 
-    if (body.products) {
-      body.products.forEach((element) => {
+    if (data.products) {
+      data.products.forEach((element) => {
         const prod = new Product(element);
         const quantity = element.quantity ? element.quantity : 1;
 
@@ -30,16 +30,16 @@ class Cart {
     }
 
     this.totalPrice += this.taxesApplied;
-    this.username = body.username;
+    this.username = data.username;
   }
 
-  public getData(): object {
-    let productsCart = this.getProducts();
+  public toJSON(): object {
+    let productsCart = this.getProductsList();
     let productsCartObject;
     let productCartArray = [];
 
     productsCart.forEach((element) => {
-      productsCartObject = element.getData();
+      productsCartObject = element.toJSON();
       productsCartObject.quantity = this.products.get(element);
       productCartArray.push(productsCartObject);
     });
@@ -52,12 +52,12 @@ class Cart {
     };
   }
 
-  public getProducts(): Array<Product> {
+  public getProductsList(): Array<Product> {
     return Array.from(this.products.keys());
   }
 
   public getProductFromId(id: string): Product {
-    for (const element of this.getProducts()) {
+    for (const element of this.getProductsList()) {
       if (element.id == id) {
         return element;
       }
@@ -75,7 +75,7 @@ class Cart {
     this.products.delete(oldProduct);
     this.products.set(newProduct, quantity);
 
-    let productsCart = this.getProducts();
+    let productsCart = this.getProductsList();
 
     this.taxesApplied = 0;
     this.totalPrice = 0;
@@ -134,7 +134,7 @@ class Cart {
   public getProductsInfoCheckout(): Array<object> {
     const lineItems: Array<object> = new Array<object>();
 
-    this.getProducts().forEach((element) => {
+    this.getProductsList().forEach((element) => {
       const prodCheckout = {
         name: element.name,
         description: element.description,

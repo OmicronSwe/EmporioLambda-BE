@@ -40,7 +40,7 @@ class Order {
     let productOrderArray = [];
 
     productsOrder.forEach((element) => {
-      productsOrderObject = element.getData();
+      productsOrderObject = element.toJSON();
       productsOrderObject.quantity = this.products.get(element);
       productOrderArray.push(productsOrderObject);
     });

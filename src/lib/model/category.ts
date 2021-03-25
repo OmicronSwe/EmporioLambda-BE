@@ -1,15 +1,15 @@
 class Category {
   name: string;
 
-  constructor(body) {
-    if (!body.name) {
+  constructor(data) {
+    if (!data.name) {
       throw Error('name value not found');
     }
 
-    this.name = body.name;
+    this.name = data.name;
   }
 
-  public getData(): object {
+  public toJSON(): object {
     return {
       name: this.name,
     };

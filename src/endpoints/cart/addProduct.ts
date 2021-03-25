@@ -59,7 +59,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   cartFromDB.addProduct(prod, body.quantity ? body.quantity : 1);
 
-  const newCart = await Dynamo.write(tableName.cart, cartFromDB.getData()).catch((err) => {
+  const newCart = await Dynamo.write(tableName.cart, cartFromDB.toJSON()).catch((err) => {
     //handle error of dynamoDB
     console.log(err);
     return null;

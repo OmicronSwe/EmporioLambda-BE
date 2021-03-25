@@ -29,7 +29,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   //push data to dynamodb
   try {
     const product = new Product(body);
-    const data = product.getData();
+    const data = product.toJSON();
 
     //check if category is in Db
     if (product.getCategory()) {

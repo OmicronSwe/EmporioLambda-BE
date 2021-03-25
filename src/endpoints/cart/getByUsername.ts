@@ -35,7 +35,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   let cart: Cart = new Cart(result);
 
   //check if products exist and are modify
-  for (const productCart of cart.getProducts()) {
+  for (const productCart of cart.getProductsList()) {
     const result = await Dynamo.get(tableName.product, 'id', productCart.id).catch((err) => {
       //handle error of dynamoDB
       console.log(err);
@@ -63,7 +63,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   if (change) {
-    result = cart.getData();
+    result = cart.toJSON();
     result.change = {
       products: messageChange,
     };

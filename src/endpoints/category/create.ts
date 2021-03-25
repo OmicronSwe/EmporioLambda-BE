@@ -30,7 +30,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       return badRequest('Category already exists');
     }
 
-    const data = category.getData();
+    const data = category.toJSON();
 
     const newCategory = await Dynamo.write(tableName.category, data).catch((err) => {
       //handle error of dynamoDB

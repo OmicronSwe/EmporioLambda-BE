@@ -8,23 +8,23 @@ class Product {
   price: number;
   category: string;
 
-  constructor(body) {
-    if (!body.name) {
+  constructor(data) {
+    if (!data.name) {
       throw Error('name value not found');
     }
-    if (!body.description) {
+    if (!data.description) {
       throw Error('description value not found');
     }
 
-    this.id = body.id ? body.id : uuid();
-    this.name = body.name;
-    this.description = body.description;
-    this.price = body.price ? body.price : 0;
-    this.imageURL = body.image ? body.image : null;
-    this.category = body.category ? body.category.name : null;
+    this.id = data.id ? data.id : uuid();
+    this.name = data.name;
+    this.description = data.description;
+    this.price = data.price ? data.price : 0;
+    this.imageURL = data.image ? data.image : null;
+    this.category = data.category ? data.category : null;
   }
 
-  public getData(): object {
+  public toJSON(): object {
     return {
       id: this.id,
       name: this.name,

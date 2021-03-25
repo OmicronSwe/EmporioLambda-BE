@@ -48,7 +48,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   }
 
-  const data = cart.getData();
+  const data = cart.toJSON();
 
   //push data to dynamodb
 
