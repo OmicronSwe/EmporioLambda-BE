@@ -19,78 +19,106 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const webhookStripe = JSON.parse(event.body).data.object;
 
   if (webhookStripe.payment_status == 'paid') {
+    let dataSessionStripe;
     try {
-      const data = await Stripe.retrieveDataCheckout(webhookStripe.id);
-      console.log(data.line_items.data);
-      console.log(data.line_items.data.name);
+      dataSessionStripe = await Stripe.retrieveDataCheckout(webhookStripe.id);
     } catch (error) {
-      return badResponse('Failed to save order');
+      return badResponse('Failed to get session from stripe');
     }
-  }
 
-  let result = await Dynamo.get(tableName.cart, 'username', event.pathParameters.username).catch(
-    (err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
+    let result = await Dynamo.get(tableName.cart, 'username', dataSessionStripe.costumer).catch(
+      (err) => {
+        //handle error of dynamoDB
+        console.log(err);
+        return null;
+      }
+    );
+
+    if (!result) {
+      return badResponse('Failed to get cart');
     }
-  );
 
-  if (!result) {
-    return badResponse('Failed to get cart');
-  }
+    if (Object.keys(result).length === 0) {
+      return notFound('Cart not found');
+    }
 
-  if (Object.keys(result).length === 0) {
-    return notFound('Cart not found');
-  }
+    let cart: Cart = new Cart(result);
+    let order: Order = new Order(cart, dataSessionStripe.customer_email);
 
-  let cart: Cart = new Cart(result);
+    //push data to dynamodb
+    try {
+      const data = order.toJSON();
 
-  //check if products exist and are modify
-  for (const productCart of cart.getProductsList()) {
-    const result = await Dynamo.get(tableName.product, 'id', productCart.id).catch((err) => {
+      const newOrder = await Dynamo.write(tableName.order, data).catch((err) => {
+        //handle error of dynamoDB
+        console.log(err);
+        return null;
+      });
+
+      if (!newOrder) {
+        return badResponse('Failed to receive order');
+      }
+    } catch (err) {
+      //handle logic error of order
+      return badRequest(err.name + ' ' + err.message);
+    }
+
+    //empty the cart
+    const data = {
+      username: cart.username,
+      products: [],
+    };
+
+    const resultCartEmpty = await Dynamo.write(tableName.cart, data).catch((err) => {
       //handle error of dynamoDB
       console.log(err);
       return null;
     });
 
     if (!result) {
-      return badResponse('Failed to get product');
+      return badResponse('Failed to empty the cart');
     }
 
-    if (Object.keys(result).length === 0) {
-      return notFound(
-        'Some products are no longer available, please check your shopping cart before proceeding'
-      );
-    } else {
-      const prodFromDb = new Product(result);
+    //send email;
 
-      if (productCart.isDifference(prodFromDb)) {
-        return badResponse(
-          'Some products have changed, please check your shopping cart before proceeding'
-        );
-      }
-    }
-  }
+    var nodemailer = require('nodemailer');
 
-  //push data to dynamodb
-  try {
-    let order: Order = new Order(cart, 'dummy');
-    const data = order.getData();
-
-    const newOrder = await Dynamo.write(tableName.order, data).catch((err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
+    // create reusable transporter object using the default SMTP transport
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.PASS_EMAIL,
+      },
     });
 
-    if (!newOrder) {
-      return badResponse('Failed to receive order');
-    }
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+      from: '"EmporioLambda company" <' + process.env.EMAIL + '>', // sender address
+      to: order.email, // list of receivers
+      subject: 'Order details', // Subject line
+      text: text, // plaintext body
+      html: html, // html body
+    };
 
-    return response({ data: { message: 'Order receive' } });
-  } catch (err) {
-    //handle logic error of order
-    return badRequest(err.name + ' ' + err.message);
+    // send mail with defined transport object
+    let resp = await new Promise((resolve) => {
+      transporter.sendMail(mailOptions, (error) => {
+        if (error) {
+          console.log(error);
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+
+    if (resp) {
+      return response({ data: { message: 'Order receive' } });
+    } else {
+      return badResponse('Failed to send email of order');
+    }
+  } else {
+    return badResponse('Failed to create order');
   }
 };

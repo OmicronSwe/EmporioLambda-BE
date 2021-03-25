@@ -30,11 +30,12 @@ class Order {
     this.taxesApplied = cart.taxesApplied;
     this.totalPrice = cart.totalPrice;
     this.id = uuid();
+    this.email = email;
     this.username = cart.username;
     this.date = new Date();
   }
 
-  public getData(): object {
+  public toJSON(): object {
     let productsOrder = Array.from(this.products.keys());
     let productsOrderObject;
     let productOrderArray = [];
@@ -47,6 +48,7 @@ class Order {
 
     return {
       id: this.id,
+      email: this.email,
       username: this.username,
       products: productOrderArray,
       totalPrice: this.totalPrice,
