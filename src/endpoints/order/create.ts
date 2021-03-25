@@ -21,7 +21,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
   if (webhookStripe.payment_status == 'paid') {
     try {
       const data = await Stripe.retrieveDataCheckout(webhookStripe.id);
-      console.log(data);
+      console.log(data.line_items.data);
+      console.log(data.line_items.data.name);
     } catch (error) {
       return badResponse('Failed to save order');
     }

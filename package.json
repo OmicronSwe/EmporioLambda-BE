@@ -33,6 +33,7 @@
     "@types/jwk-to-pem": "^2.0.0",
     "@types/mocha": "^8.2.0",
     "@types/request": "^2.48.5",
+    "@types/stripe-v3": "^3.1.23",
     "@types/uuid": "^8.3.0",
     "aws-lambda": "^1.0.6",
     "codecov": "^3.8.1",
@@ -55,7 +56,7 @@
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.4",
     "nodemailer": "^2.7.2",
-    "stripe": "^8.137.0",
+    "stripe": "^8.139.0",
     "uuid": "^3.1.0"
   }
 }
