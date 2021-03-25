@@ -20,7 +20,7 @@ class Product {
     this.name = data.name;
     this.description = data.description;
     this.price = data.price ? data.price : 0;
-    this.imageURL = data.image ? data.image : null;
+    this.imageURL = data.imageUrl ? data.imageUrl : null;
     this.category = data.category ? data.category : null;
   }
 
