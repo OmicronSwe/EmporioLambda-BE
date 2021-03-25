@@ -5,15 +5,20 @@ import tableName from '../../lib/tableName';
 import Order from '../../lib/model/order';
 import Cart from '../../lib/model/cart';
 import Product from '../../lib/model/product';
+import Stripe from '../../lib/stripe';
 
 /**
  * @param  {} event: event passed when lambda is triggered
  */
 export const index: APIGatewayProxyHandler = async (event) => {
-  console.log(event);
+  //console.log(event);
   if (!event.body) {
     return badRequest('Body missing');
   }
+
+  const data = await Stripe.retrieveDataCheckout(event.body.id);
+
+  console.log(data);
 
   let result = await Dynamo.get(tableName.cart, 'username', event.pathParameters.username).catch(
     (err) => {

@@ -23,6 +23,18 @@ const Stripe = {
     }
   },
 
+  retrieveDataCheckout: async (idSessionStripe: string) => {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(idSessionStripe, {
+        expand: ['line_items'],
+      });
+
+      return session;
+    } catch (err) {
+      throw Error('Error in Stripe retrieveDataCheckout: ' + err);
+    }
+  },
+
   charge: async (token: string, amount: number, currency: string = 'EUR') => {
     return stripe.charges
       .create({
