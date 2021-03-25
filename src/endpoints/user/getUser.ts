@@ -8,7 +8,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('PathParameters missing');
   }
 
-  const result : DynamoFormat[] = await Cognito.getUserAttributes(event.pathParameters.username).catch((err) => {
+  const result: DynamoFormat[] = await Cognito.getUserAttributes(
+    event.pathParameters.username
+  ).catch((err) => {
     //handle error of dynamoDB
     console.log(err);
     return null;
@@ -18,7 +20,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badResponse('Failed to get user data');
   }
 
-  let user = User.fromDynamoFormat(result)
+  let user = User.fromDynamoFormat(result);
 
   return response({ data: { result: user.getData() } });
 };

@@ -21,7 +21,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest(err.name + ' ' + err.message);
   }
 
-  let user = new User (requestBody.email, requestBody.name, requestBody.family_name, requestBody.address)
+  let user = new User(
+    requestBody.email,
+    requestBody.name,
+    requestBody.family_name,
+    requestBody.address
+  );
 
   const result = await Cognito.updateUser(
     user.toDynamoFormat(),
