@@ -16,11 +16,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('Body missing');
   }
 
-  const body = JSON.parse(event.body);
+  const webhookStripe = JSON.parse(event.body).data.object;
 
-  const data = await Stripe.retrieveDataCheckout(body.data.object.id);
-
-  console.log(data);
+  if (webhookStripe.payment_status == 'paid') {
+    try {
+      const data = await Stripe.retrieveDataCheckout(webhookStripe.id);
+      console.log(data);
+    } catch (error) {
+      return badResponse('Failed to save order');
+    }
+  }
 
   let result = await Dynamo.get(tableName.cart, 'username', event.pathParameters.username).catch(
     (err) => {
