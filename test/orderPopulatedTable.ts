@@ -1,4 +1,4 @@
-/*'use strict';
+'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
@@ -51,8 +51,6 @@ describe('Order populated table', () => {
         return null;
       }
     );
-
-    console.log(result);
 
     let cart: Cart;
     let order: Order;
@@ -225,7 +223,5 @@ describe('Order populated table', () => {
 
     //delete cart
     const result = await deleteCart.run(dataCart);
-
-    console.log(result);
   });
-});*/
+});
