@@ -49,6 +49,8 @@ describe('Order populated table', () => {
       return null;
     });
 
+    console.log(result);
+
     let cart: Cart;
     let order: Order;
 
@@ -69,6 +71,8 @@ describe('Order populated table', () => {
     const response = await list.run();
 
     const body = JSON.parse(response.body);
+
+    console.log(response);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
@@ -238,6 +242,8 @@ describe('Order populated table', () => {
     await deleteProduct.run(dataProduct1);
 
     //delete cart
-    await deleteCart.run(dataCart);
+    const result = await deleteCart.run(dataCart);
+
+    console.log(result);
   });
 });

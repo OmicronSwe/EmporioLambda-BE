@@ -141,6 +141,8 @@ describe('Order populate table', () => {
     await deleteProduct.run(dataProduct2);
 
     //delete cart
-    await deleteCart.run(dataCart);
+    const result = await deleteCart.run(dataCart);
+
+    console.log(result);
   });
 });
