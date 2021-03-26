@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import Product from './product';
-import Cart from './cart';
+import Product from '../product/product';
+import Cart from '../cart/cart';
 
 class Order {
   id: string;

@@ -32,12 +32,10 @@ describe('Cart populate table', () => {
     const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
 
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
     const dataProduct2: APIGatewayProxyEvent = {
-      body:
-        '{"name": "name product 2", "price" : 21,"description": "description product 2"}',
+      body: '{"name": "name product 2", "price" : 21,"description": "description product 2"}',
     };
 
     await createProd.run(dataProduct1);
@@ -61,14 +59,16 @@ describe('Cart populate table', () => {
 
     responseSearch = await search.run(data);
     IDProduct2 = JSON.parse(responseSearch.body).result.items[0].id;
-
-    
   });
 
   it('cart create function - should be "Cart saved"', async () => {
     const data: APIGatewayProxyEvent = {
       body:
-        '{"username": "username-string", "products": [{"id": "'+IDProduct1+'","quantity": 2},{"id": "'+IDProduct2+'","quantity": 4}]}',
+        '{"username": "username-string", "products": [{"id": "' +
+        IDProduct1 +
+        '","quantity": 2},{"id": "' +
+        IDProduct2 +
+        '","quantity": 4}]}',
     };
 
     const response = await create.run(data);
@@ -81,7 +81,11 @@ describe('Cart populate table', () => {
   it('cart create function - should be "Body missing"', async () => {
     const data: APIGatewayProxyEvent = {
       dummy:
-        '{"username": "username-string", "products": [{"id": "'+IDProduct1+'","quantity": 2},{"id": "'+IDProduct2+'","quantity": 4}]}',
+        '{"username": "username-string", "products": [{"id": "' +
+        IDProduct1 +
+        '","quantity": 2},{"id": "' +
+        IDProduct2 +
+        '","quantity": 4}]}',
     };
 
     const response = await create.run(data);
@@ -94,7 +98,11 @@ describe('Cart populate table', () => {
   it('cart create function - should be "Error username value not found"', async () => {
     const data: APIGatewayProxyEvent = {
       body:
-        '{"dummy": "username-string", "products": [{"id": "'+IDProduct1+'","quantity": 2},{"id": "'+IDProduct2+'","quantity": 4}]}',
+        '{"dummy": "username-string", "products": [{"id": "' +
+        IDProduct1 +
+        '","quantity": 2},{"id": "' +
+        IDProduct2 +
+        '","quantity": 4}]}',
     };
 
     const response = await create.run(data);
@@ -107,7 +115,11 @@ describe('Cart populate table', () => {
   it('cart create function - should be "Failed to save cart"', async () => {
     const errorData: APIGatewayProxyEvent = {
       body:
-        '{"username": 1, "products": [{"id": "'+IDProduct1+'","quantity": 2},{"id": "'+IDProduct2+'","quantity": 4}]}',
+        '{"username": 1, "products": [{"id": "' +
+        IDProduct1 +
+        '","quantity": 2},{"id": "' +
+        IDProduct2 +
+        '","quantity": 4}]}',
     };
 
     const response = await create.run(errorData);
@@ -135,7 +147,7 @@ describe('Cart populate table', () => {
 
   it('cart addProduct function - should be add item to "username-string"', async () => {
     const data: APIGatewayProxyEvent = {
-      body: '{"id": "'+IDProduct2+'", "quantity": 2}',
+      body: '{"id": "' + IDProduct2 + '", "quantity": 2}',
       pathParameters: {
         username: 'username-string',
       },
@@ -181,7 +193,7 @@ describe('Cart populate table', () => {
 
   it('cart addProduct function - should be "PathParameters missing"', async () => {
     const errorData: APIGatewayProxyEvent = {
-      body: '{"id": "'+IDProduct1+'", "quantity": 2}',
+      body: '{"id": "' + IDProduct1 + '", "quantity": 2}',
     };
 
     const response = await addProduct.run(errorData);
@@ -191,7 +203,7 @@ describe('Cart populate table', () => {
 
   it('cart addProduct function - should be "Failed to get cart"', async () => {
     const errorData: APIGatewayProxyEvent = {
-      body: '{"id": "'+IDProduct1+'", "quantity": 2}',
+      body: '{"id": "' + IDProduct1 + '", "quantity": 2}',
       pathParameters: {
         name: 'dummy',
       },
@@ -204,7 +216,7 @@ describe('Cart populate table', () => {
 
   it('cart addProduct function - should be add item to "username-string2" without have a cart before', async () => {
     const data: APIGatewayProxyEvent = {
-      body: '{"id": "'+IDProduct1+'", "quantity": 2}',
+      body: '{"id": "' + IDProduct1 + '", "quantity": 2}',
       pathParameters: {
         username: 'username-string2',
       },
@@ -217,7 +229,7 @@ describe('Cart populate table', () => {
 
   it('cart addProduct function - should be "Failed to get product"', async () => {
     const errorData: APIGatewayProxyEvent = {
-      body: '{"dummy": "'+IDProduct1+'", "quantity": 2}',
+      body: '{"dummy": "' + IDProduct1 + '", "quantity": 2}',
       pathParameters: {
         username: 'username-string',
       },
@@ -243,7 +255,7 @@ describe('Cart populate table', () => {
 
   it('cart removeProduct function - should be "Product "name product 1" removed from cart"', async () => {
     const data: APIGatewayProxyEvent = {
-      body: '{"id": "'+IDProduct1+'", "quantity": 2}',
+      body: '{"id": "' + IDProduct1 + '", "quantity": 2}',
       pathParameters: {
         username: 'username-string',
       },
@@ -310,8 +322,6 @@ describe('Cart populate table', () => {
 
     const response = await getByUsername.run(data);
 
-    //console.log(response);
-
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
@@ -327,9 +337,7 @@ describe('Cart populate table', () => {
     expect(body.result.products[0].quantity).to.be.equal(6);
     expect(body.result.products[0].imageUrl).to.be.null;
     expect(body.result.products[0].category).to.be.equal('garden');
-    expect(body.result.change.products[0]).to.be.equal(
-      '"name product 2" product has been modified'
-    );
+    expect(body.messageChange[0]).to.be.equal('"name product 2" product has been modified');
   });
 
   it('cart removeProduct function - should be "Product not found in the cart"', async () => {
@@ -361,7 +369,7 @@ describe('Cart populate table', () => {
 
   it('cart removeProduct function - should be "PathParameters missing"', async () => {
     const errorData: APIGatewayProxyEvent = {
-      body: '{"id": "'+IDProduct1+'", quantity": 2}',
+      body: '{"id": "' + IDProduct1 + '", quantity": 2}',
     };
 
     const response = await removeProduct.run(errorData);

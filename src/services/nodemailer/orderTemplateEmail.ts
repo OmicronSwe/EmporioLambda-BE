@@ -1,4 +1,4 @@
-import Product from '../../lib/model/product';
+import Product from '../../model/product/product';
 
 export const HMTLTemplate = (
   productList: Map<Product, number>,

@@ -1,7 +1,7 @@
 import { response, badResponse, badRequest, notFound } from '../../lib/APIResponses';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../services/dynamo/tableName';
-import { decodeURI } from '../../lib/decodeURISearch';
+import { decodeURI } from '../../lib/decodeURI';
 import Cognito from '../../services/cognito/cognito';
 
 /**

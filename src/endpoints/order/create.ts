@@ -2,13 +2,14 @@ import { response, badRequest, badResponse, notFound } from '../../lib/APIRespon
 import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../services/dynamo/tableName';
-import Order from '../../lib/model/order';
-import Cart from '../../lib/model/cart';
-import Product from '../../lib/model/product';
+import Order from '../../model/order/order';
+import Cart from '../../model/cart/cart';
+import Product from '../../model/product/product';
 import Stripe from '../../services/stripe/stripe';
 import Nodemailer from '../../services/nodemailer/nodemailer';
-import User, { DynamoFormat } from '../../lib/model/user';
+import User, { DynamoFormat } from '../../model/user';
 import Cognito from '../../services/cognito/cognito';
+import { CartDB } from '../../model/cart/interface';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -22,7 +23,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const webhookStripe = JSON.parse(event.body).data.object;
 
   if (webhookStripe.payment_status == 'paid') {
-    let result = await Dynamo.get(
+    let result: CartDB = await Dynamo.get(
       tableName.cart,
       'username',
       webhookStripe.client_reference_id
@@ -93,7 +94,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       return badResponse('Failed to get user data');
     }
 
-    let user = User.fromDynamoFormat(result);
+    let user = User.fromDynamoFormat(resultUser);
 
     //send email;
     try {

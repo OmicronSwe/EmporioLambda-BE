@@ -14,7 +14,6 @@ describe('Order populate table', () => {
   //functions of order
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/order/create.ts', 'index');
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/order/list.ts', 'index');
-  
 
   before(async () => {
     //functions
@@ -24,19 +23,16 @@ describe('Order populate table', () => {
 
     //data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
-      body:
-        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
+      body: '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
     //create product
     await createProd.run(dataProduct1);
     await createProd.run(dataProduct2);
-
 
     //get id
     let data: APIGatewayProxyEvent = {
@@ -59,10 +55,12 @@ describe('Order populate table', () => {
 
     const dataCart: APIGatewayProxyEvent = {
       body:
-        '{"username": "username-string", "products": [{"id": "'+IDProduct1+'", "quantity": 2},{"id": "'+IDProduct2+'" ,"quantity": 4}]}',
+        '{"username": "username-string", "products": [{"id": "' +
+        IDProduct1 +
+        '", "quantity": 2},{"id": "' +
+        IDProduct2 +
+        '" ,"quantity": 4}]}',
     };
-
-    
 
     //create cart
     await createCart.run(dataCart);

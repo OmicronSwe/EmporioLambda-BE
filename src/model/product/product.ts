@@ -1,26 +1,5 @@
+import { ProductDB } from './interface';
 import { v4 as uuid } from 'uuid';
-
-export interface ProductDB {
-  readonly id: string;
-  readonly name: string;
-  readonly description: string;
-  readonly imageUrl: string;
-  readonly price: number;
-  readonly category: string;
-}
-
-export interface ProductRequest {
-  readonly name: string;
-  readonly description: string;
-  readonly imageFile: ImageFile;
-  readonly price: number;
-  readonly category?: string;
-}
-
-interface ImageFile{
-  readonly imageCode: string
-  readonly mime: string
-}
 
 class Product {
   id: string;
@@ -38,9 +17,7 @@ class Product {
       throw Error('description value not found');
     }
 
-    console.log(data.id)
     this.id = data.id ? data.id : uuid();
-    console.log(this.id)
     this.name = data.name;
     this.description = data.description;
     this.price = data.price ? data.price : 0;

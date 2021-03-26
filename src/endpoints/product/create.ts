@@ -3,7 +3,8 @@ import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../services/dynamo/tableName';
 import bucketName from '../../services/s3/bucketName';
-import Product, {ProductRequest, ProductDB} from '../../lib/model/product';
+import Product from '../../model/product/product';
+import { ProductDB, ProductRequest } from '../../model/product/interface';
 import { pushImage } from '../../lib/pushImage';
 
 /**
@@ -14,10 +15,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('Body missing');
   }
 
-  const body: ProductRequest  = JSON.parse(event.body);
+  const body: ProductRequest = JSON.parse(event.body);
   let imageUrl: string = null;
-
-
 
   //if image is present, get URL and push it to s3
   if (body.imageFile) {
@@ -26,23 +25,21 @@ export const index: APIGatewayProxyHandler = async (event) => {
         body.imageFile.imageCode,
         body.imageFile.mime,
         bucketName.product_image
-      );      
+      );
     } catch (err) {
       //handle logic error of push image
       return badRequest(err.name + ' ' + err.message);
     }
   }
 
-
-  const productDB: ProductDB= {
+  const productDB: ProductDB = {
     id: null,
     name: body.name,
     description: body.description,
     imageUrl: imageUrl,
     price: body.price,
-    category: body.category?body.category : null
-
-  }
+    category: body.category ? body.category : null,
+  };
 
   //push data to dynamodb
   try {

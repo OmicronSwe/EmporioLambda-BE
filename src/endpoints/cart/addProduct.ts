@@ -2,8 +2,10 @@ import { response, badRequest, badResponse, notFound } from '../../lib/APIRespon
 import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../services/dynamo/tableName';
-import Cart from '../../lib/model/cart';
-import Product from '../../lib/model/product';
+import Cart from '../../model/cart/cart';
+import Product from '../../model/product/product';
+import { CartDB } from '../../model/cart/interface';
+import { ProductDB, ProductToCartRequest } from '../../model/product/interface';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -17,10 +19,10 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('PathParameters missing');
   }
 
-  const body = JSON.parse(event.body);
+  const body: ProductToCartRequest = JSON.parse(event.body);
 
   //get Informations cart
-  const resultGetCart = await Dynamo.get(
+  const resultGetCart: CartDB = await Dynamo.get(
     tableName.cart,
     'username',
     event.pathParameters.username
@@ -39,11 +41,13 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   //get info from product id
-  const resultGetProduct = await Dynamo.get(tableName.product, 'id', body.id).catch((err) => {
-    //handle error of dynamoDB
-    console.log(err);
-    return null;
-  });
+  const resultGetProduct: ProductDB = await Dynamo.get(tableName.product, 'id', body.id).catch(
+    (err) => {
+      //handle error of dynamoDB
+      console.log(err);
+      return null;
+    }
+  );
 
   if (!resultGetProduct) {
     return badResponse('Failed to get product');

@@ -2,6 +2,7 @@ import { response, notFound, badResponse, badRequest } from '../../lib/APIRespon
 import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../services/dynamo/tableName';
+import { ProductDB } from '../../model/product/interface';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -11,7 +12,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('PathParameters missing');
   }
 
-  const result = await Dynamo.get(tableName.product, 'id', event.pathParameters.id).catch((err) => {
+  const result: ProductDB = await Dynamo.get(
+    tableName.product,
+    'id',
+    event.pathParameters.id
+  ).catch((err) => {
     //handle error of dynamoDB
     console.log(err);
     return null;

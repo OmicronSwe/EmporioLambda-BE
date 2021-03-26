@@ -24,17 +24,13 @@ describe('Cart populated table', () => {
     const createCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
     const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
 
-    
-
     //data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
-      body:
-        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
+      body: '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
     //create product
@@ -60,17 +56,14 @@ describe('Cart populated table', () => {
     responseSearch = await search.run(data);
     IDProduct2 = JSON.parse(responseSearch.body).result.items[0].id;
 
-
-
     const dataCart: APIGatewayProxyEvent = {
       body:
-        '{"username": "username-string", "products": [{"id": "'+IDProduct1+'", "quantity": 2},{"id": "'+IDProduct2+'" ,"quantity": 4}]}',
+        '{"username": "username-string", "products": [{"id": "' +
+        IDProduct1 +
+        '", "quantity": 2},{"id": "' +
+        IDProduct2 +
+        '" ,"quantity": 4}]}',
     };
-
-    
-
-
-    
 
     //create cart
     await createCart.run(dataCart);
@@ -102,8 +95,6 @@ describe('Cart populated table', () => {
 
     const body = JSON.parse(response.body);
 
-    console.log(response);
-
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(body.result.totalPrice).to.be.equal(22);
     expect(body.result.username).to.be.equal('username-string');
@@ -117,14 +108,12 @@ describe('Cart populated table', () => {
     expect(body.result.products[0].quantity).to.be.equal(2);
     expect(body.result.products[0].imageUrl).to.be.null;
     expect(body.result.products[0].category).to.be.null;
-    expect(body.result.change.products[0]).to.be.equal(
-      'Product "name product 2 new" no longer available'
-    );
+    expect(body.messageChange[0]).to.be.equal('Product "name product 2 new" no longer available');
   });
 
   it('cart getByUsername function - should be "PathParameters missing"', async () => {
     const errorData: APIGatewayProxyEvent = {
-      body: '{"id": '+IDProduct1+', "quantity": 2}',
+      body: '{"id": ' + IDProduct1 + ', "quantity": 2}',
     };
 
     const response = await getByUsername.run(errorData);

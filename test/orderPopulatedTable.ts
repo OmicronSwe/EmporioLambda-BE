@@ -5,8 +5,8 @@ import { APIGatewayProxyEvent } from 'aws-lambda';
 import './localDynamoDb';
 import Dynamo from '../src/services/dynamo/dynamo';
 import tableName from '../src/services/dynamo/tableName';
-import Order from '../src/lib/model/order';
-import Cart from '../src/lib/model/cart';
+import Order from '../src/model/order/order';
+import Cart from '../src/model/cart/cart';
 
 //test for populated table
 describe('Order populated table', () => {
@@ -31,8 +31,7 @@ describe('Order populated table', () => {
 
     //data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     //create product
@@ -48,10 +47,11 @@ describe('Order populated table', () => {
     let responseSearch = await search.run(dataId);
     IDProduct1 = JSON.parse(responseSearch.body).result.items[0].id;
 
-
     const dataCart: APIGatewayProxyEvent = {
       body:
-        '{"username": "username-string-test", "products": [{"id": "'+IDProduct1+'" ,"quantity": 4}]}',
+        '{"username": "username-string-test", "products": [{"id": "' +
+        IDProduct1 +
+        '" ,"quantity": 4}]}',
     };
 
     //create cart

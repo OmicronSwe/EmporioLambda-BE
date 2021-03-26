@@ -1,4 +1,6 @@
-import Product from './product';
+import Product from '../product/product';
+import { ProductsForCheckout } from '../product/interface';
+import { CartDB } from './interface';
 
 class Cart {
   username: string;
@@ -6,7 +8,7 @@ class Cart {
   totalPrice: number;
   taxesApplied: number;
 
-  constructor(data) {
+  constructor(data: CartDB) {
     if (!data.username) {
       throw Error('username value not found');
     }
@@ -33,7 +35,7 @@ class Cart {
     this.username = data.username;
   }
 
-  public toJSON(): object {
+  public toJSON(): CartDB {
     let productsCart = this.getProductsList();
     let productsCartObject;
     let productCartArray = [];
@@ -131,8 +133,8 @@ class Cart {
     //manage taxes TO-DO
   }
 
-  public getProductsInfoCheckout(): Array<object> {
-    const lineItems: Array<object> = new Array<object>();
+  public getProductsInfoCheckout(): Array<ProductsForCheckout> {
+    const lineItems: Array<ProductsForCheckout> = new Array<ProductsForCheckout>();
 
     this.getProductsList().forEach((element) => {
       const prodCheckout = {

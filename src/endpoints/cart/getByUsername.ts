@@ -2,8 +2,10 @@ import { response, notFound, badResponse, badRequest } from '../../lib/APIRespon
 import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../services/dynamo/tableName';
-import Cart from '../../lib/model/cart';
-import Product from '../../lib/model/product';
+import Cart from '../../model/cart/cart';
+import Product from '../../model/product/product';
+import { CartDB } from '../../model/cart/interface';
+import { ProductDB } from '../../model/product/interface';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -13,34 +15,37 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('PathParameters missing');
   }
 
-  let result = await Dynamo.get(tableName.cart, 'username', event.pathParameters.username).catch(
-    (err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
+  let resultCart: CartDB = await Dynamo.get(
+    tableName.cart,
+    'username',
+    event.pathParameters.username
+  ).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
-  if (!result) {
+  if (!resultCart) {
     return badResponse('Failed to get cart');
   }
 
-  if (Object.keys(result).length === 0) {
+  if (Object.keys(resultCart).length === 0) {
     return notFound('Cart not found');
   }
 
   let change: boolean = false;
   let messageChange: Array<string> = new Array<string>();
-
-  let cart: Cart = new Cart(result);
+  let cart: Cart = new Cart(resultCart);
 
   //check if products exist and are modify
   for (const productCart of cart.getProductsList()) {
-    const result = await Dynamo.get(tableName.product, 'id', productCart.id).catch((err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    });
+    const result: ProductDB = await Dynamo.get(tableName.product, 'id', productCart.id).catch(
+      (err) => {
+        //handle error of dynamoDB
+        console.log(err);
+        return null;
+      }
+    );
 
     if (!result) {
       return badResponse('Failed to get product');
@@ -62,14 +67,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   }
 
-  if (change) {
-    result = cart.toJSON();
-    result.change = {
-      products: messageChange,
-    };
-  }
+  let result = cart.toJSON();
 
   //console.log(result);
 
-  return response({ data: { result } });
+  return response({ data: { result, messageChange } });
 };

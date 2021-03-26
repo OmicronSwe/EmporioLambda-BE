@@ -4,6 +4,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import tableName from '../../services/dynamo/tableName';
 import bucketName from '../../services/s3/bucketName';
 import S3services from '../../services/s3/s3';
+import { ProductDB } from '../../model/product/interface';
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -14,13 +15,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   //get product image in order to delete from S3
-  const getProduct = await Dynamo.get(tableName.product, 'id', event.pathParameters.id).catch(
-    (err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
+  const getProduct: ProductDB = await Dynamo.get(
+    tableName.product,
+    'id',
+    event.pathParameters.id
+  ).catch((err) => {
+    //handle error of dynamoDB
+    console.log(err);
+    return null;
+  });
 
   if (Object.keys(getProduct).length === 0) {
     return notFound('Product not found');

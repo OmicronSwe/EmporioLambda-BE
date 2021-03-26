@@ -1,4 +1,4 @@
-import Product from '../../lib/model/product';
+import Product from '../../model/product/product';
 import { HMTLTemplate, TXTTemplate } from './orderTemplateEmail';
 
 const nodemailer = require('nodemailer');

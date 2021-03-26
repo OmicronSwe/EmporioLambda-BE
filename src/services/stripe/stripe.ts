@@ -1,6 +1,6 @@
 'use strict';
 
-import Cart from '../../lib/model/cart';
+import Cart from '../../model/cart/cart';
 
 const https = require('https');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
