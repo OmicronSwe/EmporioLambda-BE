@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
@@ -228,4 +228,4 @@ describe('Order populated table', () => {
 
     console.log(result);
   });
-});
+});*/
