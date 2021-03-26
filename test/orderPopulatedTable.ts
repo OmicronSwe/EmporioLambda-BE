@@ -34,7 +34,8 @@ describe('Order populated table', () => {
     };
 
     const dataCart: APIGatewayProxyEvent = {
-      body: '{"username": "username-string", "products": [{"id": "dummy_id_9" ,"quantity": 4}]}',
+      body:
+        '{"username": "username-string-test", "products": [{"id": "dummy_id_9" ,"quantity": 4}]}',
     };
 
     //create product
@@ -43,11 +44,13 @@ describe('Order populated table', () => {
     //create cart
     await createCart.run(dataCart);
 
-    let result = await Dynamo.get(tableName.cart, 'username', 'username-string').catch((err) => {
-      //handle error of dynamoDB
-      console.log(err);
-      return null;
-    });
+    let result = await Dynamo.get(tableName.cart, 'username', 'username-string-test').catch(
+      (err) => {
+        //handle error of dynamoDB
+        console.log(err);
+        return null;
+      }
+    );
 
     console.log(result);
 
@@ -67,31 +70,10 @@ describe('Order populated table', () => {
     });
   });
 
-  it('order list function - should contains 1 orders of "username-string"', async () => {
-    const response = await list.run();
-
-    const body = JSON.parse(response.body);
-
-    console.log(response);
-
-    expect(JSON.parse(response.statusCode)).to.be.equal(200);
-
-    expect(body.result.items[0].email).to.be.equal('test@test.com');
-    expect(body.result.items[0].totalPrice).to.be.equal(44);
-
-    expect(body.result.items[0].products[0].id).to.be.equal('dummy_id_9');
-    expect(body.result.items[0].products[0].name).to.be.equal('name product 1');
-    expect(body.result.items[0].products[0].description).to.be.equal('description product 1');
-    expect(body.result.items[0].products[0].price).to.be.equal(11);
-    expect(body.result.items[0].products[0].quantity).to.be.equal(4);
-    expect(body.result.items[0].products[0].category).to.be.null;
-    expect(body.result.items[0].products[0].imageUrl).to.be.null;
-  });
-
-  it('order getByUsername function - should return item "username-string"', async () => {
+  it('order getByUsername function - should return item "username-string-test"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        username: 'username-string',
+        username: 'username-string-test',
       },
     };
 
@@ -117,7 +99,7 @@ describe('Order populated table', () => {
   it('order getByUsername function - should return "PathParameters missing"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters_error: {
-        username: 'username-string',
+        username: 'username-string-test',
       },
     };
 
@@ -130,7 +112,7 @@ describe('Order populated table', () => {
   it('order getByUsername function - should return "Orders not found"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        username: 'username-string_error',
+        username: 'username-string-test_error',
       },
     };
 
@@ -140,10 +122,10 @@ describe('Order populated table', () => {
     expect(JSON.parse(response.body).error).to.be.equal('Orders not found');
   });
 
-  it('order getById function - should return item "username-string"', async () => {
+  it('order getById function - should return item "username-string-test"', async () => {
     const dataUsername: APIGatewayProxyEvent = {
       pathParameters: {
-        username: 'username-string',
+        username: 'username-string-test',
       },
     };
 
@@ -234,7 +216,7 @@ describe('Order populated table', () => {
 
     const dataCart: APIGatewayProxyEvent = {
       pathParameters: {
-        username: 'username-string',
+        username: 'username-string-test',
       },
     };
 
