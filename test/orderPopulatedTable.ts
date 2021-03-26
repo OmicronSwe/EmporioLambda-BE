@@ -210,4 +210,34 @@ describe('Order populated table', () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal('Order not found');
   });
+
+  after(async () => {
+    //functions
+    const deleteProduct = mochaPlugin.getWrapper(
+      'index',
+      '/src/endpoints/product/delete.ts',
+      'index'
+    );
+
+    const deleteCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/delete.ts', 'index');
+
+    //data
+    const dataProduct1: APIGatewayProxyEvent = {
+      pathParameters: {
+        id: 'dummy_id_9',
+      },
+    };
+
+    const dataCart: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: 'username-string',
+      },
+    };
+
+    //delete product
+    await deleteProduct.run(dataProduct1);
+
+    //delete cart
+    await deleteCart.run(dataCart);
+  });
 });
