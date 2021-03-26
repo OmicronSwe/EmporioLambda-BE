@@ -286,7 +286,7 @@ describe('Cart populate table', () => {
 
     const response = await getByUsername.run(data);
 
-    console.log(response);
+    //console.log(response);
 
     const body = JSON.parse(response.body);
 

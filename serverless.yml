@@ -210,7 +210,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
-          - AttributeName: email
+          - AttributeName: username
             AttributeType: S
           - AttributeName: date
             AttributeType: S
@@ -220,9 +220,9 @@ resources:
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-order
         GlobalSecondaryIndexes:
-          - IndexName: email_date_index
+          - IndexName: username_date_index
             KeySchema:
-              - AttributeName: email
+              - AttributeName: username
                 KeyType: HASH
               - AttributeName: date
                 KeyType: RANGE
@@ -233,16 +233,6 @@ resources:
               WriteCapacityUnits: 1
 
 functions:
-  #TEST EMAIL (TO REMOVE)
-
-  testEmail:
-    handler: src/endpoints/order/testEmail.index
-    events:
-      - http:
-          path: testemail
-          method: get
-          cors: true
-
   auth:
     handler: src/auth.handler
     environment:
@@ -358,11 +348,11 @@ functions:
           method: get
           cors: true
 
-  getByEmailOrder:
-    handler: src/endpoints/order/getByEmail.index
+  getByUsernameOrder:
+    handler: src/endpoints/order/getByUsername.index
     events:
       - http:
-          path: order/getByEmail/{email}
+          path: order/getByUsername/{username}
           method: get
           cors: true
 

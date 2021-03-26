@@ -1,8 +1,12 @@
-/*'use strict';
+'use strict';
 
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
 import './localDynamoDb';
+import Dynamo from '../src/lib/dynamo';
+import tableName from '../src/lib/tableName';
+import Order from '../src/lib/model/order';
+import Cart from '../src/lib/model/cart';
 
 //test for populated table
 describe('Order populated table', () => {
@@ -11,115 +15,199 @@ describe('Order populated table', () => {
 
   //functions of product
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/order/list.ts', 'index');
+  const getByUsername = mochaPlugin.getWrapper(
+    'index',
+    '/src/endpoints/order/getByUsername.ts',
+    'index'
+  );
   const getById = mochaPlugin.getWrapper('index', '/src/endpoints/order/getById.ts', 'index');
-  const getByEmail = mochaPlugin.getWrapper('index', '/src/endpoints/order/getByEmail.ts', 'index');
 
   before(async () => {
-    const create = mochaPlugin.getWrapper('index', '/src/endpoints/order/create.ts', 'index');
+    //functions
+    const createProd = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
+    const createCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
 
-    const dataOrder1: APIGatewayProxyEvent = {
+    //data
+    const dataProduct1: APIGatewayProxyEvent = {
       body:
-        '{"email": "test@test.com", "products": [{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 10, "quantity": 2},{"id": "dummy_id_10", "name": "name product 2", "price" : 20, "quantity": 4, "description": "description product 2"}]}',
+        '{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
-    const dataOrder2: APIGatewayProxyEvent = {
-      body:
-        '{"email": "test@test.com", "products": [{"id": "dummy_id_12","description": "description product 10" ,"name": "name product 10", "price" : 30, "quantity": 1},{"id": "dummy_id_13", "name": "name product 11", "price" : 40, "quantity": 5, "description": "description product 11"}]}',
+    const dataCart: APIGatewayProxyEvent = {
+      body: '{"username": "username-string", "products": [{"id": "dummy_id_9" ,"quantity": 4}]}',
     };
 
-    const dataOrder3: APIGatewayProxyEvent = {
-      body:
-        '{"email": "test2@test.com", "products": [{"id": "dummy_id_14","description": "description product 14" ,"name": "name product 14", "price" : 12.89, "quantity": 2}]}',
-    };
+    //create product
+    await createProd.run(dataProduct1);
 
-    await create.run(dataOrder1);
-    await create.run(dataOrder2);
-    await create.run(dataOrder3);
+    //create cart
+    await createCart.run(dataCart);
+
+    let result = await Dynamo.get(tableName.cart, 'username', 'username-string').catch((err) => {
+      //handle error of dynamoDB
+      console.log(err);
+      return null;
+    });
+
+    let cart: Cart;
+    let order: Order;
+
+    //push data to dynamodb
+    cart = new Cart(result);
+    order = new Order(cart, 'test@test.com');
+
+    const data = order.toJSON();
+
+    await Dynamo.write(tableName.order, data).catch((err) => {
+      //handle error of dynamoDB
+      console.log(err);
+      return null;
+    });
   });
 
-  it('order list function - should contains 3 orders (2 of "test@test.com" and 1 of "test2@test.com")', async () => {
+  it('order list function - should contains 1 orders of "username-string"', async () => {
     const response = await list.run();
 
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
-    console.log(response);
+    expect(body.result.items[0].email).to.be.equal('test@test.com');
+    expect(body.result.items[0].totalPrice).to.be.equal(44);
 
-    let checkPrice: number = 0;
-    let checkEmail: number = 0;
-
-    body.result.items.forEach((element) => {
-      if (element.totalPrice == 100 || element.totalPrice == 230 || element.totalPrice == 25.78) {
-        checkPrice++;
-      }
-
-      if (element.email == 'test2@test.com' || element.email == 'test@test.com') {
-        checkEmail++;
-      }
-    });
-
-    expect(checkPrice).to.be.equal(3);
-    expect(checkEmail).to.be.equal(3);
-  });
-
-  it('order getByEmail function - should return item "test2@test.com"', async () => {
-    const data: APIGatewayProxyEvent = {
-      pathParameters: {
-        email: 'test2@test.com',
-      },
-    };
-
-    const response = await getByEmail.run(data);
-    const body = JSON.parse(response.body);
-
-    expect(JSON.parse(response.statusCode)).to.be.equal(200);
-
-    expect(body.result.items[0].email).to.be.equal('test2@test.com');
-    expect(body.result.items[0].totalPrice).to.be.equal(25.78);
-
-    expect(body.result.items[0].products[0].id).to.be.equal('dummy_id_14');
-    expect(body.result.items[0].products[0].name).to.be.equal('name product 14');
-    expect(body.result.items[0].products[0].description).to.be.equal('description product 14');
-    expect(body.result.items[0].products[0].price).to.be.equal(12.89);
-    expect(body.result.items[0].products[0].quantity).to.be.equal(2);
+    expect(body.result.items[0].products[0].id).to.be.equal('dummy_id_9');
+    expect(body.result.items[0].products[0].name).to.be.equal('name product 1');
+    expect(body.result.items[0].products[0].description).to.be.equal('description product 1');
+    expect(body.result.items[0].products[0].price).to.be.equal(11);
+    expect(body.result.items[0].products[0].quantity).to.be.equal(4);
     expect(body.result.items[0].products[0].category).to.be.null;
     expect(body.result.items[0].products[0].imageUrl).to.be.null;
   });
 
-  it('order getById function - should return item "test2@test.com"', async () => {
-    //get id
+  it('order getByUsername function - should return item "username-string"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
-        email: 'test2@test.com',
+        username: 'username-string',
       },
     };
 
-    const responseByEmail = await getByEmail.run(data);
+    const response = await getByUsername.run(data);
+
     //console.log(response);
-
-    const id = JSON.parse(responseByEmail.body).result.items[0].id;
-
-    const data2: APIGatewayProxyEvent = {
-      pathParameters: {
-        id: id,
-      },
-    };
-
-    const response = await getById.run(data2);
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
-    expect(body.result.email).to.be.equal('test2@test.com');
-    expect(body.result.totalPrice).to.be.equal(25.78);
+    expect(body.result.items[0].email).to.be.equal('test@test.com');
+    expect(body.result.items[0].totalPrice).to.be.equal(44);
 
-    expect(body.result.products[0].id).to.be.equal('dummy_id_14');
-    expect(body.result.products[0].name).to.be.equal('name product 14');
-    expect(body.result.products[0].description).to.be.equal('description product 14');
-    expect(body.result.products[0].price).to.be.equal(12.89);
-    expect(body.result.products[0].quantity).to.be.equal(2);
+    expect(body.result.items[0].products[0].id).to.be.equal('dummy_id_9');
+    expect(body.result.items[0].products[0].name).to.be.equal('name product 1');
+    expect(body.result.items[0].products[0].description).to.be.equal('description product 1');
+    expect(body.result.items[0].products[0].price).to.be.equal(11);
+    expect(body.result.items[0].products[0].quantity).to.be.equal(4);
+    expect(body.result.items[0].products[0].category).to.be.null;
+    expect(body.result.items[0].products[0].imageUrl).to.be.null;
+  });
+
+  it('order getByUsername function - should return "PathParameters missing"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters_error: {
+        username: 'username-string',
+      },
+    };
+
+    const response = await getByUsername.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
+  });
+
+  it('order getByUsername function - should return "Orders not found"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: 'username-string_error',
+      },
+    };
+
+    const response = await getByUsername.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal('Orders not found');
+  });
+
+  it('order getById function - should return item "username-string"', async () => {
+    const dataUsername: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: 'username-string',
+      },
+    };
+
+    const responseGetByUsername = await getByUsername.run(dataUsername);
+
+    //console.log(responseGetByUsername);
+    const bodyGetByUsername = JSON.parse(responseGetByUsername.body);
+
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        id: bodyGetByUsername.result.items[0].id,
+      },
+    };
+
+    const response = await getById.run(data);
+    const body = JSON.parse(response.body);
+
+    //console.log(response);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
+
+    expect(body.result.email).to.be.equal('test@test.com');
+    expect(body.result.totalPrice).to.be.equal(44);
+    expect(body.result.products[0].id).to.be.equal('dummy_id_9');
+    expect(body.result.products[0].name).to.be.equal('name product 1');
+    expect(body.result.products[0].description).to.be.equal('description product 1');
+    expect(body.result.products[0].price).to.be.equal(11);
+    expect(body.result.products[0].quantity).to.be.equal(4);
     expect(body.result.products[0].category).to.be.null;
     expect(body.result.products[0].imageUrl).to.be.null;
   });
-});*/
+
+  it('order getById function - should return "PathParameters missing"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters_error: {
+        id: 'dummy_id',
+      },
+    };
+
+    const response = await getById.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal('PathParameters missing');
+  });
+
+  it('order getById function - should return "Failed to get order"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        id_error: 'dummy_id',
+      },
+    };
+
+    const response = await getById.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(502);
+    expect(JSON.parse(response.body).error).to.be.equal('Failed to get order');
+  });
+
+  it('order getById function - should return "Order not found"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        id: 'dummy_id',
+      },
+    };
+
+    const response = await getById.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal('Order not found');
+  });
+});

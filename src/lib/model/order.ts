@@ -12,10 +12,6 @@ class Order {
   date: Date;
 
   constructor(cart: Cart, email: string) {
-    if (!cart.username) {
-      throw Error('username value not found');
-    }
-
     if (!email) {
       throw Error('email value not found');
     }

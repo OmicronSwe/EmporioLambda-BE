@@ -16,7 +16,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body = JSON.parse(event.body);
 
-  console.log(body);
+  //console.log(body);
 
   //if image is present, get URL and push it to s3
   if (body.imageFile) {

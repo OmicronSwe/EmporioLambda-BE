@@ -43,3 +43,5 @@ const Nodemailer = {
     }
   },
 };
+
+export default Nodemailer;

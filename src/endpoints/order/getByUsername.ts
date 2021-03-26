@@ -14,12 +14,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
   let keys: Array<string> = [];
   let valueKeys: Array<string> = [];
 
-  keys.push('email');
-  valueKeys.push(event.pathParameters.email);
+  keys.push('username');
+  valueKeys.push(event.pathParameters.username);
 
   const result = await Dynamo.query(
     tableName.order,
-    'email_date_index',
+    'username_date_index',
     keys,
     valueKeys,
     '#element0 = :Value0'
