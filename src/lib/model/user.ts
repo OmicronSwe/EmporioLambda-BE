@@ -8,12 +8,14 @@ export default class User {
   name: string;
   family_name: string;
   address: string;
+  username: string;
 
-  constructor(email: string, name: string, family_name: string, address: string) {
+  constructor(email: string, name: string, family_name: string, address: string, username: string) {
     this.email = email;
     this.name = name;
     this.family_name = family_name;
     this.address = address;
+    this.username = username;
   }
 
   public getData(): object {
@@ -22,11 +24,12 @@ export default class User {
       name: this.name,
       family_name: this.family_name,
       address: this.address,
+      username: this.username,
     };
   }
 
   public static fromDynamoFormat(body: DynamoFormat[]): User {
-    let name, family_name, email, address;
+    let name, family_name, email, address, username;
     body.forEach((element) => {
       console.log(element);
       switch (element.Name) {
@@ -42,11 +45,14 @@ export default class User {
         case 'address':
           address = element.Value;
           break;
+        case 'sub':
+          username = element.Value;
+          break;
         default:
           break;
       }
     });
-    return new User(email, name, family_name, address);
+    return new User(email, name, family_name, address, username);
   }
 
   public toDynamoFormat(): DynamoFormat[] {

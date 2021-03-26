@@ -25,7 +25,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     requestBody.email,
     requestBody.name,
     requestBody.family_name,
-    requestBody.address
+    requestBody.address,
+    requestBody.username
   );
 
   const result = await Cognito.updateUser(
