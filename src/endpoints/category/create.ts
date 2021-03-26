@@ -1,7 +1,7 @@
 import { response, badRequest, badResponse, notFound } from '../../lib/APIResponses';
-import Dynamo from '../../lib/dynamo';
+import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import tableName from '../../lib/tableName';
+import tableName from '../../services/dynamo/tableName';
 import Category from '../../lib/model/category';
 
 /**

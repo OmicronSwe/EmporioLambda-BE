@@ -1,6 +1,6 @@
 import * as fileType from 'file-type';
 import { v4 as uuid } from 'uuid';
-import S3services from './s3';
+import S3services from '../services/s3/s3';
 
 const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
 

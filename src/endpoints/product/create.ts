@@ -1,9 +1,9 @@
 import { response, badRequest, badResponse, notFound } from '../../lib/APIResponses';
-import Dynamo from '../../lib/dynamo';
+import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import tableName from '../../lib/tableName';
-import bucketName from '../../lib/bucketName';
-import Product from '../../lib/model/product';
+import tableName from '../../services/dynamo/tableName';
+import bucketName from '../../services/s3/bucketName';
+import Product, {ProductRequest, ProductDB} from '../../lib/model/product';
 import { pushImage } from '../../lib/pushImage';
 
 /**
@@ -14,29 +14,40 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest('Body missing');
   }
 
-  const body = JSON.parse(event.body);
+  const body: ProductRequest  = JSON.parse(event.body);
+  let imageUrl: string = null;
 
-  //console.log(body);
+
 
   //if image is present, get URL and push it to s3
   if (body.imageFile) {
     try {
-      body.imageUrl = await pushImage(
+      imageUrl = await pushImage(
         body.imageFile.imageCode,
         body.imageFile.mime,
         bucketName.product_image
-      );
-      delete body.imageFile;
+      );      
     } catch (err) {
       //handle logic error of push image
       return badRequest(err.name + ' ' + err.message);
     }
   }
 
+
+  const productDB: ProductDB= {
+    id: null,
+    name: body.name,
+    description: body.description,
+    imageUrl: imageUrl,
+    price: body.price,
+    category: body.category?body.category : null
+
+  }
+
   //push data to dynamodb
   try {
-    const product = new Product(body);
-    const data = product.toJSON();
+    const product: Product = new Product(productDB);
+    const data: ProductDB = product.toJSON();
 
     //check if category is in Db
     if (product.getCategory()) {

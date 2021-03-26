@@ -1,7 +1,7 @@
 import { response, badRequest, badResponse } from '../../lib/APIResponses';
-import Dynamo from '../../lib/dynamo';
+import Dynamo from '../../services/dynamo/dynamo';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import tableName from '../../lib/tableName';
+import tableName from '../../services/dynamo/tableName';
 import Cart from '../../lib/model/cart';
 import Product from '../../lib/model/product';
 

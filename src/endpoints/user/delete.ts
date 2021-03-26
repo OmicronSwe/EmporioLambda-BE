@@ -1,8 +1,8 @@
 import { response, badResponse, badRequest, notFound } from '../../lib/APIResponses';
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import tableName from '../../lib/tableName';
+import tableName from '../../services/dynamo/tableName';
 import { decodeURI } from '../../lib/decodeURISearch';
-import Cognito from '../../lib/cognito';
+import Cognito from '../../services/cognito/cognito';
 
 /**
  * @param  {} event: event passed when lambda is triggered

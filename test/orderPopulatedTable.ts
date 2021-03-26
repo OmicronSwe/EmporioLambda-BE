@@ -3,8 +3,8 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
 
 import './localDynamoDb';
-import Dynamo from '../src/lib/dynamo';
-import tableName from '../src/lib/tableName';
+import Dynamo from '../src/services/dynamo/dynamo';
+import tableName from '../src/services/dynamo/tableName';
 import Order from '../src/lib/model/order';
 import Cart from '../src/lib/model/cart';
 
@@ -12,6 +12,7 @@ import Cart from '../src/lib/model/cart';
 describe('Order populated table', () => {
   const mochaPlugin = require('serverless-mocha-plugin');
   const expect = mochaPlugin.chai.expect;
+  let IDProduct1;
 
   //functions of product
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/order/list.ts', 'index');
@@ -26,20 +27,32 @@ describe('Order populated table', () => {
     //functions
     const createProd = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
     const createCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
+    const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
 
     //data
     const dataProduct1: APIGatewayProxyEvent = {
       body:
-        '{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 11}',
-    };
-
-    const dataCart: APIGatewayProxyEvent = {
-      body:
-        '{"username": "username-string-test", "products": [{"id": "dummy_id_9" ,"quantity": 4}]}',
+        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     //create product
     await createProd.run(dataProduct1);
+
+    //get id
+    let dataId: APIGatewayProxyEvent = {
+      pathParameters: {
+        search: encodeURIComponent('name=name product 1'),
+      },
+    };
+
+    let responseSearch = await search.run(dataId);
+    IDProduct1 = JSON.parse(responseSearch.body).result.items[0].id;
+
+
+    const dataCart: APIGatewayProxyEvent = {
+      body:
+        '{"username": "username-string-test", "products": [{"id": "'+IDProduct1+'" ,"quantity": 4}]}',
+    };
 
     //create cart
     await createCart.run(dataCart);
@@ -85,7 +98,7 @@ describe('Order populated table', () => {
     expect(body.result.items[0].email).to.be.equal('test@test.com');
     expect(body.result.items[0].totalPrice).to.be.equal(44);
 
-    expect(body.result.items[0].products[0].id).to.be.equal('dummy_id_9');
+    expect(body.result.items[0].products[0].id).to.be.equal(IDProduct1);
     expect(body.result.items[0].products[0].name).to.be.equal('name product 1');
     expect(body.result.items[0].products[0].description).to.be.equal('description product 1');
     expect(body.result.items[0].products[0].price).to.be.equal(11);
@@ -147,7 +160,7 @@ describe('Order populated table', () => {
 
     expect(body.result.email).to.be.equal('test@test.com');
     expect(body.result.totalPrice).to.be.equal(44);
-    expect(body.result.products[0].id).to.be.equal('dummy_id_9');
+    expect(body.result.products[0].id).to.be.equal(IDProduct1);
     expect(body.result.products[0].name).to.be.equal('name product 1');
     expect(body.result.products[0].description).to.be.equal('description product 1');
     expect(body.result.products[0].price).to.be.equal(11);
@@ -208,7 +221,7 @@ describe('Order populated table', () => {
     //data
     const dataProduct1: APIGatewayProxyEvent = {
       pathParameters: {
-        id: 'dummy_id_9',
+        id: IDProduct1,
       },
     };
 

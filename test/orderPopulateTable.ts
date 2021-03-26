@@ -8,35 +8,61 @@ import './localDynamoDb';
 describe('Order populate table', () => {
   const mochaPlugin = require('serverless-mocha-plugin');
   const expect = mochaPlugin.chai.expect;
+  let IDProduct1;
+  let IDProduct2;
 
   //functions of order
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/order/create.ts', 'index');
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/order/list.ts', 'index');
+  
 
   before(async () => {
     //functions
     const createProd = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
     const createCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
+    const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
 
     //data
     const dataProduct1: APIGatewayProxyEvent = {
       body:
-        '{"id": "dummy_id_9","description": "description product 1" ,"name": "name product 1", "price" : 11}',
+        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
       body:
-        '{"id": "dummy_id_10", "name": "name product 2 new", "price" : 21,"description": "description product 2"}',
-    };
-
-    const dataCart: APIGatewayProxyEvent = {
-      body:
-        '{"username": "username-string", "products": [{"id": "dummy_id_9", "quantity": 2},{"id": "dummy_id_10" ,"quantity": 4}]}',
+        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
     //create product
     await createProd.run(dataProduct1);
     await createProd.run(dataProduct2);
+
+
+    //get id
+    let data: APIGatewayProxyEvent = {
+      pathParameters: {
+        search: encodeURIComponent('name=name product 1'),
+      },
+    };
+
+    let responseSearch = await search.run(data);
+    IDProduct1 = JSON.parse(responseSearch.body).result.items[0].id;
+
+    data = {
+      pathParameters: {
+        search: encodeURIComponent('name=name product 2'),
+      },
+    };
+
+    responseSearch = await search.run(data);
+    IDProduct2 = JSON.parse(responseSearch.body).result.items[0].id;
+
+    const dataCart: APIGatewayProxyEvent = {
+      body:
+        '{"username": "username-string", "products": [{"id": "'+IDProduct1+'", "quantity": 2},{"id": "'+IDProduct2+'" ,"quantity": 4}]}',
+    };
+
+    
 
     //create cart
     await createCart.run(dataCart);
@@ -120,13 +146,13 @@ describe('Order populate table', () => {
     //data
     const dataProduct1: APIGatewayProxyEvent = {
       pathParameters: {
-        id: 'dummy_id_9',
+        id: IDProduct1,
       },
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
       pathParameters: {
-        id: 'dummy_id_10',
+        id: IDProduct2,
       },
     };
 

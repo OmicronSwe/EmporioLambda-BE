@@ -1,5 +1,27 @@
 import { v4 as uuid } from 'uuid';
 
+export interface ProductDB {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly imageUrl: string;
+  readonly price: number;
+  readonly category: string;
+}
+
+export interface ProductRequest {
+  readonly name: string;
+  readonly description: string;
+  readonly imageFile: ImageFile;
+  readonly price: number;
+  readonly category?: string;
+}
+
+interface ImageFile{
+  readonly imageCode: string
+  readonly mime: string
+}
+
 class Product {
   id: string;
   name: string;
@@ -8,7 +30,7 @@ class Product {
   price: number;
   category: string;
 
-  constructor(data) {
+  constructor(data: ProductDB) {
     if (!data.name) {
       throw Error('name value not found');
     }
@@ -16,15 +38,17 @@ class Product {
       throw Error('description value not found');
     }
 
+    console.log(data.id)
     this.id = data.id ? data.id : uuid();
+    console.log(this.id)
     this.name = data.name;
     this.description = data.description;
     this.price = data.price ? data.price : 0;
-    this.imageUrl = data.imageUrl ? data.imageUrl : null;
-    this.category = data.category ? data.category : null;
+    this.imageUrl = data.imageUrl;
+    this.category = data.category;
   }
 
-  public toJSON(): object {
+  public toJSON(): ProductDB {
     return {
       id: this.id,
       name: this.name,
