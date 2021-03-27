@@ -227,6 +227,59 @@ describe('Cart populate table', () => {
     expect(JSON.parse(response.body).message).to.be.equal('Product "name product 1" added to cart');
   });
 
+  it('cart addProduct function - should be add item to "username-string2" by quantity:', async () => {
+    const dataGet1: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: 'username-string2',
+      },
+    };
+
+    const responseGet1 = await getByUsername.run(dataGet1);
+
+    console.log(responseGet1);
+
+    const data: APIGatewayProxyEvent = {
+      body: '{"id": "' + IDProduct1 + '", "quantity": 2}',
+      pathParameters: {
+        username: 'username-string2',
+      },
+    };
+
+    const response = await addProduct.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
+    expect(JSON.parse(response.body).message).to.be.equal('Product "name product 1" added to cart');
+
+    //check if cart is updated
+
+    const dataGet: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: 'username-string2',
+      },
+    };
+
+    const responseGet = await getByUsername.run(dataGet);
+
+    const body = JSON.parse(responseGet.body);
+
+    console.log(responseGet);
+
+    /*expect(JSON.parse(response.statusCode)).to.be.equal(200);
+    expect(body.result.totalPrice).to.be.equal(22);
+    expect(body.result.username).to.be.equal('username-string');
+    //manage taxes TO-DO
+    expect(body.result.taxesApplied).to.be.equal(0);
+    expect(body.result.products.length).to.be.equal(1);
+    expect(body.result.products[0].id).to.be.equal(IDProduct1);
+    expect(body.result.products[0].name).to.be.equal('name product 1');
+    expect(body.result.products[0].description).to.be.equal('description product 1');
+    expect(body.result.products[0].price).to.be.equal(11);
+    expect(body.result.products[0].quantity).to.be.equal(2);
+    expect(body.result.products[0].imageUrl).to.be.null;
+    expect(body.result.products[0].category).to.be.null;
+    expect(body.messageChange[0]).to.be.equal('Product "name product 2 new" no longer available');*/
+  });
+
   it('cart addProduct function - should be "Failed to get product"', async () => {
     const errorData: APIGatewayProxyEvent = {
       body: '{"dummy": "' + IDProduct1 + '", "quantity": 2}',
