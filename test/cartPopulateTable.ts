@@ -228,16 +228,6 @@ describe('Cart populate table', () => {
   });
 
   it('cart addProduct function - should be add item to "username-string2" by quantity:', async () => {
-    const dataGet1: APIGatewayProxyEvent = {
-      pathParameters: {
-        username: 'username-string2',
-      },
-    };
-
-    const responseGet1 = await getByUsername.run(dataGet1);
-
-    console.log(responseGet1);
-
     const data: APIGatewayProxyEvent = {
       body: '{"id": "' + IDProduct1 + '", "quantity": 2}',
       pathParameters: {
@@ -262,11 +252,9 @@ describe('Cart populate table', () => {
 
     const body = JSON.parse(responseGet.body);
 
-    console.log(responseGet);
-
-    /*expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    expect(body.result.totalPrice).to.be.equal(22);
-    expect(body.result.username).to.be.equal('username-string');
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
+    expect(body.result.totalPrice).to.be.equal(44);
+    expect(body.result.username).to.be.equal('username-string2');
     //manage taxes TO-DO
     expect(body.result.taxesApplied).to.be.equal(0);
     expect(body.result.products.length).to.be.equal(1);
@@ -274,10 +262,9 @@ describe('Cart populate table', () => {
     expect(body.result.products[0].name).to.be.equal('name product 1');
     expect(body.result.products[0].description).to.be.equal('description product 1');
     expect(body.result.products[0].price).to.be.equal(11);
-    expect(body.result.products[0].quantity).to.be.equal(2);
+    expect(body.result.products[0].quantity).to.be.equal(4);
     expect(body.result.products[0].imageUrl).to.be.null;
     expect(body.result.products[0].category).to.be.null;
-    expect(body.messageChange[0]).to.be.equal('Product "name product 2 new" no longer available');*/
   });
 
   it('cart addProduct function - should be "Failed to get product"', async () => {

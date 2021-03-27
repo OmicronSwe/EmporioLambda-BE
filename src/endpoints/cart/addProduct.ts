@@ -21,8 +21,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body: ProductToCartRequest = JSON.parse(event.body);
 
-  console.log(body);
-
   //get Informations cart
   const resultGetCart: CartDB = await Dynamo.get(
     tableName.cart,
