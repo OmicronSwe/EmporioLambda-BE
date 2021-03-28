@@ -1,43 +1,63 @@
-'use strict';
+import { APIGatewayProxyEvent } from "aws-lambda";
+import "./localDynamoDb";
 
-import { APIGatewayProxyEvent } from 'aws-lambda';
+const mochaPlugin = require("serverless-mocha-plugin");
 
-import './localDynamoDb';
-
-//test for checkout
-describe('Checkout create session Stripe', () => {
-  const mochaPlugin = require('serverless-mocha-plugin');
+// test for checkout
+describe("Checkout create session Stripe", () => {
   const expect = mochaPlugin.chai.expect;
   let IDProduct1: string;
   let IDProduct2: string;
 
-  //functions of checkout
-  const createSessionStripe = mochaPlugin.getWrapper('index', '/src/endpoints/checkout/createSessionStripe.ts', 'index');
+  // functions of checkout
+  const createSessionStripe = mochaPlugin.getWrapper(
+    "index",
+    "/src/endpoints/checkout/createSessionStripe.ts",
+    "index"
+  );
 
   before(async () => {
-    //functions
-    const createProd = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
-    const createCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
-    const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
-    const updateProd = mochaPlugin.getWrapper('index', '/src/endpoints/product/update.ts', 'index');
+    // functions
+    const createProd = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/create.ts",
+      "index"
+    );
+    const createCart = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/cart/create.ts",
+      "index"
+    );
+    const search = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/search.ts",
+      "index"
+    );
+    const updateProd = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/update.ts",
+      "index"
+    );
 
-    //data
+    // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body:
+        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
-      body: '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
+      body:
+        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
-    //create product
+    // create product
     await createProd.run(dataProduct1);
     await createProd.run(dataProduct2);
 
-    //get id
+    // get id
     let data: APIGatewayProxyEvent = {
       pathParameters: {
-        search: encodeURIComponent('name=name product 1'),
+        search: encodeURIComponent("name=name product 1"),
       },
     };
 
@@ -46,7 +66,7 @@ describe('Checkout create session Stripe', () => {
 
     data = {
       pathParameters: {
-        search: encodeURIComponent('name=name product 2'),
+        search: encodeURIComponent("name=name product 2"),
       },
     };
 
@@ -54,72 +74,67 @@ describe('Checkout create session Stripe', () => {
     IDProduct2 = JSON.parse(responseSearch.body).result.items[0].id;
 
     const dataCart: APIGatewayProxyEvent = {
-      body:
-        '{"username": "username-string", "products": [{"id": "' +
-        IDProduct1 +
-        '", "quantity": 2},{"id": "' +
-        IDProduct2 +
-        '" ,"quantity": 4}]}',
+      body: `{"username": "username-string", "products": [{"id": "${IDProduct1}", "quantity": 2},{"id": "${IDProduct2}" ,"quantity": 4}]}`,
     };
 
-    //create cart
+    // create cart
     await createCart.run(dataCart);
 
-    //update product after create cart
+    // update product after create cart
     const dataUpdate: APIGatewayProxyEvent = {
-        body:
-          '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
-        pathParameters: {
-          id: IDProduct2,
-        },
+      body:
+        '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
+      pathParameters: {
+        id: IDProduct2,
+      },
     };
 
     await updateProd.run(dataUpdate);
   });
-  
+
   it('checkout createSessionStripe function - should be "Body missing"', async () => {
     const data: APIGatewayProxyEvent = {
-      body_error: 'dummy'
+      body_error: "dummy",
     };
 
     const response = await createSessionStripe.run(data);
 
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal('Body missing');
+    expect(JSON.parse(response.body).error).to.be.equal("Body missing");
   });
 
   it('checkout createSessionStripe function - should be "Failed to get cart"', async () => {
     const data: APIGatewayProxyEvent = {
-      body: '{"username_error":"username"}'
+      body: '{"username_error":"username"}',
     };
 
     const response = await createSessionStripe.run(data);
 
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Failed to get cart');
+    expect(JSON.parse(response.body).error).to.be.equal("Failed to get cart");
   });
 
   it('checkout createSessionStripe function - should be "Some products have changed, please check your shopping cart before proceeding"', async () => {
     const data: APIGatewayProxyEvent = {
-      body: '{"username":"username-string"}'
+      body: '{"username":"username-string"}',
     };
 
     const response = await createSessionStripe.run(data);
 
-    console.log(response);
-
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Some products have changed, please check your shopping cart before proceeding');
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Some products have changed, please check your shopping cart before proceeding"
+    );
   });
 
   it('checkout createSessionStripe function - should be "Some products are no longer available, please check your shopping cart before proceeding"', async () => {
     const deleteProduct = mochaPlugin.getWrapper(
-      'index',
-      '/src/endpoints/product/delete.ts',
-      'index'
+      "index",
+      "/src/endpoints/product/delete.ts",
+      "index"
     );
     const dataProductDelete2: APIGatewayProxyEvent = {
       pathParameters: {
@@ -128,28 +143,32 @@ describe('Checkout create session Stripe', () => {
     };
 
     await deleteProduct.run(dataProductDelete2);
-    
+
     const data: APIGatewayProxyEvent = {
-      body: '{"username":"username-string"}'
+      body: '{"username":"username-string"}',
     };
 
     const response = await createSessionStripe.run(data);
 
-    console.log(response);
-
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
-    expect(JSON.parse(response.body).error).to.be.equal('Some products are no longer available, please check your shopping cart before proceeding');
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Some products are no longer available, please check your shopping cart before proceeding"
+    );
   });
 
   after(async () => {
-    //functions
+    // functions
     const deleteProduct = mochaPlugin.getWrapper(
-      'index',
-      '/src/endpoints/product/delete.ts',
-      'index'
+      "index",
+      "/src/endpoints/product/delete.ts",
+      "index"
     );
-    const deleteCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/delete.ts', 'index');
+    const deleteCart = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/cart/delete.ts",
+      "index"
+    );
 
     const dataProduct1: APIGatewayProxyEvent = {
       pathParameters: {
@@ -159,13 +178,13 @@ describe('Checkout create session Stripe', () => {
 
     const dataCart: APIGatewayProxyEvent = {
       pathParameters: {
-        username: 'username-string',
+        username: "username-string",
       },
     };
-    //delete product
+    // delete product
     await deleteProduct.run(dataProduct1);
 
-    //delete cart
+    // delete cart
     await deleteCart.run(dataCart);
   });
 });

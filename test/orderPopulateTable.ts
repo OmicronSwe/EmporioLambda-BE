@@ -1,43 +1,59 @@
-'use strict';
+import { APIGatewayProxyEvent } from "aws-lambda";
 
-import { APIGatewayProxyEvent } from 'aws-lambda';
+import "./localDynamoDb";
 
-import './localDynamoDb';
+const mochaPlugin = require("serverless-mocha-plugin");
 
-//test for populate table
-describe('Order populate table', () => {
-  const mochaPlugin = require('serverless-mocha-plugin');
+// test for populate table
+describe("Order populate table", () => {
   const expect = mochaPlugin.chai.expect;
   let IDProduct1: string;
   let IDProduct2: string;
 
-  //functions of order
-  const create = mochaPlugin.getWrapper('index', '/src/endpoints/order/create.ts', 'index');
-  const list = mochaPlugin.getWrapper('index', '/src/endpoints/order/list.ts', 'index');
+  // functions of order
+  const create = mochaPlugin.getWrapper(
+    "index",
+    "/src/endpoints/order/create.ts",
+    "index"
+  );
 
   before(async () => {
-    //functions
-    const createProd = mochaPlugin.getWrapper('index', '/src/endpoints/product/create.ts', 'index');
-    const createCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
-    const search = mochaPlugin.getWrapper('index', '/src/endpoints/product/search.ts', 'index');
+    // functions
+    const createProd = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/create.ts",
+      "index"
+    );
+    const createCart = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/cart/create.ts",
+      "index"
+    );
+    const search = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/search.ts",
+      "index"
+    );
 
-    //data
+    // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body:
+        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
-      body: '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
+      body:
+        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
-    //create product
+    // create product
     await createProd.run(dataProduct1);
     await createProd.run(dataProduct2);
 
-    //get id
+    // get id
     let data: APIGatewayProxyEvent = {
       pathParameters: {
-        search: encodeURIComponent('name=name product 1'),
+        search: encodeURIComponent("name=name product 1"),
       },
     };
 
@@ -46,7 +62,7 @@ describe('Order populate table', () => {
 
     data = {
       pathParameters: {
-        search: encodeURIComponent('name=name product 2'),
+        search: encodeURIComponent("name=name product 2"),
       },
     };
 
@@ -54,15 +70,10 @@ describe('Order populate table', () => {
     IDProduct2 = JSON.parse(responseSearch.body).result.items[0].id;
 
     const dataCart: APIGatewayProxyEvent = {
-      body:
-        '{"username": "username-string", "products": [{"id": "' +
-        IDProduct1 +
-        '", "quantity": 2},{"id": "' +
-        IDProduct2 +
-        '" ,"quantity": 4}]}',
+      body: `{"username": "username-string", "products": [{"id": "${IDProduct1}", "quantity": 2},{"id": "${IDProduct2}" ,"quantity": 4}]}`,
     };
 
-    //create cart
+    // create cart
     await createCart.run(dataCart);
   });
 
@@ -74,9 +85,11 @@ describe('Order populate table', () => {
 
     const response = await create.run(data);
 
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Failed to get user data');
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Failed to get user data"
+    );
   });
 
   it('order create function - should be "Failed to create order"', async () => {
@@ -87,9 +100,11 @@ describe('Order populate table', () => {
 
     const response = await create.run(data);
 
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Failed to create order');
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Failed to create order"
+    );
   });
 
   it('order create function - should be "Failed to get cart"', async () => {
@@ -100,9 +115,9 @@ describe('Order populate table', () => {
 
     const response = await create.run(data);
 
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal('Failed to get cart');
+    expect(JSON.parse(response.body).error).to.be.equal("Failed to get cart");
   });
 
   it('order create function - should be "Cart not found"', async () => {
@@ -113,9 +128,9 @@ describe('Order populate table', () => {
 
     const response = await create.run(data);
 
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
-    expect(JSON.parse(response.body).error).to.be.equal('Cart not found');
+    expect(JSON.parse(response.body).error).to.be.equal("Cart not found");
   });
 
   it('order create function - should be "Error email value not found"', async () => {
@@ -126,22 +141,28 @@ describe('Order populate table', () => {
 
     const response = await create.run(data);
 
-    //console.log(response);
+    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal('Error email value not found');
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Error email value not found"
+    );
   });
 
   after(async () => {
-    //functions
+    // functions
     const deleteProduct = mochaPlugin.getWrapper(
-      'index',
-      '/src/endpoints/product/delete.ts',
-      'index'
+      "index",
+      "/src/endpoints/product/delete.ts",
+      "index"
     );
 
-    const deleteCart = mochaPlugin.getWrapper('index', '/src/endpoints/cart/delete.ts', 'index');
+    const deleteCart = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/cart/delete.ts",
+      "index"
+    );
 
-    //data
+    // data
     const dataProduct1: APIGatewayProxyEvent = {
       pathParameters: {
         id: IDProduct1,
@@ -156,15 +177,15 @@ describe('Order populate table', () => {
 
     const dataCart: APIGatewayProxyEvent = {
       pathParameters: {
-        username: 'username-string',
+        username: "username-string",
       },
     };
 
-    //delete product
+    // delete product
     await deleteProduct.run(dataProduct1);
     await deleteProduct.run(dataProduct2);
 
-    //delete cart
-    const result = await deleteCart.run(dataCart);
+    // delete cart
+    await deleteCart.run(dataCart);
   });
 });
