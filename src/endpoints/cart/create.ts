@@ -33,7 +33,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
   // get info of product
 
   // check if products exist and are modify
-  /* eslint-disable no-await-in-loop */
   for (let i = 0; i < body.products.length; i++) {
     const result: ProductDB = await Dynamo.get(
       tableName.product,
@@ -55,7 +54,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
       cart.addProduct(prod, body.products[i].quantity);
     }
   }
-  /* eslint-enable no-await-in-loop */
 
   const data = cart.toJSON();
 

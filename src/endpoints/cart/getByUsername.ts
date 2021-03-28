@@ -24,9 +24,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.cart,
     "username",
     event.pathParameters.username
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 
@@ -38,19 +37,18 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return notFound("Cart not found");
   }
 
-  let change: boolean = false;
   const messageChange: Array<string> = new Array<string>();
   const cart: Cart = new Cart(resultCart);
 
   // check if products exist and are modify
-  for (const productCart of cart.getProductsList()) {
+  const cartProductList: Array<Product> = cart.getProductsList();
+  for (let i = 0; i < cartProductList.length; i++) {
     const result: ProductDB = await Dynamo.get(
       tableName.product,
       "id",
-      productCart.id
-    ).catch((err) => {
+      cartProductList[i].id
+    ).catch(() => {
       // handle error of dynamoDB
-      console.log(err);
       return null;
     });
 
@@ -59,24 +57,24 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
 
     if (Object.keys(result).length === 0) {
-      change = true;
-      messageChange.push(`Product "${productCart.name}" no longer available`);
-      cart.removeProductTotally(productCart);
+      messageChange.push(
+        `Product "${cartProductList[i].name}" no longer available`
+      );
+      cart.removeProductTotally(cartProductList[i]);
     } else {
       // console.log(result);
       const prodFromDb = new Product(result);
 
-      if (productCart.isDifference(prodFromDb)) {
-        cart.updateProduct(productCart, prodFromDb);
-        change = true;
-        messageChange.push(`"${productCart.name}" product has been modified`);
+      if (cartProductList[i].isDifference(prodFromDb)) {
+        cart.updateProduct(cartProductList[i], prodFromDb);
+        messageChange.push(
+          `"${cartProductList[i].name}" product has been modified`
+        );
       }
     }
   }
 
   const result = cart.toJSON();
-
-  // console.log(result);
 
   return response({ data: { result, messageChange } });
 };

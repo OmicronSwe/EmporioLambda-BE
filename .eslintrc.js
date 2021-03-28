@@ -17,7 +17,8 @@ module.exports = {
      "eqeqeq": "off",
      "@typescript-eslint/no-shadow": "off",
      "prefer-destructuring": "off",
-     "import/prefer-default-export": "off"
+     "import/prefer-default-export": "off",
+     "no-await-in-loop": "off"
 
     }
 }
