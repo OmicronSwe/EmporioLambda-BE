@@ -30,9 +30,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.cart,
     "username",
     event.pathParameters.username
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 
@@ -58,19 +57,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
     cartFromDB.removeProductTotally(prod);
   }
 
-  const newCart = await Dynamo.write(tableName.cart, cartFromDB.toJSON()).catch(
-    (err) => {
+  return await Dynamo.write(tableName.cart, cartFromDB.toJSON())
+    .then(() => {
+      return response({
+        data: { message: `Product "${prod.name}" removed from cart` },
+      });
+    })
+    .catch(() => {
       // handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
-
-  if (!newCart) {
-    return badResponse(`Failed to remove product "${prod.name}" from cart`);
-  }
-
-  return response({
-    data: { message: `Product "${prod.name}" removed from cart` },
-  });
+      return badResponse(`Failed to remove product "${prod.name}" from cart`);
+    });
 };

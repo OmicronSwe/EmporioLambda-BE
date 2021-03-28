@@ -17,15 +17,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
     products: [],
   };
 
-  const result = await Dynamo.write(tableName.cart, data).catch((err) => {
-    // handle error of dynamoDB
-    console.log(err);
-    return null;
-  });
-
-  if (!result) {
-    return badResponse("Failed to empty the cart");
-  }
-
-  return response({ data: { message: "Cart emptied" } });
+  return Dynamo.write(tableName.cart, data)
+    .then(() => {
+      return response({ data: { message: "Cart emptied" } });
+    })
+    .catch(() => {
+      // handle error of dynamoDB
+      return badResponse("Failed to empty the cart");
+    });
 };
