@@ -1,10 +1,10 @@
-import Product from '../../model/product/product';
-import { HMTLTemplate, TXTTemplate } from './orderTemplateEmail';
+import Product from "../../model/product/product";
+import { HMTLTemplate, TXTTemplate } from "./orderTemplateEmail";
 
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.EMAIL,
     pass: process.env.PASS_EMAIL,
@@ -20,14 +20,14 @@ const Nodemailer = {
   ) => {
     // setup e-mail data with unicode symbols
 
-    var mailOptions = {
-      from: '"EmporioLambda company" <' + process.env.EMAIL + '>', // sender address
+    const mailOptions = {
+      from: `"EmporioLambda company" <${process.env.EMAIL}>`, // sender address
       to: emailToSend, // list of receivers
-      subject: 'Order details', // Subject line
+      subject: "Order details", // Subject line
       text: TXTTemplate(productList, totalPrice, nameCustomer), // plaintext body
       html: HMTLTemplate(productList, totalPrice, nameCustomer), // html body
     };
-    let resp = await new Promise((resolve) => {
+    const resp = await new Promise((resolve) => {
       transporter.sendMail(mailOptions, (error) => {
         if (error) {
           console.log(error);
@@ -39,7 +39,7 @@ const Nodemailer = {
     });
 
     if (!resp) {
-      throw Error('Failed to send email of order');
+      throw Error("Failed to send email of order");
     }
   },
 };

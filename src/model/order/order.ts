@@ -1,26 +1,32 @@
-import { v4 as uuid } from 'uuid';
-import Product from '../product/product';
-import Cart from '../cart/cart';
+import { v4 as uuid } from "uuid";
+import Product from "../product/product";
+import Cart from "../cart/cart";
 
 class Order {
   id: string;
+
   username: string;
+
   email: string;
+
   products: Map<Product, number>;
+
   totalPrice: number;
+
   taxesApplied: number;
+
   date: Date;
 
   constructor(cart: Cart, email: string) {
     if (!email) {
-      throw Error('email value not found');
+      throw Error("email value not found");
     }
 
     if (cart.products.size <= 0) {
-      throw Error('products list not found');
+      throw Error("products list not found");
     }
 
-    //console.log(body);
+    // console.log(body);
 
     this.products = cart.products;
     this.taxesApplied = cart.taxesApplied;
@@ -32,9 +38,9 @@ class Order {
   }
 
   public toJSON(): object {
-    let productsOrder = Array.from(this.products.keys());
+    const productsOrder = Array.from(this.products.keys());
     let productsOrderObject;
-    let productOrderArray = [];
+    const productOrderArray = [];
 
     productsOrder.forEach((element) => {
       productsOrderObject = element.toJSON();

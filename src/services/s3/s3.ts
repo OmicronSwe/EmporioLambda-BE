@@ -1,4 +1,4 @@
-import { S3 } from 'aws-sdk';
+import { S3 } from "aws-sdk";
 
 const s3 = new S3();
 
@@ -16,24 +16,24 @@ const S3services = {
     data: Buffer,
     key: string,
     contentType: string,
-    ACL: string = 'public-read'
+    ACL: string = "public-read"
   ): Promise<S3.ManagedUpload.SendData> => {
     const params: S3.PutObjectRequest = {
       Body: data,
       Key: key,
       ContentType: contentType,
       Bucket: bucket,
-      ACL: ACL,
+      ACL,
     };
 
-    return await s3
+    return s3
       .upload(params)
       .promise()
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in S3 upload for bucket ${bucket}: ` + err);
+        throw Error(`Error in S3 upload for bucket ${bucket}: ${err}`);
       });
   },
   /**
@@ -41,20 +41,23 @@ const S3services = {
    * @param  {string} key: key of file
    * @returns Promise
    */
-  delete: async (bucket: string, key: string): Promise<S3.DeleteObjectOutput> => {
+  delete: async (
+    bucket: string,
+    key: string
+  ): Promise<S3.DeleteObjectOutput> => {
     const params: S3.DeleteObjectRequest = {
       Key: key,
       Bucket: bucket,
     };
 
-    return await s3
+    return s3
       .deleteObject(params)
       .promise()
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in S3 delete for bucket ${bucket}: ` + err);
+        throw Error(`Error in S3 delete for bucket ${bucket}: ${err}`);
       });
   },
 };

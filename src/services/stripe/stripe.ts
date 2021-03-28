@@ -1,18 +1,20 @@
-'use strict';
+import Cart from "../../model/cart/cart";
 
-import Cart from '../../model/cart/cart';
-
-const https = require('https');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+const https = require("https");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
   httpAgent: new https.Agent({ keepAlive: false }),
 });
 
 const Stripe = {
-  createSession: async (cart: Cart, successUrl: string, cancelUrl: string): Promise<string> => {
+  createSession: async (
+    cart: Cart,
+    successUrl: string,
+    cancelUrl: string
+  ): Promise<string> => {
     try {
       const params = {
-        payment_method_types: ['card'],
-        mode: 'payment',
+        payment_method_types: ["card"],
+        mode: "payment",
         client_reference_id: cart.username,
         line_items: cart.getProductsInfoCheckout(),
         success_url: successUrl,
@@ -23,29 +25,29 @@ const Stripe = {
 
       return session.id;
     } catch (err) {
-      throw Error('Error in Stripe createSession: ' + err);
+      throw Error(`Error in Stripe createSession: ${err}`);
     }
   },
 
   retrieveDataCheckout: async (idSessionStripe: string) => {
     try {
       const session = await stripe.checkout.sessions.retrieve(idSessionStripe, {
-        expand: ['line_items'],
+        expand: ["line_items"],
       });
 
       return session;
     } catch (err) {
-      throw Error('Error in Stripe retrieveDataCheckout: ' + err);
+      throw Error(`Error in Stripe retrieveDataCheckout: ${err}`);
     }
   },
 
-  charge: async (token: string, amount: number, currency: string = 'EUR') => {
+  charge: async (token: string, amount: number, currency: string = "EUR") => {
     return stripe.charges
       .create({
         // Create Stripe charge with token
         amount,
         currency,
-        description: 'Serverless Stripe Test charge',
+        description: "Serverless Stripe Test charge",
         source: token,
       })
       .then((charge) => {
@@ -54,7 +56,7 @@ const Stripe = {
       })
       .catch((err) => {
         // Error response
-        throw Error('Error in Stripe service' + err);
+        throw Error(`Error in Stripe service${err}`);
       });
   },
 };

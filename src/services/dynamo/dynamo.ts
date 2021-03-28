@@ -1,4 +1,4 @@
-import { DynamoDB } from 'aws-sdk';
+import { DynamoDB } from "aws-sdk";
 
 const dynamoDb = new DynamoDB.DocumentClient();
 
@@ -28,7 +28,7 @@ const Dynamo = {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in Dynamo get from table ${tableName}: ` + err);
+        throw Error(`Error in Dynamo get from table ${tableName}: ${err}`);
       });
 
     return data.Item ? data.Item : {};
@@ -45,14 +45,14 @@ const Dynamo = {
       Item: data,
     };
 
-    return await dynamoDb
+    return dynamoDb
       .put(params)
       .promise()
       .then((data) => {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in Dynamo write in table ${tableName}: ` + err);
+        throw Error(`Error in Dynamo write in table ${tableName}: ${err}`);
       });
   },
 
@@ -77,25 +77,25 @@ const Dynamo = {
       );
     }
 
-    let updateExpr: string = 'SET ';
-    let AttriNameExpr: { [k: string]: string } = {};
-    let AttriValueExpr: { [k: string]: any } = {};
+    let updateExpr: string = "SET ";
+    const AttriNameExpr: { [k: string]: string } = {};
+    const AttriValueExpr: { [k: string]: any } = {};
 
-    //create expression for update
+    // create expression for update
     for (let index = 0; index < updateElement.length; index++) {
-      updateExpr += '#element' + index + ' = :value' + index + ',';
+      updateExpr += `#element${index} = :value${index},`;
     }
 
     updateExpr = updateExpr.slice(0, -1);
 
-    //create element and value for update
+    // create element and value for update
     updateElement.forEach((element, index) => {
-      AttriNameExpr['#element' + index] = element;
+      AttriNameExpr[`#element${index}`] = element;
 
       if (isNaN(+updateValue[index])) {
-        AttriValueExpr[':value' + index] = updateValue[index];
+        AttriValueExpr[`:value${index}`] = updateValue[index];
       } else {
-        AttriValueExpr[':value' + index] = Number(updateValue[index]);
+        AttriValueExpr[`:value${index}`] = Number(updateValue[index]);
       }
     });
 
@@ -107,7 +107,7 @@ const Dynamo = {
       ExpressionAttributeValues: AttriValueExpr,
     };
 
-    //console.log(params);
+    // console.log(params);
 
     return dynamoDb
       .update(params)
@@ -116,7 +116,7 @@ const Dynamo = {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in Dynamo update in table ${tableName}: ` + err);
+        throw Error(`Error in Dynamo update in table ${tableName}: ${err}`);
       });
   },
 
@@ -136,24 +136,24 @@ const Dynamo = {
     element: Array<string>,
     value: Array<string>,
     keyCondition: string,
-    filterExpression: string = '',
+    filterExpression: string = "",
     limit?: number,
     exclusiveStartKey?: string
   ): Promise<object> => {
-    let AttriNameExpr: { [k: string]: string } = {};
-    let AttriValueExpr: { [k: string]: any } = {};
+    const AttriNameExpr: { [k: string]: string } = {};
+    const AttriValueExpr: { [k: string]: any } = {};
 
-    //create element for query
+    // create element for query
     element.forEach((element, index) => {
-      AttriNameExpr['#element' + index] = element;
+      AttriNameExpr[`#element${index}`] = element;
     });
 
-    //create value for query
+    // create value for query
     value.forEach((element, index) => {
       if (isNaN(+element)) {
-        AttriValueExpr[':Value' + index] = element;
+        AttriValueExpr[`:Value${index}`] = element;
       } else {
-        AttriValueExpr[':Value' + index] = Number(element);
+        AttriValueExpr[`:Value${index}`] = Number(element);
       }
     });
 
@@ -165,8 +165,8 @@ const Dynamo = {
       ExpressionAttributeValues: AttriValueExpr,
     };
 
-    //add filterExpression if not empty
-    if (filterExpression != '') {
+    // add filterExpression if not empty
+    if (filterExpression != "") {
       params.FilterExpression = filterExpression;
     }
 
@@ -185,13 +185,15 @@ const Dynamo = {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in Dynamo query in table in table ${tableName}: ` + err);
+        throw Error(
+          `Error in Dynamo query in table in table ${tableName}: ${err}`
+        );
       });
 
     return { items: res.Items || [], lastEvaluatedKey: res.LastEvaluatedKey };
   },
 
-  /**Percorre tutta la tabella e poi applica le condizioni, per questo più lenta della query. Non serve identificare le
+  /** Percorre tutta la tabella e poi applica le condizioni, per questo più lenta della query. Non serve identificare le
    * chiavi primarie, secondarie o indici
    * @param  {string} tableName: name of the table
    * @param  {string=''} filterExpression: the expression filter for scan (optional)
@@ -211,26 +213,26 @@ const Dynamo = {
    */
   scan: async (
     tableName: string,
-    filterExpression: string = '',
+    filterExpression: string = "",
     element: Array<string> = [],
     value: Array<string> = [],
     limit?: number,
     startKey?: object
   ): Promise<object> => {
-    let AttriNameExpr: { [k: string]: string } = {};
-    let AttriValueExpr: { [k: string]: any } = {};
+    const AttriNameExpr: { [k: string]: string } = {};
+    const AttriValueExpr: { [k: string]: any } = {};
 
-    //create element for scan
+    // create element for scan
     element.forEach((element, index) => {
-      AttriNameExpr['#element' + index] = element;
+      AttriNameExpr[`#element${index}`] = element;
     });
 
-    //create value for scan
+    // create value for scan
     value.forEach((element, index) => {
       if (isNaN(+element)) {
-        AttriValueExpr[':Value' + index] = element;
+        AttriValueExpr[`:Value${index}`] = element;
       } else {
-        AttriValueExpr[':Value' + index] = Number(element);
+        AttriValueExpr[`:Value${index}`] = Number(element);
       }
     });
 
@@ -238,18 +240,18 @@ const Dynamo = {
       TableName: tableName,
     };
 
-    //add filterExpression if not empty
-    if (filterExpression != '') {
-      //scan by condition
+    // add filterExpression if not empty
+    if (filterExpression != "") {
+      // scan by condition
       params.FilterExpression = filterExpression;
       params.ExpressionAttributeValues = AttriValueExpr;
       params.ExpressionAttributeNames = AttriNameExpr;
     }
 
     if (startKey) {
-      //console.log(startKey);
+      // console.log(startKey);
       params.ExclusiveStartKey = startKey;
-      //console.log(params.ExclusiveStartKey.id);
+      // console.log(params.ExclusiveStartKey.id);
     }
 
     if (limit) {
@@ -263,7 +265,7 @@ const Dynamo = {
         return data;
       })
       .catch((err) => {
-        throw Error(`Error in Dynamo scan in table ${tableName}: ` + err);
+        throw Error(`Error in Dynamo scan in table ${tableName}: ${err}`);
       });
 
     return { items: res.Items || [], lastEvaluatedKey: res.LastEvaluatedKey };
@@ -293,7 +295,7 @@ const Dynamo = {
         return data;
       })
       .catch(function (err) {
-        throw Error(`Error in Dynamo delete in table ${tableName}: ` + err);
+        throw Error(`Error in Dynamo delete in table ${tableName}: ${err}`);
       });
   },
 };
