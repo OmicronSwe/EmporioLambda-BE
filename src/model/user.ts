@@ -3,6 +3,7 @@ export interface DynamoFormat {
   Value: string;
 }
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export default class User {
   email: string;
 
@@ -45,7 +46,6 @@ export default class User {
     let address;
     let username;
     body.forEach((element) => {
-      console.log(element);
       switch (element.Name) {
         case "name":
           name = element.Value;
@@ -92,3 +92,4 @@ export default class User {
     return result;
   }
 }
+/* eslint-enable @typescript-eslint/naming-convention */
