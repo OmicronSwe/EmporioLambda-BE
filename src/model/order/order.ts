@@ -1,6 +1,7 @@
 import { v4 as uuid } from "uuid";
 import Product from "../product/product";
 import Cart from "../cart/cart";
+import { OrderDB } from "./interface";
 
 class Order {
   id: string;
@@ -37,7 +38,7 @@ class Order {
     this.date = new Date();
   }
 
-  public toJSON(): object {
+  public toJSON(): OrderDB {
     const productsOrder = Array.from(this.products.keys());
     let productsOrderObject;
     const productOrderArray = [];

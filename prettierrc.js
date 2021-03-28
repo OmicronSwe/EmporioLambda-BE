@@ -1,3 +1,3 @@
-'use strict';
+"use strict";
 
-module.exports = require('@serverless/eslint-config/prettier.config');
+module.exports = require("@serverless/eslint-config/prettier.config");
