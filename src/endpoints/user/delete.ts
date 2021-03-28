@@ -1,12 +1,5 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import {
-  response,
-  badResponse,
-  badRequest,
-  notFound,
-} from "../../lib/APIResponses";
-import tableName from "../../services/dynamo/tableName";
-import { decodeURI } from "../../lib/decodeURI";
+import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Cognito from "../../services/cognito/cognito";
 
 /**
@@ -17,17 +10,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const result = await Cognito.deleteUser(event.pathParameters.username).catch(
-    (err) => {
+  return Cognito.deleteUser(event.pathParameters.username)
+    .then(() => {
+      return response({ data: { message: "User deleted correctly" } });
+    })
+    .catch(() => {
       // handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
-
-  if (!result) {
-    return badResponse("Failed to delete user");
-  }
-
-  return response({ data: { message: "User deleted correctly" } });
+      return badResponse("Failed to delete user");
+    });
 };

@@ -1,12 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import {
-  response,
-  notFound,
-  badResponse,
-  badRequest,
-} from "../../lib/APIResponses";
+import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Cognito from "../../services/cognito/cognito";
-import User, { DynamoFormat } from "../../model/user";
+import User from "../../model/user";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -34,18 +29,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
     requestBody.username
   );
 
-  const result = await Cognito.updateUser(
+  return Cognito.updateUser(
     user.toDynamoFormat(),
     event.pathParameters.username
-  ).catch((err) => {
-    // handle error of dynamoDB
-    console.log(err);
-    return null;
-  });
-
-  if (!result) {
-    return badResponse("Failed to udpate user");
-  }
-
-  return response({ data: { message: "User updated correctly" } });
+  )
+    .then(() => {
+      return response({ data: { message: "User updated correctly" } });
+    })
+    .catch(() => {
+      // handle error of dynamoDB
+      return badResponse("Failed to udpate user");
+    });
 };
