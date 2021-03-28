@@ -31,9 +31,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.product,
     "id",
     event.pathParameters.id
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 
@@ -63,21 +62,18 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   // update product
-  const result = await Dynamo.update(
+  return await Dynamo.update(
     tableName.product,
     "id",
     event.pathParameters.id,
     Object.keys(body),
     Object.values(body)
-  ).catch((err) => {
-    // handle dynamoDb error
-    console.log(err);
-    return null;
-  });
-
-  if (!result) {
-    return badResponse("Failed to update product");
-  }
-
-  return response({ data: { message: "Product updated correctly" } });
+  )
+    .then(() => {
+      return response({ data: { message: "Product updated correctly" } });
+    })
+    .catch(() => {
+      // handle dynamoDb error
+      return badResponse("Failed to update product");
+    });
 };

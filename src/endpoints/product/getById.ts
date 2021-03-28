@@ -21,9 +21,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.product,
     "id",
     event.pathParameters.id
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 

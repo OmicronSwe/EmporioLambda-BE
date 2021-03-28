@@ -57,9 +57,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
         tableName.category,
         "name",
         product.getCategory()
-      ).catch((err) => {
+      ).catch(() => {
         // handle error of dynamoDB
-        console.log(err);
         return null;
       });
 
@@ -72,21 +71,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
       }
     }
 
-    const newProduct = await Dynamo.write(tableName.product, data).catch(
-      (err) => {
+    return await Dynamo.write(tableName.product, data)
+      .then(() => {
+        return response({
+          data: { message: `Product "${product.name}" created correctly` },
+        });
+      })
+      .catch(() => {
         // handle error of dynamoDB
-        console.log(err);
-        return null;
-      }
-    );
-
-    if (!newProduct) {
-      return badResponse("Failed to create product");
-    }
-
-    return response({
-      data: { message: `Product "${product.name}" created correctly` },
-    });
+        return badResponse("Failed to create product");
+      });
   } catch (err) {
     // handle logic error of product
     return badRequest(`${err.name} ${err.message}`);

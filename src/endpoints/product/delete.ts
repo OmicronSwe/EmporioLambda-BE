@@ -24,9 +24,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.product,
     "id",
     event.pathParameters.id
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 
@@ -41,19 +40,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   // delete Element
-  const result = await Dynamo.delete(
-    tableName.product,
-    "id",
-    event.pathParameters.id
-  ).catch((err) => {
-    // handle error of dynamoDB
-    console.log(err);
-    return null;
-  });
-
-  if (!result) {
-    return badResponse("Failed to delete product");
-  }
-
-  return response({ data: { message: "Product deleted correctly" } });
+  return await Dynamo.delete(tableName.product, "id", event.pathParameters.id)
+    .then(() => {
+      return response({ data: { message: "Product deleted correctly" } });
+    })
+    .catch(() => {
+      // handle error of dynamoDB
+      return badResponse("Failed to delete product");
+    });
 };

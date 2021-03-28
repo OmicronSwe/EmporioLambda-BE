@@ -28,7 +28,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
     dataSearch = JSON.parse(decodeURI(event.pathParameters.search));
   } catch (err) {
     // handle error to parse URI
-    console.log(err);
     return badRequest("Bad search path form");
   }
 
@@ -103,9 +102,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     valueKeys,
     limit,
     dataSearch.lastEvaluatedKey
-  ).catch((err) => {
+  ).catch(() => {
     // handle dynamoDb error
-    console.log(err);
     return null;
   });
 
