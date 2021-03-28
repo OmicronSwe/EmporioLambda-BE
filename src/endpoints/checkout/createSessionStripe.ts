@@ -44,7 +44,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // check if products exist and are modify
   const cartProductList: Array<Product> = cart.getProductsList();
-  for (let i = 0; i <= cartProductList.length; i++) {
+  for (let i = 0; i < cartProductList.length; i++) {
     const result: ProductDB = await Dynamo.get(
       tableName.product,
       "id",
