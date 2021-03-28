@@ -62,9 +62,10 @@ class Cart {
   }
 
   public getProductFromId(id: string): Product {
-    for (const element of this.getProductsList()) {
-      if (element.id == id) {
-        return element;
+    const productList: Array<Product> = this.getProductsList();
+    for (let i = 0; i < productList.length; i++) {
+      if (productList[i].id == id) {
+        return productList[i];
       }
     }
 
