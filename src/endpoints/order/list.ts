@@ -4,9 +4,8 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 
 export const index: APIGatewayProxyHandler = async () => {
-  const result = await Dynamo.scan(tableName.order).catch((err) => {
+  const result = await Dynamo.scan(tableName.order).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 

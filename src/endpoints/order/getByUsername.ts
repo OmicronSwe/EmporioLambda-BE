@@ -28,9 +28,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     keys,
     valueKeys,
     "#element0 = :Value0"
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 

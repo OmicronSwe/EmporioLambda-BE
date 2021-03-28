@@ -9,8 +9,6 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import Order from "../../model/order/order";
 import Cart from "../../model/cart/cart";
-import Product from "../../model/product/product";
-import Stripe from "../../services/stripe/stripe";
 import Nodemailer from "../../services/nodemailer/nodemailer";
 import User, { DynamoFormat } from "../../model/user";
 import Cognito from "../../services/cognito/cognito";
@@ -32,9 +30,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
       tableName.cart,
       "username",
       webhookStripe.client_reference_id
-    ).catch((err) => {
+    ).catch(() => {
       // handle error of dynamoDB
-      console.log(err);
       return null;
     });
 
@@ -56,19 +53,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
       const data = order.toJSON();
 
-      const newOrder = await Dynamo.write(tableName.order, data).catch(
-        (err) => {
-          // handle error of dynamoDB
-          console.log(err);
-          return null;
-        }
-      );
+      const newOrder = await Dynamo.write(tableName.order, data).catch(() => {
+        // handle error of dynamoDB
+        return null;
+      });
 
       if (!newOrder) {
         return badResponse("Failed to receive order");
       }
     } catch (err) {
-      // handle logic error
+      // handle logic error of cart and order
       return badRequest(`${err.name} ${err.message}`);
     }
 
@@ -79,9 +73,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     };
 
     const resultCartEmpty = await Dynamo.write(tableName.cart, data).catch(
-      (err) => {
+      () => {
         // handle error of dynamoDB
-        console.log(err);
         return null;
       }
     );
@@ -93,9 +86,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     // get user name
     const resultUser: DynamoFormat[] = await Cognito.getUserAttributes(
       cart.username
-    ).catch((err) => {
+    ).catch(() => {
       // handle error of dynamoDB
-      console.log(err);
       return null;
     });
 
@@ -106,18 +98,18 @@ export const index: APIGatewayProxyHandler = async (event) => {
     const user = User.fromDynamoFormat(resultUser);
 
     // send email;
-    try {
-      await Nodemailer.sendEmailProduct(
-        cart.products,
-        webhookStripe.customer_details.email,
-        cart.totalPrice,
-        user.name
-      );
-    } catch (error) {
-      return badResponse("Failed to send email order");
-    }
-
-    return response({ data: { message: "Order recevied" } });
+    return await Nodemailer.sendEmailProduct(
+      cart.products,
+      webhookStripe.customer_details.email,
+      cart.totalPrice,
+      user.name
+    )
+      .then(() => {
+        return response({ data: { message: "Order recevied" } });
+      })
+      .catch(() => {
+        return badResponse("Failed to send email order");
+      });
   }
   return badResponse("Failed to create order");
 };
