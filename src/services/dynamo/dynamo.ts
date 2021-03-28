@@ -92,7 +92,7 @@ const Dynamo = {
     updateElement.forEach((element, index) => {
       AttriNameExpr[`#element${index}`] = element;
 
-      if (isNaN(+updateValue[index])) {
+      if (Number.isNaN(+updateValue[index])) {
         AttriValueExpr[`:value${index}`] = updateValue[index];
       } else {
         AttriValueExpr[`:value${index}`] = Number(updateValue[index]);
@@ -150,7 +150,7 @@ const Dynamo = {
 
     // create value for query
     value.forEach((element, index) => {
-      if (isNaN(+element)) {
+      if (Number.isNaN(+element)) {
         AttriValueExpr[`:Value${index}`] = element;
       } else {
         AttriValueExpr[`:Value${index}`] = Number(element);
@@ -229,7 +229,7 @@ const Dynamo = {
 
     // create value for scan
     value.forEach((element, index) => {
-      if (isNaN(+element)) {
+      if (Number.isNaN(+element)) {
         AttriValueExpr[`:Value${index}`] = element;
       } else {
         AttriValueExpr[`:Value${index}`] = Number(element);
@@ -291,10 +291,10 @@ const Dynamo = {
     return dynamoDb
       .delete(params)
       .promise()
-      .then(function (data) {
+      .then((data) => {
         return data;
       })
-      .catch(function (err) {
+      .catch((err) => {
         throw Error(`Error in Dynamo delete in table ${tableName}: ${err}`);
       });
   },
