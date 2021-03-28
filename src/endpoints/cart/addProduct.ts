@@ -70,12 +70,13 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   cartFromDB.addProduct(prod, body.quantity ? body.quantity : 1);
 
-  await Dynamo.write(tableName.cart, cartFromDB.toJSON()).catch(() => {
-    // handle error of dynamoDB
-    return badResponse(`Failed to add product "${prod.name}" to cart`);
-  });
-
-  return response({
-    data: { message: `Product "${prod.name}" added to cart` },
-  });
+  return await Dynamo.write(tableName.cart, cartFromDB.toJSON())
+    .then(() => {
+      return response({
+        data: { message: `Product "${prod.name}" added to cart` },
+      });
+    })
+    .catch(() => {
+      return badResponse(`Failed to add product "${prod.name}" to cart`);
+    });
 };

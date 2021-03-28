@@ -33,14 +33,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
   // get info of product
 
   // check if products exist and are modify
-  for (const productCart of body.products) {
+  /* eslint-disable no-await-in-loop */
+  for (let i = 0; i < body.products.length; i++) {
     const result: ProductDB = await Dynamo.get(
       tableName.product,
       "id",
-      productCart.id
-    ).catch((err) => {
+      body.products[i].id
+    ).catch(() => {
       // handle error of dynamoDB
-      console.log(err);
+      // console.log(err);
       return null;
     });
 
@@ -51,23 +52,20 @@ export const index: APIGatewayProxyHandler = async (event) => {
     if (Object.keys(result).length !== 0) {
       const prod: Product = new Product(result);
 
-      cart.addProduct(prod, productCart.quantity);
+      cart.addProduct(prod, body.products[i].quantity);
     }
   }
+  /* eslint-enable no-await-in-loop */
 
   const data = cart.toJSON();
 
   // push data to dynamodb
 
-  const newCart = await Dynamo.write(tableName.cart, data).catch((err) => {
-    // handle error of dynamoDB
-    console.log(err);
-    return null;
-  });
-
-  if (!newCart) {
-    return badResponse("Failed to save cart");
-  }
-
-  return response({ data: { message: "Cart saved" } });
+  return await Dynamo.write(tableName.cart, data)
+    .then(() => {
+      return response({ data: { message: "Cart saved" } });
+    })
+    .catch(() => {
+      return badResponse("Failed to save cart");
+    });
 };
