@@ -119,7 +119,7 @@ function ValidateToken(pems, event, context) {
   }
 
   // Get AWS AccountId and API Options
-  const apiOptions : any= {};
+  const apiOptions: any = {};
   const tmp = event.methodArn.split(":");
   const apiGatewayArnTmp = tmp[5].split("/");
   const awsAccountId = tmp[4];

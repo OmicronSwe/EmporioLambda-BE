@@ -31,9 +31,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.cart,
     "username",
     event.pathParameters.username
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
+    // console.log(err);
     return null;
   });
 
@@ -50,9 +50,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.product,
     "id",
     body.id
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
+    // console.log(err);
     return null;
   });
 
@@ -70,17 +70,10 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   cartFromDB.addProduct(prod, body.quantity ? body.quantity : 1);
 
-  const newCart = await Dynamo.write(tableName.cart, cartFromDB.toJSON()).catch(
-    (err) => {
-      // handle error of dynamoDB
-      console.log(err);
-      return null;
-    }
-  );
-
-  if (!newCart) {
+  await Dynamo.write(tableName.cart, cartFromDB.toJSON()).catch(() => {
+    // handle error of dynamoDB
     return badResponse(`Failed to add product "${prod.name}" to cart`);
-  }
+  });
 
   return response({
     data: { message: `Product "${prod.name}" added to cart` },

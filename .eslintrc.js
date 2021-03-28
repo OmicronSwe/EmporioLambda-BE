@@ -16,7 +16,9 @@ module.exports = {
      'no-plusplus': 'off',
      "eqeqeq": "off",
      "@typescript-eslint/no-shadow": "off",
-     "prefer-destructuring": "off"
+     "prefer-destructuring": "off",
+     "import/prefer-default-export": "off"
+
     }
 }
   
