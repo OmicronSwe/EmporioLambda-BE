@@ -1,10 +1,5 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import {
-  response,
-  badRequest,
-  badResponse,
-  notFound,
-} from "../../lib/APIResponses";
+import { response, badRequest, badResponse } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import Category from "../../model/category";
@@ -22,9 +17,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     const name = category.getName();
 
     const resultGet = await Dynamo.get(tableName.category, "name", name).catch(
-      (err) => {
+      () => {
         // handle error of dynamoDB
-        console.log(err);
         return null;
       }
     );
@@ -39,21 +33,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     const data = category.toJSON();
 
-    const newCategory = await Dynamo.write(tableName.category, data).catch(
-      (err) => {
+    return await Dynamo.write(tableName.category, data)
+      .then(() => {
+        return response({
+          data: { message: `Category "${category.name}" created correctly` },
+        });
+      })
+      .catch(() => {
         // handle error of dynamoDB
-        console.log(err);
         return badResponse("Failed to create category");
-      }
-    );
-
-    if (!newCategory) {
-      return badResponse("Failed to create category");
-    }
-
-    return response({
-      data: { message: `Category "${category.name}" created correctly` },
-    });
+      });
   } catch (err) {
     // handle logic error of category
     return badRequest(`${err.name} ${err.message}`);

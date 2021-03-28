@@ -8,8 +8,8 @@ import './localDynamoDb';
 describe('Cart populated table', () => {
   const mochaPlugin = require('serverless-mocha-plugin');
   const expect = mochaPlugin.chai.expect;
-  let IDProduct1;
-  let IDProduct2;
+  let IDProduct1: string;
+  let IDProduct2: string;
 
   //functions of caart
   const getByUsername = mochaPlugin.getWrapper(

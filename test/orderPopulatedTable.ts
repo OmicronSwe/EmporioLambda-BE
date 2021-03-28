@@ -12,7 +12,7 @@ import Cart from '../src/model/cart/cart';
 describe('Order populated table', () => {
   const mochaPlugin = require('serverless-mocha-plugin');
   const expect = mochaPlugin.chai.expect;
-  let IDProduct1;
+  let IDProduct1: string;
 
   //functions of product
   const list = mochaPlugin.getWrapper('index', '/src/endpoints/order/list.ts', 'index');

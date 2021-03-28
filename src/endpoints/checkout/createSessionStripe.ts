@@ -7,7 +7,6 @@ import {
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
-import Order from "../../model/order/order";
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import Stripe from "../../services/stripe/stripe";
@@ -28,9 +27,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     tableName.cart,
     "username",
     body.username
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 
@@ -45,14 +43,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const cart: Cart = new Cart(result);
 
   // check if products exist and are modify
-  for (const productCart of cart.getProductsList()) {
+  const cartProductList: Array<Product> = cart.getProductsList();
+  for (let i = 0; i <= cartProductList.length; i++) {
     const result: ProductDB = await Dynamo.get(
       tableName.product,
       "id",
-      productCart.id
-    ).catch((err) => {
+      cartProductList[i].id
+    ).catch(() => {
       // handle error of dynamoDB
-      console.log(err);
       return null;
     });
 
@@ -67,7 +65,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
     const prodFromDb = new Product(result);
 
-    if (productCart.isDifference(prodFromDb)) {
+    if (cartProductList[i].isDifference(prodFromDb)) {
       return badResponse(
         "Some products have changed, please check your shopping cart before proceeding"
       );
@@ -75,17 +73,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   // create stripe session
-  try {
-    const sessionStripeId = await Stripe.createSession(
-      cart,
-      body.successurl,
-      body.cancelurl
-    );
-
-    return response({ data: { sessionId: sessionStripeId } });
-  } catch (err) {
-    // handle error of stripe
-    console.log(err);
-    return badResponse("Enable to create sessione of Stripe");
-  }
+  return await Stripe.createSession(cart, body.successurl, body.cancelurl)
+    .then((data) => {
+      return response({ data: { sessionId: data } });
+    })
+    .catch(() => {
+      return badResponse("Enable to create sessione of Stripe");
+    });
 };

@@ -1,10 +1,5 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
-import {
-  response,
-  badResponse,
-  badRequest,
-  notFound,
-} from "../../lib/APIResponses";
+import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 
@@ -21,31 +16,29 @@ export const index: APIGatewayProxyHandler = async (event) => {
     "#element0 = :Value0",
     ["category"],
     [event.pathParameters.name]
-  ).catch((err) => {
+  ).catch(() => {
     // handle error of dynamoDB
-    console.log(err);
     return null;
   });
 
-  console.log(scanCategory);
+  if (!scanCategory) {
+    return badResponse("Failed to scan category");
+  }
 
   if (scanCategory.items.length >= 1) {
     return badRequest("Category is being used");
   }
 
-  const result = await Dynamo.delete(
+  return await Dynamo.delete(
     tableName.category,
     "name",
     decodeURIComponent(event.pathParameters.name)
-  ).catch((err) => {
-    // handle error of dynamoDB
-    console.log(err);
-    return null;
-  });
-
-  if (!result) {
-    return badResponse("Failed to delete category");
-  }
-
-  return response({ data: { message: "Category deleted correctly" } });
+  )
+    .then(() => {
+      return response({ data: { message: "Category deleted correctly" } });
+    })
+    .catch(() => {
+      // handle error of dynamoDB
+      return badResponse("Failed to delete category");
+    });
 };

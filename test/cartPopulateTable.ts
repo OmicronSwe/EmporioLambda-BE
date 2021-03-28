@@ -8,8 +8,8 @@ import './localDynamoDb';
 describe('Cart populate table', () => {
   const mochaPlugin = require('serverless-mocha-plugin');
   const expect = mochaPlugin.chai.expect;
-  let IDProduct1;
-  let IDProduct2;
+  let IDProduct1: string;
+  let IDProduct2: string;
 
   //functions of cart
   const create = mochaPlugin.getWrapper('index', '/src/endpoints/cart/create.ts', 'index');
