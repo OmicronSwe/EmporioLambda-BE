@@ -16,17 +16,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const keys: Array<string> = [];
-  const valueKeys: Array<string> = [];
-
-  keys.push("username");
-  valueKeys.push(event.pathParameters.username);
-
   const result = await Dynamo.query(
     tableName.order,
     "username_date_index",
-    keys,
-    valueKeys,
+    ["username"],
+    [event.pathParameters.username],
     "#element0 = :Value0"
   ).catch(() => {
     // handle error of dynamoDB
