@@ -2,14 +2,14 @@ import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Cognito from "../../services/cognito/cognito";
 import User from "../../model/user/user";
-import { DynamoFormat } from "../../model/user/interface";
+import { CognitoFormat } from "../../model/user/interface";
 
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.pathParameters) {
     return badRequest("PathParameters missing");
   }
 
-  const result: DynamoFormat[] = await Cognito.getUserAttributes(
+  const result: CognitoFormat[] = await Cognito.getUserAttributes(
     event.pathParameters.username
   ).catch(() => {
     // handle error of dynamoDB
@@ -20,7 +20,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badResponse("Failed to get user data");
   }
 
-  const user = User.fromDynamoFormat(result);
+  const user = User.fromCognitoFormat(result);
 
-  return response({ data: { result: user.getData() } });
+  return response({ data: { result: user.toJSON() } });
 };

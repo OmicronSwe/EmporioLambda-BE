@@ -1,4 +1,4 @@
-import { DynamoFormat } from "./interface";
+import { CognitoFormat, UserCognito } from "./interface";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export default class User {
@@ -26,7 +26,7 @@ export default class User {
     this.username = username;
   }
 
-  public getData(): object {
+  public toJSON(): UserCognito {
     return {
       email: this.email,
       name: this.name,
@@ -36,7 +36,7 @@ export default class User {
     };
   }
 
-  public static fromDynamoFormat(body: DynamoFormat[]): User {
+  public static fromCognitoFormat(body: CognitoFormat[]): User {
     let name;
     let family_name;
     let email;
@@ -66,8 +66,8 @@ export default class User {
     return new User(email, name, family_name, address, username);
   }
 
-  public toDynamoFormat(): DynamoFormat[] {
-    const result: DynamoFormat[] = [
+  public toCognitoFormat(): CognitoFormat[] {
+    const result: CognitoFormat[] = [
       {
         Name: "name",
         Value: this.name,

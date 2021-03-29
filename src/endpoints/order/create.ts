@@ -14,7 +14,7 @@ import User from "../../model/user/user";
 import Cognito from "../../services/cognito/cognito";
 import { CartDB } from "../../model/cart/interface";
 import { OrderDB } from "../../model/order/interface";
-import { DynamoFormat } from "../../model/user/interface";
+import { CognitoFormat } from "../../model/user/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -86,7 +86,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
 
     // get user name
-    const resultUser: DynamoFormat[] = await Cognito.getUserAttributes(
+    const resultUser: CognitoFormat[] = await Cognito.getUserAttributes(
       cart.username
     ).catch(() => {
       // handle error of dynamoDB
@@ -97,7 +97,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       return badResponse("Failed to get user data");
     }
 
-    const user = User.fromDynamoFormat(resultUser);
+    const user = User.fromCognitoFormat(resultUser);
 
     // send email;
     return await Nodemailer.sendEmailProduct(

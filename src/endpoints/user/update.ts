@@ -30,7 +30,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   );
 
   return Cognito.updateUser(
-    user.toDynamoFormat(),
+    user.toCognitoFormat(),
     event.pathParameters.username
   )
     .then(() => {
