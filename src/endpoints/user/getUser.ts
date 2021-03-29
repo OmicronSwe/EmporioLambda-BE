@@ -1,7 +1,8 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Cognito from "../../services/cognito/cognito";
-import User, { DynamoFormat } from "../../model/user";
+import User from "../../model/user/user";
+import { DynamoFormat } from "../../model/user/interface";
 
 export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.pathParameters) {

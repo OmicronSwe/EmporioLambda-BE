@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Cognito from "../../services/cognito/cognito";
-import User from "../../model/user";
+import User from "../../model/user/user";
 
 /**
  * @param  {} event: event passed when lambda is triggered

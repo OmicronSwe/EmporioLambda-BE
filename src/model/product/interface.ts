@@ -35,7 +35,7 @@ export interface ProductToCartRequest {
   readonly quantity: number;
 }
 
-export interface ProductsForCheckout {
+export interface ProductForCheckout {
   readonly name: string;
   readonly description: string;
   readonly images: Array<string>;

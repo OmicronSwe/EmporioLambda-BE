@@ -1,5 +1,5 @@
 import Product from "../product/product";
-import { ProductsForCheckout } from "../product/interface";
+import { ProductForCheckout } from "../product/interface";
 import { CartDB } from "./interface";
 
 class Cart {
@@ -137,8 +137,8 @@ class Cart {
     // manage taxes TO-DO
   }
 
-  public getProductsInfoCheckout(): Array<ProductsForCheckout> {
-    const lineItems: Array<ProductsForCheckout> = new Array<ProductsForCheckout>();
+  public getProductsInfoCheckout(): Array<ProductForCheckout> {
+    const lineItems: Array<ProductForCheckout> = new Array<ProductForCheckout>();
 
     this.getProductsList().forEach((element) => {
       const prodCheckout = {

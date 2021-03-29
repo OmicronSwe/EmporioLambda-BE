@@ -1,3 +1,5 @@
+import { CategoryDB } from "./interface";
+
 class Category {
   name: string;
 
@@ -9,7 +11,7 @@ class Category {
     this.name = data.name;
   }
 
-  public toJSON(): object {
+  public toJSON(): CategoryDB {
     return {
       name: this.name,
     };

@@ -10,9 +10,11 @@ import tableName from "../../services/dynamo/tableName";
 import Order from "../../model/order/order";
 import Cart from "../../model/cart/cart";
 import Nodemailer from "../../services/nodemailer/nodemailer";
-import User, { DynamoFormat } from "../../model/user";
+import User from "../../model/user/user";
 import Cognito from "../../services/cognito/cognito";
 import { CartDB } from "../../model/cart/interface";
+import { OrderDB } from "../../model/order/interface";
+import { DynamoFormat } from "../../model/user/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -51,7 +53,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       cart = new Cart(result);
       order = new Order(cart, webhookStripe.customer_details.email);
 
-      const data = order.toJSON();
+      const data: OrderDB = order.toJSON();
 
       const newOrder = await Dynamo.write(tableName.order, data).catch(() => {
         // handle error of dynamoDB

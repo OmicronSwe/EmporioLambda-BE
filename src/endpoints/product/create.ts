@@ -11,6 +11,7 @@ import bucketName from "../../services/s3/bucketName";
 import Product from "../../model/product/product";
 import { ProductDB, ProductRequest } from "../../model/product/interface";
 import { pushImage } from "../../lib/pushImage";
+import { CategoryDB } from "../../model/category/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -53,7 +54,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     // check if category is in Db
     if (product.getCategory()) {
-      const category = await Dynamo.get(
+      const category: CategoryDB = await Dynamo.get(
         tableName.category,
         "name",
         product.getCategory()

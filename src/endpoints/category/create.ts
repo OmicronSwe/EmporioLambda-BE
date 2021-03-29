@@ -2,8 +2,8 @@ import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badRequest, badResponse } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
-import Category from "../../model/category";
-
+import Category from "../../model/category/category";
+import { CategoryDB } from "../../model/category/interface";
 /**
  * @param  {} event: event passed when lambda is triggered
  */
@@ -16,12 +16,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
     const category = new Category(JSON.parse(event.body));
     const name = category.getName();
 
-    const resultGet = await Dynamo.get(tableName.category, "name", name).catch(
-      () => {
-        // handle error of dynamoDB
-        return null;
-      }
-    );
+    const resultGet: CategoryDB = await Dynamo.get(
+      tableName.category,
+      "name",
+      name
+    ).catch(() => {
+      // handle error of dynamoDB
+      return null;
+    });
 
     if (!resultGet) {
       return badResponse("Failed to create category");
