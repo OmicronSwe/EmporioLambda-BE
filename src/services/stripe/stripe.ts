@@ -28,37 +28,6 @@ const Stripe = {
       throw Error(`Error in Stripe createSession: ${err}`);
     }
   },
-
-  retrieveDataCheckout: async (idSessionStripe: string) => {
-    try {
-      const session = await stripe.checkout.sessions.retrieve(idSessionStripe, {
-        expand: ["line_items"],
-      });
-
-      return session;
-    } catch (err) {
-      throw Error(`Error in Stripe retrieveDataCheckout: ${err}`);
-    }
-  },
-
-  charge: async (token: string, amount: number, currency: string = "EUR") => {
-    return stripe.charges
-      .create({
-        // Create Stripe charge with token
-        amount,
-        currency,
-        description: "Serverless Stripe Test charge",
-        source: token,
-      })
-      .then((charge) => {
-        // Success response
-        return charge;
-      })
-      .catch((err) => {
-        // Error response
-        throw Error(`Error in Stripe service${err}`);
-      });
-  },
 };
 
 export default Stripe;
