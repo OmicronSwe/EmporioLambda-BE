@@ -334,6 +334,8 @@ functions:
   #ORDER
   createOrder:
     handler: src/endpoints/order/create.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
     events:
       - http:
           path: order
