@@ -86,6 +86,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
 
     // get user name
+    console.log("getUsername");
+    console.log(cart.username);
     const resultUser: CognitoFormat[] = await Cognito.getUserAttributes(
       cart.username
     ).catch(() => {
@@ -100,6 +102,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     const user = User.fromCognitoFormat(resultUser);
 
     // send email;
+    console.log("send email");
+    console.log(user.name);
     return await Nodemailer.sendEmailProduct(
       cart.products,
       webhookStripe.customer_details.email,
@@ -107,9 +111,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
       user.name
     )
       .then(() => {
+        console.log("return good");
         return response({ data: { message: "Order recevied" } });
       })
       .catch(() => {
+        console.log("return false");
         return badResponse("Failed to send email order");
       });
   }
