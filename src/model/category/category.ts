@@ -1,15 +1,17 @@
+import { CategoryDB } from "./interface";
+
 class Category {
   name: string;
 
   constructor(data) {
     if (!data.name) {
-      throw Error('name value not found');
+      throw Error("name value not found");
     }
 
     this.name = data.name;
   }
 
-  public toJSON(): object {
+  public toJSON(): CategoryDB {
     return {
       name: this.name,
     };

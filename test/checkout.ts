@@ -1,19 +1,18 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-
 import "./localDynamoDb";
 
 const mochaPlugin = require("serverless-mocha-plugin");
 
-// test for populate table
-describe("Order populate table", () => {
+// test for checkout
+describe("Checkout create session Stripe", () => {
   const expect = mochaPlugin.chai.expect;
   let IDProduct1: string;
   let IDProduct2: string;
 
-  // functions of order
-  const create = mochaPlugin.getWrapper(
+  // functions of checkout
+  const createSessionStripe = mochaPlugin.getWrapper(
     "index",
-    "/src/endpoints/order/create.ts",
+    "/src/endpoints/checkout/createSessionStripe.ts",
     "index"
   );
 
@@ -32,6 +31,11 @@ describe("Order populate table", () => {
     const search = mochaPlugin.getWrapper(
       "index",
       "/src/endpoints/product/search.ts",
+      "index"
+    );
+    const updateProd = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/update.ts",
       "index"
     );
 
@@ -75,76 +79,81 @@ describe("Order populate table", () => {
 
     // create cart
     await createCart.run(dataCart);
-  });
 
-  it('order create function - should be "Failed to get user data"', async () => {
-    const data: APIGatewayProxyEvent = {
+    // update product after create cart
+    const dataUpdate: APIGatewayProxyEvent = {
       body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',
+        '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
+      pathParameters: {
+        id: IDProduct2,
+      },
     };
 
-    const response = await create.run(data);
+    await updateProd.run(dataUpdate);
+  });
+
+  it('checkout createSessionStripe function - should be "Body missing"', async () => {
+    const data: APIGatewayProxyEvent = {
+      body_error: "dummy",
+    };
+
+    const response = await createSessionStripe.run(data);
 
     // console.log(response);
-    expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal(
-      "Failed to get user data"
-    );
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal("Body missing");
   });
 
-  it('order create function - should be "Failed to create order"', async () => {
+  it('checkout createSessionStripe function - should be "Failed to get cart"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "not_paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',
+      body: '{"username_error":"username"}',
     };
 
-    const response = await create.run(data);
-
-    // console.log(response);
-    expect(JSON.parse(response.statusCode)).to.be.equal(502);
-    expect(JSON.parse(response.body).error).to.be.equal(
-      "Failed to create order"
-    );
-  });
-
-  it('order create function - should be "Failed to get cart"', async () => {
-    const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference": "username-string"}}}',
-    };
-
-    const response = await create.run(data);
+    const response = await createSessionStripe.run(data);
 
     // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal("Failed to get cart");
   });
 
-  it('order create function - should be "Cart not found"', async () => {
+  it('checkout createSessionStripe function - should be "Some products have changed, please check your shopping cart before proceeding"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string_error"}}}',
+      body: '{"username":"username-string"}',
     };
 
-    const response = await create.run(data);
+    const response = await createSessionStripe.run(data);
+
+    // console.log(response);
+    expect(JSON.parse(response.statusCode)).to.be.equal(502);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Some products have changed, please check your shopping cart before proceeding"
+    );
+  });
+
+  it('checkout createSessionStripe function - should be "Some products are no longer available, please check your shopping cart before proceeding"', async () => {
+    const deleteProduct = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/delete.ts",
+      "index"
+    );
+    const dataProductDelete2: APIGatewayProxyEvent = {
+      pathParameters: {
+        id: IDProduct2,
+      },
+    };
+
+    await deleteProduct.run(dataProductDelete2);
+
+    const data: APIGatewayProxyEvent = {
+      body: '{"username":"username-string"}',
+    };
+
+    const response = await createSessionStripe.run(data);
 
     // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
-    expect(JSON.parse(response.body).error).to.be.equal("Cart not found");
-  });
-
-  it('order create function - should be "Error email value not found"', async () => {
-    const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email_error": "test@test.com"}, "client_reference_id": "username-string"}}}',
-    };
-
-    const response = await create.run(data);
-
-    // console.log(response);
-    expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal(
-      "Error email value not found"
+      "Some products are no longer available, please check your shopping cart before proceeding"
     );
   });
 
@@ -155,23 +164,15 @@ describe("Order populate table", () => {
       "/src/endpoints/product/delete.ts",
       "index"
     );
-
     const deleteCart = mochaPlugin.getWrapper(
       "index",
       "/src/endpoints/cart/delete.ts",
       "index"
     );
 
-    // data
     const dataProduct1: APIGatewayProxyEvent = {
       pathParameters: {
         id: IDProduct1,
-      },
-    };
-
-    const dataProduct2: APIGatewayProxyEvent = {
-      pathParameters: {
-        id: IDProduct2,
       },
     };
 
@@ -180,10 +181,8 @@ describe("Order populate table", () => {
         username: "username-string",
       },
     };
-
     // delete product
     await deleteProduct.run(dataProduct1);
-    await deleteProduct.run(dataProduct2);
 
     // delete cart
     await deleteCart.run(dataCart);

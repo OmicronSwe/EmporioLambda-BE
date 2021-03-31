@@ -1,4 +1,4 @@
-import { ProductForCartDB } from '../product/interface';
+import { ProductForCartDB } from "../product/interface";
 
 export interface OrderDB {
   readonly id: string;

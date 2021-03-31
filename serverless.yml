@@ -1,6 +1,6 @@
 service: emporiolambda-be
 
-frameworkVersion: '2'
+frameworkVersion: "2"
 
 plugins:
   - serverless-plugin-typescript
@@ -49,7 +49,7 @@ provider:
         - dynamodb:*
         - s3:*
         - cognito-idp:*
-      Resource: '*'
+      Resource: "*"
 
 resources:
   Resources:
@@ -137,7 +137,7 @@ resources:
 
     #DYNAMO_DB
     ProductTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         KeySchema:
@@ -166,7 +166,7 @@ resources:
               WriteCapacityUnits: 1
 
     CartTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         KeySchema:
@@ -183,7 +183,7 @@ resources:
         TableName: ${self:provider.environment.NAMESPACE}-EML-cart
 
     CategoryTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         KeySchema:
@@ -200,7 +200,7 @@ resources:
         TableName: ${self:provider.environment.NAMESPACE}-EML-category
 
     OrderTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         KeySchema:

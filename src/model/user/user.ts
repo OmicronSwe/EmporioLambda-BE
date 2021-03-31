@@ -1,16 +1,24 @@
-export interface DynamoFormat {
-  Name: string;
-  Value: string;
-}
+import { CognitoFormat, UserCognito } from "./interface";
 
+/* eslint-disable @typescript-eslint/naming-convention */
 export default class User {
   email: string;
+
   name: string;
+
   family_name: string;
+
   address: string;
+
   username: string;
 
-  constructor(email: string, name: string, family_name: string, address: string, username: string) {
+  constructor(
+    email: string,
+    name: string,
+    family_name: string,
+    address: string,
+    username: string
+  ) {
     this.email = email;
     this.name = name;
     this.family_name = family_name;
@@ -18,7 +26,7 @@ export default class User {
     this.username = username;
   }
 
-  public getData(): object {
+  public toJSON(): UserCognito {
     return {
       email: this.email,
       name: this.name,
@@ -28,24 +36,27 @@ export default class User {
     };
   }
 
-  public static fromDynamoFormat(body: DynamoFormat[]): User {
-    let name, family_name, email, address, username;
+  public static fromCognitoFormat(body: CognitoFormat[]): User {
+    let name;
+    let family_name;
+    let email;
+    let address;
+    let username;
     body.forEach((element) => {
-      console.log(element);
       switch (element.Name) {
-        case 'name':
+        case "name":
           name = element.Value;
           break;
-        case 'family_name':
+        case "family_name":
           family_name = element.Value;
           break;
-        case 'email':
+        case "email":
           email = element.Value;
           break;
-        case 'address':
+        case "address":
           address = element.Value;
           break;
-        case 'sub':
+        case "sub":
           username = element.Value;
           break;
         default:
@@ -55,22 +66,22 @@ export default class User {
     return new User(email, name, family_name, address, username);
   }
 
-  public toDynamoFormat(): DynamoFormat[] {
-    let result: DynamoFormat[] = [
+  public toCognitoFormat(): CognitoFormat[] {
+    const result: CognitoFormat[] = [
       {
-        Name: 'name',
+        Name: "name",
         Value: this.name,
       },
       {
-        Name: 'family_name',
+        Name: "family_name",
         Value: this.family_name,
       },
       {
-        Name: 'email',
+        Name: "email",
         Value: this.email,
       },
       {
-        Name: 'address',
+        Name: "address",
         Value: this.address,
       },
     ];
@@ -78,3 +89,4 @@ export default class User {
     return result;
   }
 }
+/* eslint-enable @typescript-eslint/naming-convention */

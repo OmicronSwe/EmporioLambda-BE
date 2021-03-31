@@ -1,20 +1,25 @@
-import { ProductDB } from './interface';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from "uuid";
+import { ProductDB } from "./interface";
 
 class Product {
   id: string;
+
   name: string;
+
   description: string;
+
   imageUrl: string;
+
   price: number;
+
   category: string;
 
   constructor(data: ProductDB) {
     if (!data.name) {
-      throw Error('name value not found');
+      throw Error("name value not found");
     }
     if (!data.description) {
-      throw Error('description value not found');
+      throw Error("description value not found");
     }
 
     this.id = data.id ? data.id : uuid();

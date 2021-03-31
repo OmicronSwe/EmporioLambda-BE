@@ -1,19 +1,22 @@
-import Product from '../product/product';
-import { ProductsForCheckout } from '../product/interface';
-import { CartDB } from './interface';
+import Product from "../product/product";
+import { ProductForCheckout } from "../product/interface";
+import { CartDB } from "./interface";
 
 class Cart {
   username: string;
+
   products: Map<Product, number>;
+
   totalPrice: number;
+
   taxesApplied: number;
 
   constructor(data: CartDB) {
     if (!data.username) {
-      throw Error('username value not found');
+      throw Error("username value not found");
     }
 
-    //console.log(data);
+    // console.log(data);
 
     this.products = new Map<Product, number>();
     this.taxesApplied = 0;
@@ -27,7 +30,7 @@ class Cart {
         this.products.set(prod, quantity);
         this.totalPrice += prod.getPrice() * quantity;
 
-        //manage taxes TO-DO
+        // manage taxes TO-DO
       });
     }
 
@@ -36,9 +39,9 @@ class Cart {
   }
 
   public toJSON(): CartDB {
-    let productsCart = this.getProductsList();
+    const productsCart = this.getProductsList();
     let productsCartObject;
-    let productCartArray = [];
+    const productCartArray = [];
 
     productsCart.forEach((element) => {
       productsCartObject = element.toJSON();
@@ -59,9 +62,10 @@ class Cart {
   }
 
   public getProductFromId(id: string): Product {
-    for (const element of this.getProductsList()) {
-      if (element.id == id) {
-        return element;
+    const productList: Array<Product> = this.getProductsList();
+    for (let i = 0; i < productList.length; i++) {
+      if (productList[i].id == id) {
+        return productList[i];
       }
     }
 
@@ -73,18 +77,18 @@ class Cart {
   }
 
   public updateProduct(oldProduct: Product, newProduct: Product) {
-    let quantity: number = this.products.get(oldProduct);
+    const quantity: number = this.products.get(oldProduct);
     this.products.delete(oldProduct);
     this.products.set(newProduct, quantity);
 
-    let productsCart = this.getProductsList();
+    const productsCart = this.getProductsList();
 
     this.taxesApplied = 0;
     this.totalPrice = 0;
     productsCart.forEach((element) => {
       const prod = new Product(element);
       this.totalPrice += prod.getPrice() * this.products.get(element);
-      //manage taxes TO-DO
+      // manage taxes TO-DO
     });
   }
 
@@ -106,14 +110,14 @@ class Cart {
 
   public removeProductTotally(product: Product) {
     this.updateTotalPrice(-(product.price * this.products.get(product)));
-    //manage taxes TO-DO
+    // manage taxes TO-DO
     this.products.delete(product);
   }
 
   public removeProductByQuantity(product: Product, quantity: number = 1) {
     if (this.products.get(product) - quantity > 0) {
       this.updateTotalPrice(-(product.price * quantity));
-      //manage taxes TO-DO
+      // manage taxes TO-DO
       this.products.set(product, this.products.get(product) - quantity);
     } else {
       this.removeProductTotally(product);
@@ -130,11 +134,11 @@ class Cart {
     }
 
     this.updateTotalPrice(product.price * quantity);
-    //manage taxes TO-DO
+    // manage taxes TO-DO
   }
 
-  public getProductsInfoCheckout(): Array<ProductsForCheckout> {
-    const lineItems: Array<ProductsForCheckout> = new Array<ProductsForCheckout>();
+  public getProductsInfoCheckout(): Array<ProductForCheckout> {
+    const lineItems: Array<ProductForCheckout> = new Array<ProductForCheckout>();
 
     this.getProductsList().forEach((element) => {
       const prodCheckout = {
@@ -142,7 +146,7 @@ class Cart {
         description: element.description,
         images: [element.imageUrl],
         amount: element.price * 100,
-        currency: 'EUR',
+        currency: "EUR",
         quantity: this.getProductQuantity(element),
       };
 
