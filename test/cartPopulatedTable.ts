@@ -103,10 +103,9 @@ describe("Cart populated table", () => {
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-    expect(body.result.totalPrice).to.be.equal(22);
+    expect(body.result.taxesApplied).to.be.equal(20);
+    expect(body.result.totalPrice).to.be.equal(26.4);
     expect(body.result.username).to.be.equal("username-string");
-    // manage taxes TO-DO
-    expect(body.result.taxesApplied).to.be.equal(0);
     expect(body.result.products.length).to.be.equal(1);
     expect(body.result.products[0].id).to.be.equal(IDProduct1);
     expect(body.result.products[0].name).to.be.equal("name product 1");

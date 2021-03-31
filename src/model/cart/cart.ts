@@ -19,7 +19,7 @@ class Cart {
     // console.log(data);
 
     this.products = new Map<Product, number>();
-    this.taxesApplied = 0;
+    this.taxesApplied = 20;
     this.totalPrice = 0;
 
     if (data.products) {
@@ -28,13 +28,10 @@ class Cart {
         const quantity = element.quantity ? element.quantity : 1;
 
         this.products.set(prod, quantity);
-        this.totalPrice += prod.getPrice() * quantity;
-
-        // manage taxes TO-DO
+        this.updateTotalPrice(prod.getPrice() * quantity);
       });
     }
 
-    this.totalPrice += this.taxesApplied;
     this.username = data.username;
   }
 
@@ -52,9 +49,13 @@ class Cart {
     return {
       username: this.username,
       products: productCartArray,
-      totalPrice: this.totalPrice,
+      totalPrice: +this.totalPrice.toFixed(2),
       taxesApplied: this.taxesApplied,
     };
+  }
+
+  private priceWithTaxes(price: number): number {
+    return (this.taxesApplied * price) / 100;
   }
 
   public getProductsList(): Array<Product> {
@@ -83,28 +84,18 @@ class Cart {
 
     const productsCart = this.getProductsList();
 
-    this.taxesApplied = 0;
     this.totalPrice = 0;
     productsCart.forEach((element) => {
       const prod = new Product(element);
-      this.totalPrice += prod.getPrice() * this.products.get(element);
-      // manage taxes TO-DO
+      this.updateTotalPrice(prod.getPrice() * this.products.get(element));
     });
   }
 
   public updateTotalPrice(price: number) {
-    this.totalPrice += price;
+    this.totalPrice += price + this.priceWithTaxes(price);
 
     if (this.totalPrice < 0) {
       this.totalPrice = 0;
-    }
-  }
-
-  public updateTaxes(price: number) {
-    this.taxesApplied += price;
-
-    if (this.taxesApplied < 0) {
-      this.taxesApplied = 0;
     }
   }
 
@@ -134,7 +125,6 @@ class Cart {
     }
 
     this.updateTotalPrice(product.price * quantity);
-    // manage taxes TO-DO
   }
 
   public getProductsInfoCheckout(): Array<ProductForCheckout> {
