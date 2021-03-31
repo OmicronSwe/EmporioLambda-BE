@@ -27,6 +27,10 @@ const Nodemailer = {
       text: TXTTemplate(productList, totalPrice, nameCustomer), // plaintext body
       html: HMTLTemplate(productList, totalPrice, nameCustomer), // html body
     };
+
+    console.log(mailOptions);
+    console.log(process.env.EMAIL);
+    console.log(process.env.PASS_EMAIL);
     const resp = await new Promise((resolve) => {
       transporter.sendMail(mailOptions, (error) => {
         if (error) {

@@ -23,6 +23,7 @@ module.exports = {
     "prefer-destructuring": "off",
     "import/prefer-default-export": "off",
     "no-await-in-loop": "off",
+    "no-console": "off",
   },
   overrides: [
     {
