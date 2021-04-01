@@ -10,7 +10,7 @@ import tableName from "../../services/dynamo/tableName";
 import bucketName from "../../services/s3/bucketName";
 import S3services from "../../services/s3/s3";
 import { pushImage } from "../../lib/pushImage";
-import { ProductDB } from "../../model/product/interface";
+import { ProductDB, UpdateProductRequest } from "../../model/product/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -24,23 +24,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const body = JSON.parse(event.body);
+  const body: UpdateProductRequest = JSON.parse(event.body);
+  let imageUrl: string = null;
 
   // if image is present, get URL and push it to s3
   if (body.imageFile) {
-    // get image
-    try {
-      body.imageUrl = await pushImage(
-        body.imageFile.imageCode,
-        body.imageFile.mime,
-        bucketName.product_image
-      );
-      delete body.imageFile;
-    } catch (err) {
-      // handle logic error of push image
-      return badRequest(`${err.name} ${err.message}`);
-    }
-
     // delete old image
     try {
       const getProduct = await Dynamo.get(
@@ -61,6 +49,25 @@ export const index: APIGatewayProxyHandler = async (event) => {
     } catch (error) {
       return badResponse("Failed to delete product image");
     }
+
+    // get image
+
+    try {
+      imageUrl = await pushImage(
+        body.imageFile.imageCode,
+        body.imageFile.mime,
+        bucketName.product_image
+      );
+    } catch (err) {
+      // handle logic error of push image
+      return badRequest(`${err.name} ${err.message}`);
+    }
+  }
+
+  const productUpdateDB: ProductDB = body;
+
+  if (imageUrl) {
+    productUpdateDB.imageUrl = imageUrl;
   }
 
   try {
@@ -68,8 +75,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
       tableName.product,
       "id",
       event.pathParameters.id,
-      Object.keys(body),
-      Object.values(body)
+      Object.keys(productUpdateDB),
+      Object.values(productUpdateDB)
     );
 
     return response({ data: { message: "Product updated correctly" } });

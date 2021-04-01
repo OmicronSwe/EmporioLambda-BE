@@ -8,6 +8,7 @@ import {
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import { decodeURI } from "../../lib/decodeURI";
+import { SearchProductRequest } from "../../model/product/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -22,7 +23,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   let countElement: number = 0;
   let countValue: number = 0;
   let limit: number;
-  let dataSearch;
+  let dataSearch: SearchProductRequest;
 
   try {
     dataSearch = JSON.parse(decodeURI(event.pathParameters.search));

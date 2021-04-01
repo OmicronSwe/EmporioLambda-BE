@@ -1,17 +1,16 @@
-export interface createCartRequest {
+export interface CreateCartRequest {
   username: string;
   readonly products: Array<ProductForCartDB>;
   readonly totalPrice?: number;
   readonly taxesApplied?: number;
 }
 
-
-export interface UpdateProductInCartRequest{
-  readonly id: string
-  readonly quantity: number
+export interface UpdateProductInCartRequest {
+  readonly id: string;
+  readonly quantity: number;
 }
 
-interface ProductForCartDB  {
+interface ProductForCartDB {
   readonly id: string;
   readonly name: string;
   readonly description: string;

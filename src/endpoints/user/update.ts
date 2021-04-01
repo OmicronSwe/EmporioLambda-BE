@@ -2,6 +2,7 @@ import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Cognito from "../../services/cognito/cognito";
 import User from "../../model/user/user";
+import { UserCognito } from "../../model/user/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -14,7 +15,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
-  let requestBody;
+  let requestBody: UserCognito;
   try {
     requestBody = JSON.parse(event.body);
   } catch (err) {

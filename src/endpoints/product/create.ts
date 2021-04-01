@@ -9,9 +9,8 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import bucketName from "../../services/s3/bucketName";
 import Product from "../../model/product/product";
-import { ProductDB, ProductRequest } from "../../model/product/interface";
+import { CreateProductRequest, ProductDB } from "../../model/product/interface";
 import { pushImage } from "../../lib/pushImage";
-import { CategoryDB } from "../../model/category/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -21,7 +20,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
-  const body: ProductRequest = JSON.parse(event.body);
+  const body: CreateProductRequest = JSON.parse(event.body);
   let imageUrl: string = null;
   let product;
   let data;
@@ -41,7 +40,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   const productDB: ProductDB = {
-    id: null,
     name: body.name,
     description: body.description,
     imageUrl,

@@ -4,7 +4,7 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
-import { createCartRequest } from "../../model/cart/interface";
+import { CreateCartRequest } from "../../model/cart/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -14,9 +14,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
-  const body: createCartRequest = JSON.parse(event.body);
+  const body: CreateCartRequest = JSON.parse(event.body);
 
-  const dataCart: createCartRequest = {
+  const dataCart: CreateCartRequest = {
     username: body.username,
     products: [],
   };

@@ -7,7 +7,6 @@ import {
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
-import { ProductDB } from "../../model/product/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered

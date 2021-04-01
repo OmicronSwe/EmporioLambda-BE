@@ -10,7 +10,7 @@ import tableName from "../../services/dynamo/tableName";
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import Stripe from "../../services/stripe/stripe";
-import { ProductDB } from "../../model/product/interface";
+import { CreateSessionStripeRequest } from "../../model/checkout/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -20,7 +20,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
-  const body = JSON.parse(event.body);
+  const body: CreateSessionStripeRequest = JSON.parse(event.body);
 
   let result;
 

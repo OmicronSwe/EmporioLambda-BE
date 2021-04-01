@@ -1,4 +1,5 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
+import Stripe from "stripe";
 import {
   response,
   badRequest,
@@ -12,8 +13,6 @@ import Cart from "../../model/cart/cart";
 import Nodemailer from "../../services/nodemailer/nodemailer";
 import User from "../../model/user/user";
 import Cognito from "../../services/cognito/cognito";
-import { OrderDB } from "../../model/order/interface";
-import { CognitoFormat } from "../../model/user/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -24,7 +23,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
-  const webhookStripe = JSON.parse(event.body).data.object;
+  const webhookStripe: Stripe.Checkout.Session = JSON.parse(event.body).data
+    .object;
 
   if (webhookStripe.payment_status == "paid") {
     let result;

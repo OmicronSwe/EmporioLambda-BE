@@ -3,7 +3,7 @@ import { response, badRequest, badResponse } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import Category from "../../model/category/category";
-import { CategoryDB } from "../../model/category/interface";
+import { CreateCategoryRequest } from "../../model/category/interface";
 /**
  * @param  {} event: event passed when lambda is triggered
  */
@@ -12,10 +12,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
+  const body: CreateCategoryRequest = JSON.parse(event.body);
+
   let category;
 
   try {
-    category = new Category(JSON.parse(event.body));
+    category = new Category(body);
   } catch (err) {
     // handle logic error of category
     return badRequest(`${err.name} ${err.message}`);

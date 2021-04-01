@@ -23,7 +23,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const body: UpdateProductInCartRequest= JSON.parse(event.body);
+  const body: UpdateProductInCartRequest = JSON.parse(event.body);
 
   // get Informations cart
   let resultGetCart;

@@ -9,7 +9,6 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import bucketName from "../../services/s3/bucketName";
 import S3services from "../../services/s3/s3";
-import { ProductDB } from "../../model/product/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered

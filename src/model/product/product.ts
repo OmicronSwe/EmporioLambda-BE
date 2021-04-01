@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { ProductDB } from "./interface";
+import { ProductDBWithID } from "./interface";
 
 class Product {
   id: string;
@@ -30,7 +30,7 @@ class Product {
     this.category = data.category;
   }
 
-  public toJSON(): ProductDB {
+  public toJSON(): ProductDBWithID {
     return {
       id: this.id,
       name: this.name,

@@ -1,3 +1,3 @@
-export interface CategoryDB {
+export interface CreateCategoryRequest {
   readonly name: string;
 }

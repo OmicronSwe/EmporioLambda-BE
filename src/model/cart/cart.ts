@@ -1,5 +1,6 @@
 import Product from "../product/product";
 import { ProductForCheckout } from "../product/interface";
+import { CreateCartRequest } from "./interface";
 
 class Cart {
   username: string;
@@ -10,7 +11,7 @@ class Cart {
 
   taxesApplied: number;
 
-  constructor(data) {
+  constructor(data: CreateCartRequest) {
     if (!data.username) {
       throw Error("username value not found");
     }
@@ -34,7 +35,7 @@ class Cart {
     this.username = data.username;
   }
 
-  public toJSON() {
+  public toJSON(): CreateCartRequest {
     const productsCart = this.getProductsList();
     let productsCartObject;
     const productCartArray = [];
