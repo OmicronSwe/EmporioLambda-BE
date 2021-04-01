@@ -9,8 +9,7 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
-import { CartDB } from "../../model/cart/interface";
-import { ProductDB, ProductToCartRequest } from "../../model/product/interface";
+import { UpdateProductInCartRequest } from "../../model/cart/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -24,44 +23,35 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const body: ProductToCartRequest = JSON.parse(event.body);
+  const body: UpdateProductInCartRequest= JSON.parse(event.body);
 
   // get Informations cart
-  const resultGetCart: CartDB = await Dynamo.get(
-    tableName.cart,
-    "username",
-    event.pathParameters.username
-  ).catch(() => {
-    // handle error of dynamoDB
-    // console.log(err);
-    return null;
-  });
+  let resultGetCart;
+  let resultGetProduct;
 
-  if (!resultGetCart) {
+  try {
+    resultGetCart = await Dynamo.get(
+      tableName.cart,
+      "username",
+      event.pathParameters.username
+    );
+
+    if (Object.keys(resultGetCart).length === 0) {
+      resultGetCart.username = event.pathParameters.username;
+    }
+  } catch (error) {
     return badResponse("Failed to get cart");
   }
 
-  if (Object.keys(resultGetCart).length === 0) {
-    resultGetCart.username = event.pathParameters.username;
-  }
-
   // get info from product id
-  const resultGetProduct: ProductDB = await Dynamo.get(
-    tableName.product,
-    "id",
-    body.id
-  ).catch(() => {
-    // handle error of dynamoDB
-    // console.log(err);
-    return null;
-  });
+  try {
+    resultGetProduct = await Dynamo.get(tableName.product, "id", body.id);
 
-  if (!resultGetProduct) {
+    if (Object.keys(resultGetProduct).length === 0) {
+      return notFound("Product not found");
+    }
+  } catch (error) {
     return badResponse("Failed to get product");
-  }
-
-  if (Object.keys(resultGetProduct).length === 0) {
-    return notFound("Product not found");
   }
 
   const prod: Product = new Product(resultGetProduct);
@@ -70,13 +60,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   cartFromDB.addProduct(prod, body.quantity ? body.quantity : 1);
 
-  return await Dynamo.write(tableName.cart, cartFromDB.toJSON())
-    .then(() => {
-      return response({
-        data: { message: `Product "${prod.name}" added to cart` },
-      });
-    })
-    .catch(() => {
-      return badResponse(`Failed to add product "${prod.name}" to cart`);
+  try {
+    await Dynamo.write(tableName.cart, cartFromDB.toJSON());
+    return response({
+      data: { message: `Product "${prod.name}" added to cart` },
     });
+  } catch (error) {
+    return badResponse(`Failed to add product "${prod.name}" to cart`);
+  }
 };

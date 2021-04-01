@@ -7,13 +7,7 @@ export interface ProductDB {
   readonly category: string;
 }
 
-export interface ProductForCartDB {
-  readonly id: string;
-  readonly name: string;
-  readonly description: string;
-  readonly imageUrl: string;
-  readonly price: number;
-  readonly category: string;
+export interface ProductForCartDB extends ProductDB {
   readonly quantity: number;
 }
 

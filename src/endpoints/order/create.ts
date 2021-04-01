@@ -12,7 +12,6 @@ import Cart from "../../model/cart/cart";
 import Nodemailer from "../../services/nodemailer/nodemailer";
 import User from "../../model/user/user";
 import Cognito from "../../services/cognito/cognito";
-import { CartDB } from "../../model/cart/interface";
 import { OrderDB } from "../../model/order/interface";
 import { CognitoFormat } from "../../model/user/interface";
 
@@ -28,21 +27,20 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const webhookStripe = JSON.parse(event.body).data.object;
 
   if (webhookStripe.payment_status == "paid") {
-    const result: CartDB = await Dynamo.get(
-      tableName.cart,
-      "username",
-      webhookStripe.client_reference_id
-    ).catch(() => {
-      // handle error of dynamoDB
-      return null;
-    });
+    let result;
 
-    if (!result) {
+    try {
+      result = await Dynamo.get(
+        tableName.cart,
+        "username",
+        webhookStripe.client_reference_id
+      );
+
+      if (Object.keys(result).length === 0) {
+        return notFound("Cart not found");
+      }
+    } catch (error) {
       return badResponse("Failed to get cart");
-    }
-
-    if (Object.keys(result).length === 0) {
-      return notFound("Cart not found");
     }
 
     let cart: Cart;
@@ -52,20 +50,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
     try {
       cart = new Cart(result);
       order = new Order(cart, webhookStripe.customer_details.email);
-
-      const data: OrderDB = order.toJSON();
-
-      const newOrder = await Dynamo.write(tableName.order, data).catch(() => {
-        // handle error of dynamoDB
-        return null;
-      });
-
-      if (!newOrder) {
-        return badResponse("Failed to receive order");
-      }
     } catch (err) {
       // handle logic error of cart and order
       return badRequest(`${err.name} ${err.message}`);
+    }
+
+    try {
+      const data = order.toJSON();
+      await Dynamo.write(tableName.order, data);
+    } catch (error) {
+      return badResponse("Failed to receive order");
     }
 
     // empty the cart
@@ -74,44 +68,35 @@ export const index: APIGatewayProxyHandler = async (event) => {
       products: [],
     };
 
-    const resultCartEmpty = await Dynamo.write(tableName.cart, data).catch(
-      () => {
-        // handle error of dynamoDB
-        return null;
-      }
-    );
-
-    if (!resultCartEmpty) {
+    try {
+      await Dynamo.write(tableName.cart, data);
+    } catch (error) {
       return badResponse("Failed to empty the cart");
     }
 
     // get user name
-    const resultUser: CognitoFormat[] = await Cognito.getUserAttributes(
-      cart.username
-    ).catch(() => {
-      // handle error of dynamoDB
-      return null;
-    });
+    let userName: string;
+    try {
+      const resultUser = await Cognito.getUserAttributes(cart.username);
 
-    if (!resultUser) {
+      userName = User.fromCognitoFormat(resultUser).name;
+    } catch (error) {
       return badResponse("Failed to get user data");
     }
 
-    const user = User.fromCognitoFormat(resultUser);
-
     // send email;
-    return await Nodemailer.sendEmailProduct(
-      cart.products,
-      webhookStripe.customer_details.email,
-      cart.totalPrice,
-      user.name
-    )
-      .then(() => {
-        return response({ data: { message: "Order recevied" } });
-      })
-      .catch(() => {
-        return badResponse("Failed to send email order");
-      });
+    try {
+      Nodemailer.sendEmailProduct(
+        cart.products,
+        webhookStripe.customer_details.email,
+        cart.totalPrice,
+        userName
+      );
+
+      return response({ data: { message: "Order recevied" } });
+    } catch (err) {
+      return badResponse("Failed to send email order");
+    }
   }
   return badResponse("Failed to create order");
 };

@@ -29,15 +29,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
     requestBody.username
   );
 
-  return Cognito.updateUser(
-    user.toCognitoFormat(),
-    event.pathParameters.username
-  )
-    .then(() => {
-      return response({ data: { message: "User updated correctly" } });
-    })
-    .catch(() => {
-      // handle error of dynamoDB
-      return badResponse("Failed to udpate user");
-    });
+  try {
+    await Cognito.updateUser(
+      user.toCognitoFormat(),
+      event.pathParameters.username
+    );
+
+    return response({ data: { message: "User updated correctly" } });
+  } catch (error) {
+    return badResponse("Failed to udpate user");
+  }
 };

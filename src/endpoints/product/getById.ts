@@ -17,22 +17,19 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const result: ProductDB = await Dynamo.get(
-    tableName.product,
-    "id",
-    event.pathParameters.id
-  ).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
+  try {
+    const result = await Dynamo.get(
+      tableName.product,
+      "id",
+      event.pathParameters.id
+    );
 
-  if (!result) {
+    if (Object.keys(result).length === 0) {
+      return notFound("Product not found");
+    }
+
+    return response({ data: { result } });
+  } catch (error) {
     return badResponse("Failed to get product");
   }
-
-  if (Object.keys(result).length === 0) {
-    return notFound("Product not found");
-  }
-
-  return response({ data: { result } });
 };

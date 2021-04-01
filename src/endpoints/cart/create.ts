@@ -4,8 +4,7 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
-import { CartDB } from "../../model/cart/interface";
-import { ProductDB } from "../../model/product/interface";
+import { createCartRequest } from "../../model/cart/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -15,9 +14,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
-  const body: CartDB = JSON.parse(event.body);
+  const body: createCartRequest = JSON.parse(event.body);
 
-  const dataCart: CartDB = {
+  const dataCart: createCartRequest = {
     username: body.username,
     products: [],
   };
@@ -34,24 +33,20 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // check if products exist and are modify
   for (let i = 0; i < body.products.length; i++) {
-    const result: ProductDB = await Dynamo.get(
-      tableName.product,
-      "id",
-      body.products[i].id
-    ).catch(() => {
-      // handle error of dynamoDB
-      // console.log(err);
-      return null;
-    });
+    try {
+      const result = await Dynamo.get(
+        tableName.product,
+        "id",
+        body.products[i].id
+      );
 
-    if (!result) {
+      if (Object.keys(result).length !== 0) {
+        const prod: Product = new Product(result);
+
+        cart.addProduct(prod, body.products[i].quantity);
+      }
+    } catch (error) {
       return badResponse("Failed to get product");
-    }
-
-    if (Object.keys(result).length !== 0) {
-      const prod: Product = new Product(result);
-
-      cart.addProduct(prod, body.products[i].quantity);
     }
   }
 
@@ -59,11 +54,10 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // push data to dynamodb
 
-  return await Dynamo.write(tableName.cart, data)
-    .then(() => {
-      return response({ data: { message: "Cart saved" } });
-    })
-    .catch(() => {
-      return badResponse("Failed to save cart");
-    });
+  try {
+    await Dynamo.write(tableName.cart, data);
+    return response({ data: { message: "Cart saved" } });
+  } catch (error) {
+    return badResponse("Failed to save cart");
+  }
 };

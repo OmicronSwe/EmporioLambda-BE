@@ -11,16 +11,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  return Dynamo.delete(
-    tableName.cart,
-    "username",
-    event.pathParameters.username
-  )
-    .then(() => {
-      return response({ data: { message: "Cart deleted" } });
-    })
-    .catch(() => {
-      // handle error of dynamoDB
-      return badResponse("Failed to delete the cart");
-    });
+  try {
+    await Dynamo.delete(
+      tableName.cart,
+      "username",
+      event.pathParameters.username
+    );
+
+    return response({ data: { message: "Cart deleted" } });
+  } catch (error) {
+    return badResponse("Failed to delete the cart");
+  }
 };

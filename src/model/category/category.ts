@@ -1,6 +1,6 @@
 import { CategoryDB } from "./interface";
 
-class Category {
+class Category implements CategoryDB {
   name: string;
 
   constructor(data) {

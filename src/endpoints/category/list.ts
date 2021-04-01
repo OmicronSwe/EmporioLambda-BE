@@ -4,17 +4,14 @@ import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
 
 export const index: APIGatewayProxyHandler = async () => {
-  const result = await Dynamo.scan(tableName.category).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
-
-  if (!result) {
+  let result;
+  try {
+    result = await Dynamo.scan(tableName.category);
+    if (result.items.length == 0) {
+      return notFound("Categories not found");
+    }
+  } catch (error) {
     return badResponse("Failed to scan categories");
-  }
-
-  if (result.items.length == 0) {
-    return notFound("Categories not found");
   }
 
   const categoriesList: string[] = [];

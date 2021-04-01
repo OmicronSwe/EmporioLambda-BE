@@ -5,7 +5,6 @@ import tableName from "../src/services/dynamo/tableName";
 import Order from "../src/model/order/order";
 import Cart from "../src/model/cart/cart";
 import { OrderDB } from "../src/model/order/interface";
-import { CartDB } from "../src/model/cart/interface";
 
 const mochaPlugin = require("serverless-mocha-plugin");
 
@@ -70,7 +69,7 @@ describe("Order populated table", () => {
     // create cart
     await createCart.run(dataCart);
 
-    const result: CartDB = await Dynamo.get(
+    const result = await Dynamo.get(
       tableName.cart,
       "username",
       "username-string-test"

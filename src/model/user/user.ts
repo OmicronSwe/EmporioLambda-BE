@@ -1,7 +1,7 @@
 import { CognitoFormat, UserCognito } from "./interface";
 
 /* eslint-disable @typescript-eslint/naming-convention */
-export default class User {
+export default class User implements UserCognito {
   email: string;
 
   name: string;
@@ -36,7 +36,7 @@ export default class User {
     };
   }
 
-  public static fromCognitoFormat(body: CognitoFormat[]): User {
+  public static fromCognitoFormat(body): User {
     let name;
     let family_name;
     let email;

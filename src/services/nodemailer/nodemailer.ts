@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const Nodemailer = {
-  sendEmailProduct: async (
+  sendEmailProduct: (
     productList: Map<Product, number>,
     emailToSend: string,
     totalPrice: number,
@@ -28,7 +28,7 @@ const Nodemailer = {
       html: HMTLTemplate(productList, totalPrice, nameCustomer), // html body
     };
 
-    const resp = await new Promise((resolve) => {
+    const resp = new Promise((resolve) => {
       transporter.sendMail(mailOptions, (error) => {
         if (error) {
           resolve(false);

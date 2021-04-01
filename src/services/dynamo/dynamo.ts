@@ -9,11 +9,7 @@ const Dynamo = {
    * @param  {string} primaryKeyValue: the value of the key
    * @returns Promise
    */
-  get: async (
-    tableName: string,
-    primaryKey: string,
-    primaryKeyValue: string
-  ): Promise<DynamoDB.AttributeMap> => {
+  get: (tableName: string, primaryKey: string, primaryKeyValue: string) => {
     const params: DynamoDB.DocumentClient.GetItemInput = {
       TableName: tableName,
       Key: {
@@ -21,17 +17,15 @@ const Dynamo = {
       },
     };
 
-    const data = await dynamoDb
+    return dynamoDb
       .get(params)
       .promise()
       .then((data) => {
-        return data;
+        return data.Item ? data.Item : {};
       })
       .catch((err) => {
         throw Error(`Error in Dynamo get from table ${tableName}: ${err}`);
       });
-
-    return data.Item ? data.Item : {};
   },
 
   /**
@@ -39,7 +33,7 @@ const Dynamo = {
    * @param  {} data: data in the object JS form to write in the table
    * @returns Promise
    */
-  write: async (tableName: string, data): Promise<DynamoDB.PutItemOutput> => {
+  write: (tableName: string, data): Promise<DynamoDB.PutItemOutput> => {
     const params: DynamoDB.DocumentClient.PutItemInput = {
       TableName: tableName,
       Item: data,
@@ -64,7 +58,7 @@ const Dynamo = {
    * @param  {Array<string>} updateValue: value of the column to update in the table
    * @returns Promise
    */
-  update: async (
+  update: (
     tableName: string,
     primaryKey: string,
     primaryKeyValue: string,
@@ -130,7 +124,7 @@ const Dynamo = {
    * @param  {string} filterExpression: the expression filter for query (optional)
    * @returns Promise
    */
-  query: async (
+  query: (
     tableName: string,
     indexName: string,
     element: Array<string>,
@@ -139,7 +133,7 @@ const Dynamo = {
     filterExpression: string = "",
     limit?: number,
     exclusiveStartKey?: string
-  ): Promise<object> => {
+  ) => {
     const AttriNameExpr: { [k: string]: string } = {};
     const AttriValueExpr: { [k: string]: any } = {};
 
@@ -178,19 +172,20 @@ const Dynamo = {
       params.ExclusiveStartKey = { item_id: exclusiveStartKey };
     }
 
-    const res = await dynamoDb
+    return dynamoDb
       .query(params)
       .promise()
       .then((data) => {
-        return data;
+        return {
+          items: data.Items || [],
+          lastEvaluatedKey: data.LastEvaluatedKey,
+        };
       })
       .catch((err) => {
         throw Error(
           `Error in Dynamo query in table in table ${tableName}: ${err}`
         );
       });
-
-    return { items: res.Items || [], lastEvaluatedKey: res.LastEvaluatedKey };
   },
 
   /** Percorre tutta la tabella e poi applica le condizioni, per questo più lenta della query. Non serve identificare le
@@ -211,14 +206,14 @@ const Dynamo = {
    
    * @returns Promise
    */
-  scan: async (
+  scan: (
     tableName: string,
     filterExpression: string = "",
     element: Array<string> = [],
     value: Array<string> = [],
     limit?: number,
     startKey?: object
-  ): Promise<object> => {
+  ) => {
     const AttriNameExpr: { [k: string]: string } = {};
     const AttriValueExpr: { [k: string]: any } = {};
 
@@ -258,17 +253,18 @@ const Dynamo = {
       params.Limit = limit;
     }
 
-    const res = await dynamoDb
+    return dynamoDb
       .scan(params)
       .promise()
       .then((data) => {
-        return data;
+        return {
+          items: data.Items || [],
+          lastEvaluatedKey: data.LastEvaluatedKey,
+        };
       })
       .catch((err) => {
         throw Error(`Error in Dynamo scan in table ${tableName}: ${err}`);
       });
-
-    return { items: res.Items || [], lastEvaluatedKey: res.LastEvaluatedKey };
   },
 
   /**
@@ -276,7 +272,7 @@ const Dynamo = {
    * @param  {string} primaryKey: the key of the table
    * @param  {string} primaryKeyValue: the value of the key
    */
-  delete: async (
+  delete: (
     tableName: string,
     primaryKey: string,
     primaryKeyValue: string

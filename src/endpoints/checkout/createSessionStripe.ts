@@ -10,7 +10,6 @@ import tableName from "../../services/dynamo/tableName";
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import Stripe from "../../services/stripe/stripe";
-import { CartDB } from "../../model/cart/interface";
 import { ProductDB } from "../../model/product/interface";
 
 /**
@@ -23,21 +22,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body = JSON.parse(event.body);
 
-  const result: CartDB = await Dynamo.get(
-    tableName.cart,
-    "username",
-    body.username
-  ).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
+  let result;
 
-  if (!result) {
+  try {
+    result = await Dynamo.get(tableName.cart, "username", body.username);
+
+    if (Object.keys(result).length === 0) {
+      return notFound("Cart not found");
+    }
+  } catch (error) {
     return badResponse("Failed to get cart");
-  }
-
-  if (Object.keys(result).length === 0) {
-    return notFound("Cart not found");
   }
 
   const cart: Cart = new Cart(result);
@@ -45,39 +39,39 @@ export const index: APIGatewayProxyHandler = async (event) => {
   // check if products exist and are modify
   const cartProductList: Array<Product> = cart.getProductsList();
   for (let i = 0; i < cartProductList.length; i++) {
-    const result: ProductDB = await Dynamo.get(
-      tableName.product,
-      "id",
-      cartProductList[i].id
-    ).catch(() => {
-      // handle error of dynamoDB
-      return null;
-    });
+    try {
+      const result = await Dynamo.get(
+        tableName.product,
+        "id",
+        cartProductList[i].id
+      );
 
-    if (!result) {
+      if (Object.keys(result).length === 0) {
+        return notFound(
+          "Some products are no longer available, please check your shopping cart before proceeding"
+        );
+      }
+      const prodFromDb = new Product(result);
+
+      if (cartProductList[i].isDifference(prodFromDb)) {
+        return badResponse(
+          "Some products have changed, please check your shopping cart before proceeding"
+        );
+      }
+    } catch (error) {
       return badResponse("Failed to get product");
-    }
-
-    if (Object.keys(result).length === 0) {
-      return notFound(
-        "Some products are no longer available, please check your shopping cart before proceeding"
-      );
-    }
-    const prodFromDb = new Product(result);
-
-    if (cartProductList[i].isDifference(prodFromDb)) {
-      return badResponse(
-        "Some products have changed, please check your shopping cart before proceeding"
-      );
     }
   }
 
   // create stripe session
-  return await Stripe.createSession(cart, body.successurl, body.cancelurl)
-    .then((data) => {
-      return response({ data: { sessionId: data } });
-    })
-    .catch(() => {
-      return badResponse("Enable to create sessione of Stripe");
-    });
+  try {
+    const idSession = await Stripe.createSession(
+      cart,
+      body.successurl,
+      body.cancelurl
+    );
+    return response({ data: { sessionId: idSession } });
+  } catch (error) {
+    return badResponse("Enable to create sessione of Stripe");
+  }
 };

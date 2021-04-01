@@ -11,7 +11,7 @@ const S3services = {
    * @param  {string='public-read'} ACL: Access Control List (optional)
    * @returns Promise
    */
-  upload: async (
+  upload: (
     bucket: string,
     data: Buffer,
     key: string,
@@ -41,10 +41,7 @@ const S3services = {
    * @param  {string} key: key of file
    * @returns Promise
    */
-  delete: async (
-    bucket: string,
-    key: string
-  ): Promise<S3.DeleteObjectOutput> => {
+  delete: (bucket: string, key: string): Promise<S3.DeleteObjectOutput> => {
     const params: S3.DeleteObjectRequest = {
       Key: key,
       Bucket: bucket,

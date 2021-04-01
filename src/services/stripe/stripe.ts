@@ -6,27 +6,28 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
 });
 
 const Stripe = {
-  createSession: async (
+  createSession: (
     cart: Cart,
     successUrl: string,
     cancelUrl: string
   ): Promise<string> => {
-    try {
-      const params = {
-        payment_method_types: ["card"],
-        mode: "payment",
-        client_reference_id: cart.username,
-        line_items: cart.getProductsInfoCheckout(),
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-      };
+    const params = {
+      payment_method_types: ["card"],
+      mode: "payment",
+      client_reference_id: cart.username,
+      line_items: cart.getProductsInfoCheckout(),
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+    };
 
-      const session = await stripe.checkout.sessions.create(params);
-
-      return session.id;
-    } catch (err) {
-      throw Error(`Error in Stripe createSession: ${err}`);
-    }
+    return stripe.checkout.sessions
+      .create(params)
+      .then((data) => {
+        return data.id;
+      })
+      .catch((err) => {
+        throw Error(`Error in Stripe createSession: ${err}`);
+      });
   },
 };
 

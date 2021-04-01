@@ -95,25 +95,22 @@ export const index: APIGatewayProxyHandler = async (event) => {
     dataSearch.lastEvaluatedKey = JSON.parse(dataSearch.lastEvaluatedKey);
   }
 
-  const result = await Dynamo.scan(
-    tableName.product,
-    filterExpression,
-    keys,
-    valueKeys,
-    limit,
-    dataSearch.lastEvaluatedKey
-  ).catch(() => {
-    // handle dynamoDb error
-    return null;
-  });
+  try {
+    const result = await Dynamo.scan(
+      tableName.product,
+      filterExpression,
+      keys,
+      valueKeys,
+      limit,
+      dataSearch.lastEvaluatedKey
+    );
 
-  if (!result) {
+    if (result.items.length == 0) {
+      return notFound("Products not found");
+    }
+
+    return response({ data: { result } });
+  } catch (error) {
     return badResponse("Failed to search products");
   }
-
-  if (result.items.length == 0) {
-    return notFound("Products not found");
-  }
-
-  return response({ data: { result } });
 };

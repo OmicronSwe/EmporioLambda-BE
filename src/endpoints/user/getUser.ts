@@ -9,18 +9,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const result: CognitoFormat[] = await Cognito.getUserAttributes(
-    event.pathParameters.username
-  ).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
+  try {
+    const result = await Cognito.getUserAttributes(
+      event.pathParameters.username
+    );
 
-  if (!result) {
+    const user = User.fromCognitoFormat(result);
+
+    return response({ data: { result: user.toJSON() } });
+  } catch (error) {
     return badResponse("Failed to get user data");
   }
-
-  const user = User.fromCognitoFormat(result);
-
-  return response({ data: { result: user.toJSON() } });
 };

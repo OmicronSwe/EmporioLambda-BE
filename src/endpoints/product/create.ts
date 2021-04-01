@@ -23,6 +23,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body: ProductRequest = JSON.parse(event.body);
   let imageUrl: string = null;
+  let product;
+  let data;
 
   // if image is present, get URL and push it to s3
   if (body.imageFile) {
@@ -49,41 +51,36 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // push data to dynamodb
   try {
-    const product: Product = new Product(productDB);
-    const data: ProductDB = product.toJSON();
+    product = new Product(productDB);
+    data = product.toJSON();
+  } catch (err) {
+    // handle logic error of product
+    return badRequest(`${err.name} ${err.message}`);
+  }
 
-    // check if category is in Db
-    if (product.getCategory()) {
-      const category: CategoryDB = await Dynamo.get(
+  // check if category is in Db
+  if (product.getCategory()) {
+    try {
+      const category = await Dynamo.get(
         tableName.category,
         "name",
         product.getCategory()
-      ).catch(() => {
-        // handle error of dynamoDB
-        return null;
-      });
-
-      if (!category) {
-        return badResponse("Failed to check category existence");
-      }
+      );
 
       if (Object.keys(category).length === 0) {
         return notFound("Category not exist");
       }
+    } catch (error) {
+      return badResponse("Failed to check category existence");
     }
+  }
 
-    return await Dynamo.write(tableName.product, data)
-      .then(() => {
-        return response({
-          data: { message: `Product "${product.name}" created correctly` },
-        });
-      })
-      .catch(() => {
-        // handle error of dynamoDB
-        return badResponse("Failed to create product");
-      });
-  } catch (err) {
-    // handle logic error of product
-    return badRequest(`${err.name} ${err.message}`);
+  try {
+    await Dynamo.write(tableName.product, data);
+    return response({
+      data: { message: `Product "${product.name}" created correctly` },
+    });
+  } catch (error) {
+    return badResponse("Failed to create product");
   }
 };

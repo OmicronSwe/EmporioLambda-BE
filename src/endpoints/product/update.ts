@@ -26,28 +26,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const body = JSON.parse(event.body);
 
-  // get product image in order to delete from S3
-  const getProduct: ProductDB = await Dynamo.get(
-    tableName.product,
-    "id",
-    event.pathParameters.id
-  ).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
-
-  if (Object.keys(getProduct).length === 0) {
-    return notFound("Product not found");
-  }
-
-  if (getProduct.imageUrl) {
-    const keyImage: string = getProduct.imageUrl.split("/").pop();
-
-    await S3services.delete(bucketName.product_image, keyImage);
-  }
-
   // if image is present, get URL and push it to s3
   if (body.imageFile) {
+    // get image
     try {
       body.imageUrl = await pushImage(
         body.imageFile.imageCode,
@@ -59,21 +40,40 @@ export const index: APIGatewayProxyHandler = async (event) => {
       // handle logic error of push image
       return badRequest(`${err.name} ${err.message}`);
     }
+
+    // delete old image
+    try {
+      const getProduct = await Dynamo.get(
+        tableName.product,
+        "id",
+        event.pathParameters.id
+      );
+
+      if (Object.keys(getProduct).length === 0) {
+        return notFound("Product not found");
+      }
+
+      if (getProduct.imageUrl) {
+        const keyImage: string = getProduct.imageUrl.split("/").pop();
+
+        await S3services.delete(bucketName.product_image, keyImage);
+      }
+    } catch (error) {
+      return badResponse("Failed to delete product image");
+    }
   }
 
-  // update product
-  return await Dynamo.update(
-    tableName.product,
-    "id",
-    event.pathParameters.id,
-    Object.keys(body),
-    Object.values(body)
-  )
-    .then(() => {
-      return response({ data: { message: "Product updated correctly" } });
-    })
-    .catch(() => {
-      // handle dynamoDb error
-      return badResponse("Failed to update product");
-    });
+  try {
+    await Dynamo.update(
+      tableName.product,
+      "id",
+      event.pathParameters.id,
+      Object.keys(body),
+      Object.values(body)
+    );
+
+    return response({ data: { message: "Product updated correctly" } });
+  } catch (error) {
+    return badResponse("Failed to update product");
+  }
 };

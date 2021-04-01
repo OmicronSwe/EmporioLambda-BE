@@ -16,7 +16,7 @@ const Cognito = {
    * @param  {string} username: username of the user
    * @returns Promise
    */
-  getUserAttributes: async (
+  getUserAttributes: (
     username: string
   ): Promise<CognitoIdentityServiceProvider.AttributeListType> => {
     const params: CognitoIdentityServiceProvider.AdminGetUserRequest = {
@@ -24,38 +24,34 @@ const Cognito = {
       UserPoolId: process.env.USER_POOL_ID,
     };
 
-    const data = await CognitoService.adminGetUser(params)
+    return CognitoService.adminGetUser(params)
       .promise()
       .then((data) => {
-        return data;
+        return data.UserAttributes ? data.UserAttributes : null;
       })
       .catch((err) => {
         throw Error(`Error in Cognito adminGetUser: ${err}`);
       });
-
-    return data.UserAttributes ? data.UserAttributes : null;
   },
 
   /**
    * @param  {string} username: username of the user
    * @returns Promise
    */
-  getUsername: async (username: string): Promise<string> => {
+  getUsername: (username: string): Promise<string> => {
     const params: CognitoIdentityServiceProvider.AdminGetUserRequest = {
       Username: username,
       UserPoolId: process.env.USER_POOL_ID,
     };
 
-    const data = await CognitoService.adminGetUser(params)
+    return CognitoService.adminGetUser(params)
       .promise()
       .then((data) => {
-        return data;
+        return data.Username ? data.Username : null;
       })
       .catch((err) => {
         throw Error(`Error in Cognito adminGetUser: ${err}`);
       });
-
-    return data.Username ? data.Username : null;
   },
 
   /**
@@ -63,7 +59,7 @@ const Cognito = {
    * @param  {string} username: username of the user
    * @returns Promise
    */
-  updateUser: async (
+  updateUser: (
     userAttributes: CognitoIdentityServiceProvider.AttributeListType,
     username: string
   ): Promise<CognitoIdentityServiceProvider.AdminUpdateUserAttributesResponse> => {
@@ -87,7 +83,7 @@ const Cognito = {
    * @param  {string} username: username of the user
    * @returns Promise
    */
-  deleteUser: async (username: string): Promise<{}> => {
+  deleteUser: (username: string): Promise<{}> => {
     const params: CognitoIdentityServiceProvider.AdminDeleteUserRequest = {
       Username: username,
       UserPoolId: process.env.USER_POOL_ID,

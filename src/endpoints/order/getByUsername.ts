@@ -16,24 +16,21 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const result = await Dynamo.query(
-    tableName.order,
-    "username_date_index",
-    ["username"],
-    [event.pathParameters.username],
-    "#element0 = :Value0"
-  ).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
+  try {
+    const result = await Dynamo.query(
+      tableName.order,
+      "username_date_index",
+      ["username"],
+      [event.pathParameters.username],
+      "#element0 = :Value0"
+    );
 
-  if (!result) {
+    if (result.items.length == 0) {
+      return notFound("Orders not found");
+    }
+
+    return response({ data: { result } });
+  } catch (error) {
     return badResponse("Failed to get orders");
   }
-
-  if (result.items.length == 0) {
-    return notFound("Orders not found");
-  }
-
-  return response({ data: { result } });
 };

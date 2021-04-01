@@ -12,41 +12,34 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("Body missing");
   }
 
+  let category;
+
   try {
-    const category = new Category(JSON.parse(event.body));
-    const name = category.getName();
+    category = new Category(JSON.parse(event.body));
+  } catch (err) {
+    // handle logic error of category
+    return badRequest(`${err.name} ${err.message}`);
+  }
+  const name = category.getName();
 
-    const resultGet: CategoryDB = await Dynamo.get(
-      tableName.category,
-      "name",
-      name
-    ).catch(() => {
-      // handle error of dynamoDB
-      return null;
-    });
-
-    if (!resultGet) {
-      return badResponse("Failed to create category");
-    }
+  try {
+    const resultGet = await Dynamo.get(tableName.category, "name", name);
 
     if (Object.keys(resultGet).length >= 1) {
       return badRequest("Category already exists");
     }
+  } catch (error) {
+    return badResponse("Failed to create category");
+  }
 
-    const data = category.toJSON();
+  const data = category.toJSON();
 
-    return await Dynamo.write(tableName.category, data)
-      .then(() => {
-        return response({
-          data: { message: `Category "${category.name}" created correctly` },
-        });
-      })
-      .catch(() => {
-        // handle error of dynamoDB
-        return badResponse("Failed to create category");
-      });
-  } catch (err) {
-    // handle logic error of category
-    return badRequest(`${err.name} ${err.message}`);
+  try {
+    await Dynamo.write(tableName.category, data);
+    return response({
+      data: { message: `Category "${category.name}" created correctly` },
+    });
+  } catch (error) {
+    return badResponse("Failed to create category");
   }
 };

@@ -11,34 +11,29 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const scanCategory = await Dynamo.scan(
-    tableName.product,
-    "#element0 = :Value0",
-    ["category"],
-    [event.pathParameters.name]
-  ).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
+  try {
+    const scanCategory = await Dynamo.scan(
+      tableName.product,
+      "#element0 = :Value0",
+      ["category"],
+      [event.pathParameters.name]
+    );
 
-  if (!scanCategory) {
+    if (scanCategory.items.length >= 1) {
+      return badRequest("Category is being used");
+    }
+  } catch (error) {
     return badResponse("Failed to scan category");
   }
 
-  if (scanCategory.items.length >= 1) {
-    return badRequest("Category is being used");
+  try {
+    await Dynamo.delete(
+      tableName.category,
+      "name",
+      decodeURIComponent(event.pathParameters.name)
+    );
+    return response({ data: { message: "Category deleted correctly" } });
+  } catch (error) {
+    return badResponse("Failed to delete category");
   }
-
-  return await Dynamo.delete(
-    tableName.category,
-    "name",
-    decodeURIComponent(event.pathParameters.name)
-  )
-    .then(() => {
-      return response({ data: { message: "Category deleted correctly" } });
-    })
-    .catch(() => {
-      // handle error of dynamoDB
-      return badResponse("Failed to delete category");
-    });
 };

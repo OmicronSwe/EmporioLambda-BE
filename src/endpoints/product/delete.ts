@@ -19,33 +19,31 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  // get product image in order to delete from S3
-  const getProduct: ProductDB = await Dynamo.get(
-    tableName.product,
-    "id",
-    event.pathParameters.id
-  ).catch(() => {
-    // handle error of dynamoDB
-    return null;
-  });
+  try {
+    const getProduct = await Dynamo.get(
+      tableName.product,
+      "id",
+      event.pathParameters.id
+    );
 
-  if (Object.keys(getProduct).length === 0) {
-    return notFound("Product not found");
+    if (Object.keys(getProduct).length === 0) {
+      return notFound("Product not found");
+    }
+
+    if (getProduct.imageUrl) {
+      const keyImage: string = getProduct.imageUrl.split("/").pop();
+
+      await S3services.delete(bucketName.product_image, keyImage);
+    }
+  } catch (error) {
+    return badResponse("Failed to delete product image");
   }
 
-  if (getProduct.imageUrl) {
-    const keyImage: string = getProduct.imageUrl.split("/").pop();
-
-    await S3services.delete(bucketName.product_image, keyImage);
+  // delete product
+  try {
+    await Dynamo.delete(tableName.product, "id", event.pathParameters.id);
+    return response({ data: { message: "Product deleted correctly" } });
+  } catch (error) {
+    return badResponse("Failed to delete product");
   }
-
-  // delete Element
-  return await Dynamo.delete(tableName.product, "id", event.pathParameters.id)
-    .then(() => {
-      return response({ data: { message: "Product deleted correctly" } });
-    })
-    .catch(() => {
-      // handle error of dynamoDB
-      return badResponse("Failed to delete product");
-    });
 };

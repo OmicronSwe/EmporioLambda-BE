@@ -14,7 +14,7 @@ class Product {
 
   category: string;
 
-  constructor(data: ProductDB) {
+  constructor(data) {
     if (!data.name) {
       throw Error("name value not found");
     }
