@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 import Product from "../product/product";
 import Cart from "../cart/cart";
-import { OrderDB } from "./interface";
+import { OrderDB, ProductForOrderDB } from "./interface";
 
 class Order {
   id: string;
@@ -39,6 +39,20 @@ class Order {
   }
 
   public toJSON(): OrderDB {
+    
+
+    return {
+      id: this.id,
+      email: this.email,
+      username: this.username,
+      products: this.getProductsInfoOrder(),
+      totalPrice: this.totalPrice,
+      taxesApplied: this.taxesApplied,
+      date: this.date.toISOString(),
+    };
+  }
+
+  public getProductsInfoOrder(): Array<ProductForOrderDB> {
     const productsOrder = Array.from(this.products.keys());
     let productsOrderObject;
     const productOrderArray = [];
@@ -49,15 +63,7 @@ class Order {
       productOrderArray.push(productsOrderObject);
     });
 
-    return {
-      id: this.id,
-      email: this.email,
-      username: this.username,
-      products: productOrderArray,
-      totalPrice: this.totalPrice,
-      taxesApplied: this.taxesApplied,
-      date: this.date.toISOString(),
-    };
+    return productOrderArray
   }
 }
 

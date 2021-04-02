@@ -90,7 +90,7 @@ class Cart {
     });
   }
 
-  public updateTotalPrice(price: number) {
+  private updateTotalPrice(price: number) {
     this.totalPrice += price + this.priceWithTaxes(price);
 
     if (this.totalPrice < 0) {

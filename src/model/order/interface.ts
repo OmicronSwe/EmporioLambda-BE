@@ -8,7 +8,7 @@ export interface OrderDB {
   readonly date: string;
 }
 
-interface ProductForOrderDB {
+export interface ProductForOrderDB {
   readonly id: string;
   readonly name: string;
   readonly description: string;

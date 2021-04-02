@@ -1,9 +1,9 @@
-import { CreateCategoryRequest } from "./interface";
+import { CategoryDB } from "./interface";
 
 class Category {
   name: string;
 
-  constructor(data: CreateCategoryRequest) {
+  constructor(data: CategoryDB) {
     if (!data.name) {
       throw Error("name value not found");
     }
@@ -11,7 +11,7 @@ class Category {
     this.name = data.name;
   }
 
-  public toJSON(): CreateCategoryRequest {
+  public toJSON(): CategoryDB {
     return {
       name: this.name,
     };
