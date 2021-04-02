@@ -11,6 +11,8 @@ import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import Stripe from "../../services/stripe/stripe";
 import { CreateSessionStripeRequest } from "../../model/checkout/interface";
+import { ProductDB } from "../../model/product/interface";
+
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -51,7 +53,17 @@ export const index: APIGatewayProxyHandler = async (event) => {
           "Some products are no longer available, please check your shopping cart before proceeding"
         );
       }
-      const prodFromDb = new Product(result);
+
+      const productDb: ProductDB ={
+        id: result.id,
+        name: result.name,
+        description: result.description,
+        imageUrl: result.imageUrl,
+        price: result.price,
+        category: result.category
+      }
+
+      const prodFromDb = new Product(productDb);
 
       if (cartProductList[i].isDifference(prodFromDb)) {
         return badResponse(

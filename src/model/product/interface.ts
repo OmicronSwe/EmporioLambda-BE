@@ -6,10 +6,27 @@ export interface CreateProductRequest {
   readonly category?: string;
 }
 
+export interface ProductDB {
+  readonly id?: string
+  readonly name: string;
+  readonly description: string;
+  imageUrl?: string;
+  readonly price?: number;
+  readonly category?: string;
+}
+
 export interface UpdateProductRequest {
   readonly name?: string;
   readonly description?: string;
   readonly imageFile?: ImageFile;
+  readonly price?: number;
+  readonly category?: string;
+}
+
+export interface UpdateProductDB {
+  readonly name?: string;
+  readonly description?: string;
+  imageUrl?: string;
   readonly price?: number;
   readonly category?: string;
 }
@@ -26,16 +43,4 @@ export interface SearchProductRequest {
 interface ImageFile {
   readonly imageCode: string;
   readonly mime: string;
-}
-
-export interface ProductDB {
-  readonly name?: string;
-  readonly description?: string;
-  imageUrl?: string;
-  readonly price?: number;
-  readonly category?: string;
-}
-
-export interface ProductDBWithID extends ProductDB {
-  readonly id: string;
 }

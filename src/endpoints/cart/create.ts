@@ -5,6 +5,7 @@ import tableName from "../../services/dynamo/tableName";
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import { CartDB } from "../../model/cart/interface";
+import {ProductDB} from "../../model/product/interface"
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -41,7 +42,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
       );
 
       if (Object.keys(result).length !== 0) {
-        const prod: Product = new Product(result);
+        const productDb: ProductDB ={
+          id: result.id,
+          name: result.name,
+          description: result.description,
+          imageUrl: result.imageUrl,
+          price: result.price,
+          category: result.category
+        }
+        
+        const prod: Product = new Product(productDb);
 
         cart.addProduct(prod, body.products[i].quantity);
       }

@@ -1,5 +1,5 @@
 import { v4 as uuid } from "uuid";
-import { ProductDBWithID } from "./interface";
+import { ProductDB } from "./interface";
 
 class Product {
   id: string;
@@ -14,7 +14,7 @@ class Product {
 
   category: string;
 
-  constructor(data) {
+  constructor(data: ProductDB) {
     if (!data.name) {
       throw Error("name value not found");
     }
@@ -30,7 +30,7 @@ class Product {
     this.category = data.category;
   }
 
-  public toJSON(): ProductDBWithID {
+  public toJSON(): ProductDB {
     return {
       id: this.id,
       name: this.name,
