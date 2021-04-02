@@ -13,7 +13,6 @@ import Stripe from "../../services/stripe/stripe";
 import { CreateSessionStripeRequest } from "../../model/checkout/interface";
 import { ProductDB } from "../../model/product/interface";
 
-
 /**
  * @param  {} event: event passed when lambda is triggered
  */
@@ -54,14 +53,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
         );
       }
 
-      const productDb: ProductDB ={
+      const productDb: ProductDB = {
         id: result.id,
         name: result.name,
         description: result.description,
         imageUrl: result.imageUrl,
         price: result.price,
-        category: result.category
-      }
+        category: result.category,
+      };
 
       const prodFromDb = new Product(productDb);
 

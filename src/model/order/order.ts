@@ -39,8 +39,6 @@ class Order {
   }
 
   public toJSON(): OrderDB {
-    
-
     return {
       id: this.id,
       email: this.email,
@@ -63,7 +61,7 @@ class Order {
       productOrderArray.push(productsOrderObject);
     });
 
-    return productOrderArray
+    return productOrderArray;
   }
 }
 

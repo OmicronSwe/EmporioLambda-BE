@@ -10,7 +10,10 @@ import tableName from "../../services/dynamo/tableName";
 import bucketName from "../../services/s3/bucketName";
 import S3services from "../../services/s3/s3";
 import { pushImage } from "../../lib/pushImage";
-import { UpdateProductDB, UpdateProductRequest } from "../../model/product/interface";
+import {
+  UpdateProductDB,
+  UpdateProductRequest,
+} from "../../model/product/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -64,7 +67,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   }
 
-  
   const productUpdateDB: UpdateProductDB = body;
 
   if (imageUrl) {

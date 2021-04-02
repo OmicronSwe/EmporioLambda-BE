@@ -28,4 +28,3 @@ export interface CartProductForCheckout {
   readonly currency: string;
   readonly quantity: number;
 }
-

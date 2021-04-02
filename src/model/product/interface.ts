@@ -7,7 +7,7 @@ export interface CreateProductRequest {
 }
 
 export interface ProductDB {
-  readonly id?: string
+  readonly id?: string;
   readonly name: string;
   readonly description: string;
   imageUrl?: string;

@@ -55,15 +55,15 @@ export const index: APIGatewayProxyHandler = async (event) => {
         cart.removeProductTotally(cartProductList[i]);
       } else {
         // console.log(result);
-        const productDb: ProductDB ={
+        const productDb: ProductDB = {
           id: result.id,
           name: result.name,
           description: result.description,
           imageUrl: result.imageUrl,
           price: result.price,
-          category: result.category
-        }
-        
+          category: result.category,
+        };
+
         const prodFromDb = new Product(productDb);
 
         if (cartProductList[i].isDifference(prodFromDb)) {
