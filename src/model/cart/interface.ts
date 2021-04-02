@@ -1,4 +1,4 @@
-export interface CreateCartRequest {
+export interface CartDB {
   username: string;
   readonly products: Array<ProductForCartDB>;
   readonly totalPrice?: number;

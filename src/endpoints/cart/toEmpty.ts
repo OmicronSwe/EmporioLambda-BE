@@ -2,7 +2,7 @@ import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
 import tableName from "../../services/dynamo/tableName";
-import { CreateCartRequest } from "../../model/cart/interface";
+import { CartDB } from "../../model/cart/interface";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -12,7 +12,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const data: CreateCartRequest = {
+  const data: CartDB = {
     username: event.pathParameters.username,
     products: [],
   };
