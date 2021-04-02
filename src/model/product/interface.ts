@@ -39,12 +39,3 @@ export interface ProductDB {
 export interface ProductDBWithID extends ProductDB {
   readonly id: string;
 }
-
-export interface ProductForCheckout {
-  readonly name: string;
-  readonly description: string;
-  readonly images: Array<string>;
-  readonly amount: number;
-  readonly currency: string;
-  readonly quantity: number;
-}

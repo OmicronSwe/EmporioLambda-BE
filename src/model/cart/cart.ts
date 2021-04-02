@@ -1,6 +1,5 @@
 import Product from "../product/product";
-import { ProductForCheckout } from "../product/interface";
-import { CartDB } from "./interface";
+import { CartDB, CartProductForCheckout } from "./interface";
 
 class Cart {
   username: string;
@@ -127,8 +126,8 @@ class Cart {
     this.updateTotalPrice(product.price * quantity);
   }
 
-  public getProductsInfoCheckout(): Array<ProductForCheckout> {
-    const lineItems: Array<ProductForCheckout> = new Array<ProductForCheckout>();
+  public getProductsInfoCheckout(): Array<CartProductForCheckout> {
+    const lineItems: Array<CartProductForCheckout> = new Array<CartProductForCheckout>();
 
     this.getProductsList().forEach((element) => {
       const prodCheckout = {

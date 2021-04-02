@@ -19,3 +19,13 @@ interface ProductForCartDB {
   readonly category: string;
   readonly quantity: number;
 }
+
+export interface CartProductForCheckout {
+  readonly name: string;
+  readonly description: string;
+  readonly images: Array<string>;
+  readonly amount: number;
+  readonly currency: string;
+  readonly quantity: number;
+}
+
