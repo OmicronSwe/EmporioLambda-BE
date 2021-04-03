@@ -23,7 +23,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const body: CreateProductRequest = JSON.parse(event.body);
   let imageUrl: string = null;
   let product;
-  let data;
 
   // if image is present, get URL and push it to s3
   if (body.imageFile) {
@@ -50,7 +49,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
   // push data to dynamodb
   try {
     product = new Product(productDB);
-    data = product.toJSON();
   } catch (err) {
     // handle logic error of product
     return badRequest(`${err.name} ${err.message}`);
@@ -74,7 +72,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   try {
-    await Dynamo.write(tableName.product, data);
+    await Dynamo.write(tableName.product, product.toJSON());
     return response({
       data: { message: `Product "${product.name}" created correctly` },
     });
