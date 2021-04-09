@@ -79,7 +79,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     try {
       const resultUser = await Cognito.getUserAttributes(cart.getUsername());
 
-      userName = User.fromCognitoFormat(resultUser).name;
+      userName = User.fromCognitoFormat(resultUser).getName();
     } catch (error) {
       return badResponse("Failed to get user data");
     }

@@ -1,16 +1,16 @@
 import { CognitoFormat, UserCognito } from "./interface";
 
 /* eslint-disable @typescript-eslint/naming-convention */
-export default class User implements UserCognito {
-  email: string;
+export default class User {
+  private email: string;
 
-  name: string;
+  private name: string;
 
-  family_name: string;
+  private family_name: string;
 
-  address: string;
+  private address: string;
 
-  username: string;
+  private username: string;
 
   constructor(
     email: string,
@@ -24,6 +24,10 @@ export default class User implements UserCognito {
     this.family_name = family_name;
     this.address = address;
     this.username = username;
+  }
+
+  public getName(): string {
+    return this.name;
   }
 
   public toJSON(): UserCognito {
