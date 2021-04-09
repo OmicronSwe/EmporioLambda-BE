@@ -30,19 +30,19 @@ class Product {
     this.category = data.category;
   }
 
-  public getId(): string{
+  public getId(): string {
     return this.id;
   }
 
-  public getName(): string{
+  public getName(): string {
     return this.name;
   }
 
-  public getImageUrl(): string{
+  public getImageUrl(): string {
     return this.imageUrl;
   }
 
-  public getDescription(): string{
+  public getDescription(): string {
     return this.description;
   }
 

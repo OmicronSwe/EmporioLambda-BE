@@ -35,19 +35,19 @@ class Cart {
     this.username = data.username;
   }
 
-  public getUsername(): string{
+  public getUsername(): string {
     return this.username;
   }
 
-  public getProducts(): Map<Product, number>{
+  public getProducts(): Map<Product, number> {
     return this.products;
   }
 
-  public getTotalPrice(): number{
+  public getTotalPrice(): number {
     return this.totalPrice;
   }
 
-  public getTaxesApplied(): number{
+  public getTaxesApplied(): number {
     return this.taxesApplied;
   }
 
