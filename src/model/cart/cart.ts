@@ -1,14 +1,15 @@
+import { ProductDB } from "../product/interface";
 import Product from "../product/product";
 import { CartDB, CartProductForCheckout } from "./interface";
 
 class Cart {
-  username: string;
+  private username: string;
 
-  products: Map<Product, number>;
+  private products: Map<Product, number>;
 
-  totalPrice: number;
+  private totalPrice: number;
 
-  taxesApplied: number;
+  private taxesApplied: number;
 
   constructor(data: CartDB) {
     if (!data.username) {
@@ -32,6 +33,22 @@ class Cart {
     }
 
     this.username = data.username;
+  }
+
+  public getUsername(): string{
+    return this.username;
+  }
+
+  public getProducts(): Map<Product, number>{
+    return this.products;
+  }
+
+  public getTotalPrice(): number{
+    return this.totalPrice;
+  }
+
+  public getTaxesApplied(): number{
+    return this.taxesApplied;
   }
 
   public toJSON(): CartDB {
@@ -64,7 +81,7 @@ class Cart {
   public getProductFromId(id: string): Product {
     const productList: Array<Product> = this.getProductsList();
     for (let i = 0; i < productList.length; i++) {
-      if (productList[i].id == id) {
+      if (productList[i].getId() == id) {
         return productList[i];
       }
     }
@@ -85,7 +102,16 @@ class Cart {
 
     this.totalPrice = 0;
     productsCart.forEach((element) => {
-      const prod = new Product(element);
+      const productDb: ProductDB = {
+        id: element.getId(),
+        name: element.getName(),
+        description: element.getDescription(),
+        imageUrl: element.getImageUrl(),
+        price: element.getPrice(),
+        category: element.getCategory(),
+      };
+
+      const prod = new Product(productDb);
       this.updateTotalPrice(prod.getPrice() * this.products.get(element));
     });
   }
@@ -99,14 +125,14 @@ class Cart {
   }
 
   public removeProductTotally(product: Product) {
-    this.updateTotalPrice(-(product.price * this.products.get(product)));
+    this.updateTotalPrice(-(product.getPrice() * this.products.get(product)));
     // manage taxes TO-DO
     this.products.delete(product);
   }
 
   public removeProductByQuantity(product: Product, quantity: number = 1) {
     if (this.products.get(product) - quantity > 0) {
-      this.updateTotalPrice(-(product.price * quantity));
+      this.updateTotalPrice(-(product.getPrice() * quantity));
       // manage taxes TO-DO
       this.products.set(product, this.products.get(product) - quantity);
     } else {
@@ -115,7 +141,7 @@ class Cart {
   }
 
   public addProduct(product: Product, quantity: number = 1) {
-    const prod = this.getProductFromId(product.id);
+    const prod = this.getProductFromId(product.getId());
 
     if (prod) {
       this.products.set(prod, quantity + this.products.get(prod));
@@ -123,7 +149,7 @@ class Cart {
       this.products.set(product, quantity);
     }
 
-    this.updateTotalPrice(product.price * quantity);
+    this.updateTotalPrice(product.getPrice() * quantity);
   }
 
   public getProductsInfoCheckout(): Array<CartProductForCheckout> {
@@ -131,10 +157,10 @@ class Cart {
 
     this.getProductsList().forEach((element) => {
       const prodCheckout = {
-        name: element.name,
-        description: element.description,
-        images: [element.imageUrl],
-        amount: element.price * 100,
+        name: element.getName(),
+        description: element.getDescription(),
+        images: [element.getImageUrl()],
+        amount: element.getPrice() * 100,
         currency: "EUR",
         quantity: this.getProductQuantity(element),
       };

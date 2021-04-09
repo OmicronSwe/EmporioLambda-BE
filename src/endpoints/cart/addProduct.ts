@@ -63,9 +63,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     await Dynamo.write(tableName.cart, cartFromDB.toJSON());
     return response({
-      data: { message: `Product "${prod.name}" added to cart` },
+      data: { message: `Product "${prod.getName()}" added to cart` },
     });
   } catch (error) {
-    return badResponse(`Failed to add product "${prod.name}" to cart`);
+    return badResponse(`Failed to add product "${prod.getName()}" to cart`);
   }
 };

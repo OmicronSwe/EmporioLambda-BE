@@ -1,7 +1,7 @@
 import { CategoryDB } from "./interface";
 
 class Category {
-  name: string;
+  private name: string;
 
   constructor(data: CategoryDB) {
     if (!data.name) {

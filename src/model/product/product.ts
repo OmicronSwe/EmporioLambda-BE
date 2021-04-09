@@ -2,17 +2,17 @@ import { v4 as uuid } from "uuid";
 import { ProductDB } from "./interface";
 
 class Product {
-  id: string;
+  private id: string;
 
-  name: string;
+  private name: string;
 
-  description: string;
+  private description: string;
 
-  imageUrl: string;
+  private imageUrl: string;
 
-  price: number;
+  private price: number;
 
-  category: string;
+  private category: string;
 
   constructor(data: ProductDB) {
     if (!data.name) {
@@ -28,6 +28,22 @@ class Product {
     this.price = data.price ? data.price : 0;
     this.imageUrl = data.imageUrl;
     this.category = data.category;
+  }
+
+  public getId(): string{
+    return this.id;
+  }
+
+  public getName(): string{
+    return this.name;
+  }
+
+  public getImageUrl(): string{
+    return this.imageUrl;
+  }
+
+  public getDescription(): string{
+    return this.description;
   }
 
   public toJSON(): ProductDB {

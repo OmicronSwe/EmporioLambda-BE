@@ -64,7 +64,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     // empty the cart
     const data = {
-      username: cart.username,
+      username: cart.getUsername(),
       products: [],
     };
 
@@ -77,7 +77,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     // get user name
     let userName: string;
     try {
-      const resultUser = await Cognito.getUserAttributes(cart.username);
+      const resultUser = await Cognito.getUserAttributes(cart.getUsername());
 
       userName = User.fromCognitoFormat(resultUser).name;
     } catch (error) {
@@ -87,9 +87,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
     // send email;
     try {
       Nodemailer.sendEmailProduct(
-        cart.products,
+        cart.getProducts(),
         webhookStripe.customer_details.email,
-        cart.totalPrice,
+        cart.getTotalPrice(),
         userName
       );
 

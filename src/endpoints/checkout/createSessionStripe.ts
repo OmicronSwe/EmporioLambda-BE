@@ -44,7 +44,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       const result = await Dynamo.get(
         tableName.product,
         "id",
-        cartProductList[i].id
+        cartProductList[i].getId()
       );
 
       if (Object.keys(result).length === 0) {

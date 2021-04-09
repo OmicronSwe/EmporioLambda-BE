@@ -14,7 +14,7 @@ const Stripe = {
     const params = {
       payment_method_types: ["card"],
       mode: "payment",
-      client_reference_id: cart.username,
+      client_reference_id: cart.getUsername(),
       line_items: cart.getProductsInfoCheckout(),
       success_url: successUrl,
       cancel_url: cancelUrl,

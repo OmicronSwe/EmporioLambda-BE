@@ -4,37 +4,37 @@ import Cart from "../cart/cart";
 import { OrderDB, ProductForOrderDB } from "./interface";
 
 class Order {
-  id: string;
+  private id: string;
 
-  username: string;
+  private username: string;
 
-  email: string;
+  private email: string;
 
-  products: Map<Product, number>;
+  private products: Map<Product, number>;
 
-  totalPrice: number;
+  private totalPrice: number;
 
-  taxesApplied: number;
+  private taxesApplied: number;
 
-  date: Date;
+  private date: Date;
 
   constructor(cart: Cart, email: string) {
     if (!email) {
       throw Error("email value not found");
     }
 
-    if (cart.products.size <= 0) {
+    if (cart.getProducts().size <= 0) {
       throw Error("products list not found");
     }
 
     // console.log(body);
 
-    this.products = cart.products;
-    this.taxesApplied = cart.taxesApplied;
-    this.totalPrice = cart.totalPrice;
+    this.products = cart.getProducts();
+    this.taxesApplied = cart.getTaxesApplied();
+    this.totalPrice = cart.getTotalPrice();
     this.id = uuid();
     this.email = email;
-    this.username = cart.username;
+    this.username = cart.getUsername();
     this.date = new Date();
   }
 

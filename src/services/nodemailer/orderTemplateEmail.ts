@@ -15,9 +15,9 @@ export const HMTLTemplate = (
     </tr>`;
 
   productList.forEach((value: number, key: Product) => {
-    html += `<tr><td width="30%"><img width="100%" src="${key.imageUrl}" alt="${key.name}" /></td>
-    <td><p>${key.name}</p></td>
-    <td><p>${key.price} EUR</p></td>
+    html += `<tr><td width="30%"><img width="100%" src="${key.getImageUrl()}" alt="${key.getName()}" /></td>
+    <td><p>${key.getName()}</p></td>
+    <td><p>${key.getPrice()} EUR</p></td>
     <td><p>${value}</p></td></tr>`;
   });
   html += `</table><br><h2>Total price: ${totalPrice} EUR</h2>`;
@@ -33,7 +33,7 @@ export const TXTTemplate = (
   let text: string = `Hi ${nameCustomer}, this is your order:\n\n`;
 
   productList.forEach((value: number, key: Product) => {
-    text += `- Product: ${key.name} | Price: ${key.price} EUR | Quantity: ${value}\n`;
+    text += `- Product: ${key.getName()} | Price: ${key.getPrice()} EUR | Quantity: ${value}\n`;
   });
   text += `\nTotal price: ${totalPrice} EUR`;
 

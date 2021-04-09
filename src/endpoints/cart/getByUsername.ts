@@ -45,12 +45,12 @@ export const index: APIGatewayProxyHandler = async (event) => {
       const result = await Dynamo.get(
         tableName.product,
         "id",
-        cartProductList[i].id
+        cartProductList[i].getId()
       );
 
       if (Object.keys(result).length === 0) {
         messageChange.push(
-          `Product "${cartProductList[i].name}" no longer available`
+          `Product "${cartProductList[i].getName()}" no longer available`
         );
         cart.removeProductTotally(cartProductList[i]);
       } else {
@@ -69,7 +69,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
         if (cartProductList[i].isDifference(prodFromDb)) {
           cart.updateProduct(cartProductList[i], prodFromDb);
           messageChange.push(
-            `"${cartProductList[i].name}" product has been modified`
+            `"${cartProductList[i].getName()}" product has been modified`
           );
         }
       }

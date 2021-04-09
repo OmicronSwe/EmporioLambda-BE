@@ -59,9 +59,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     await Dynamo.write(tableName.cart, cartFromDB.toJSON());
     return response({
-      data: { message: `Product "${prod.name}" removed from cart` },
+      data: { message: `Product "${prod.getName()}" removed from cart` },
     });
   } catch (error) {
-    return badResponse(`Failed to remove product "${prod.name}" from cart`);
+    return badResponse(`Failed to remove product "${prod.getName()}" from cart`);
   }
 };
