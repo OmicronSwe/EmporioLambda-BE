@@ -4,9 +4,9 @@
   "description": "backend module for the EmporioLambda project",
   "scripts": {
     "test": "sls invoke test --compilers ts-node/register",
-    "lint": "eslint  --ignore-path .gitignore . --ext ts,tsx",
+    "checkWithLint": "eslint  --ignore-path .gitignore . --ext ts,tsx",
     "lint:updated": "pipe-git-updated --ext=ts -- eslint --ignore-path .gitignore",
-    "lintFix": "eslint . --ext ts,tsx --fix",
+    "lint": "eslint . --ext ts,tsx --fix",
     "prettier-check": "prettier -c --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml,ts}\"",
     "prettier-check:updated": "pipe-git-updated --ext=css --ext=html --ext=js --ext=ts --ext=json --ext=md --ext=yaml --ext=yml -- prettier -c",
     "prettify": "prettier --write --ignore-path .gitignore \"**/*.{css,html,js,json,md,yaml,yml,ts}\"",

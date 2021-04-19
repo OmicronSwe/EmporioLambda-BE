@@ -9,7 +9,11 @@ const Dynamo = {
    * @param  {string} primaryKeyValue: the value of the key
    * @returns Promise
    */
-  get: (tableName: string, primaryKey: string, primaryKeyValue: string):  Promise<DynamoDB.DocumentClient.AttributeMap> => {
+  get: (
+    tableName: string,
+    primaryKey: string,
+    primaryKeyValue: string
+  ): Promise<DynamoDB.DocumentClient.AttributeMap> => {
     const params: DynamoDB.DocumentClient.GetItemInput = {
       TableName: tableName,
       Key: {
@@ -131,7 +135,7 @@ const Dynamo = {
     filterExpression: string = "",
     limit?: number,
     exclusiveStartKey?: string
-  ) :Promise<any> => {
+  ): Promise<any> => {
     const AttriNameExpr: { [k: string]: string } = {};
     const AttriValueExpr: { [k: string]: any } = {};
 
@@ -211,7 +215,7 @@ const Dynamo = {
     value: Array<string> = [],
     limit?: number,
     startKey?: object
-  ) : Promise<any> => {
+  ): Promise<any> => {
     const AttriNameExpr: { [k: string]: string } = {};
     const AttriValueExpr: { [k: string]: any } = {};
 

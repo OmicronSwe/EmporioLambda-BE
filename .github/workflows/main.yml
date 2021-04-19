@@ -22,7 +22,7 @@ jobs:
         run: npm run prettier-check
 
       - name: Test ESLint 🛂
-        run: npm run lint
+        run: npm run checkWithLint
 
       - name: Install Serverless
         run: npm install -g serverless
