@@ -9,7 +9,7 @@ const Dynamo = {
    * @param  {string} primaryKeyValue: the value of the key
    * @returns Promise
    */
-  get: (tableName: string, primaryKey: string, primaryKeyValue: string) => {
+  get: (tableName: string, primaryKey: string, primaryKeyValue: string):  Promise<DynamoDB.DocumentClient.AttributeMap> => {
     const params: DynamoDB.DocumentClient.GetItemInput = {
       TableName: tableName,
       Key: {
@@ -131,7 +131,7 @@ const Dynamo = {
     filterExpression: string = "",
     limit?: number,
     exclusiveStartKey?: string
-  ) => {
+  ) :Promise<any> => {
     const AttriNameExpr: { [k: string]: string } = {};
     const AttriValueExpr: { [k: string]: any } = {};
 
@@ -211,7 +211,7 @@ const Dynamo = {
     value: Array<string> = [],
     limit?: number,
     startKey?: object
-  ) => {
+  ) : Promise<any> => {
     const AttriNameExpr: { [k: string]: string } = {};
     const AttriValueExpr: { [k: string]: any } = {};
 
@@ -274,7 +274,7 @@ const Dynamo = {
     tableName: string,
     primaryKey: string,
     primaryKeyValue: string
-  ): Promise<DynamoDB.DeleteItemOutput> => {
+  ): Promise<DynamoDB.DocumentClient.DeleteItemOutput> => {
     const params: DynamoDB.DocumentClient.DeleteItemInput = {
       TableName: tableName,
       Key: {
