@@ -6,7 +6,7 @@ module.exports = {
     es6: true,
   },
   parserOptions: { ecmaVersion: 8 }, // to enable features such as async/await
-  ignorePatterns: ["node_modules/*", "!.prettierrc.js"], // We don't want to lint generated files nor node_modules, but we want to lint .prettierrc.js (ignored by default by eslint)
+  ignorePatterns: ["node_modules/*", "!.prettierrc.js", "test/nodemailer.ts"], // We don't want to lint generated files nor node_modules, but we want to lint .prettierrc.js (ignored by default by eslint)
   extends: [
     "airbnb-typescript",
     "plugin:prettier/recommended",

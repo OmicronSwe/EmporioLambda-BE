@@ -92,12 +92,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
       userName
     );
 
-    if (resp){
+    if (resp) {
       return response({ data: { message: "Order recevied" } });
     }
-    else{
-      return badResponse("Failed to send email order");
-    }
+
+    return badResponse("Failed to send email order");
   }
   return badResponse("Failed to create order");
 };

@@ -31,7 +31,7 @@ const Nodemailer = {
     return new Promise((resolve) => {
       transporter.sendMail(mailOptions, (error) => {
         if (error) {
-          resolve(false)
+          resolve(false);
         } else {
           resolve(true);
         }
