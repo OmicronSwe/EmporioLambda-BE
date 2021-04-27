@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import "./localDynamoDb";
+import "./testConfig/localDynamoDb";
 import Dynamo from "../src/services/dynamo/dynamo";
 import tableName from "../src/services/dynamo/tableName";
 import Order from "../src/model/order/order";

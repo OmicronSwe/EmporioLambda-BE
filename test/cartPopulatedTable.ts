@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-import "./localDynamoDb";
+import "./testConfig/localDynamoDb";
 
 const mochaPlugin = require("serverless-mocha-plugin");
 

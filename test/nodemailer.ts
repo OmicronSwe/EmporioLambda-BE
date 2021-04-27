@@ -14,7 +14,7 @@ mockery.registerMock("nodemailer", nodemailerMock);
 //import must be after mockery settings
 import Nodemailer from "../src/services/nodemailer/nodemailer";
 
-describe("Tests that send email", () => {
+describe("Nodemailer test send email", () => {
   const expect = mochaPlugin.chai.expect;
 
   // data to send
@@ -37,14 +37,14 @@ describe("Tests that send email", () => {
     mockery.disable();
   });
 
-  it("should send an email using nodemailer-mock", async () => {
+  it("Should send an email using nodemailer-mock", async () => {
     // call a service that uses nodemailer
     const resp = await Nodemailer.sendEmailProduct(
       products,
       "test@test.com",
       20,
       "testCostumerName"
-    ); // <-- your email code here
+    );
     expect(resp).equal(true);
 
     const sentEmails = nodemailerMock.mock.getSentMail();
@@ -53,7 +53,7 @@ describe("Tests that send email", () => {
     expect(sentEmails[0].subject).equal("Order details");
   });
 
-  it("should fail to send an email using nodemailer-mock", async () => {
+  it("Should fail to send an email using nodemailer-mock", async () => {
     // tell the mock class to return an error
     nodemailerMock.mock.setShouldFailOnce();
 
@@ -63,7 +63,7 @@ describe("Tests that send email", () => {
       "test@test.com",
       20,
       "testCostumerName"
-    ); // <-- your email code here
+    );
     expect(resp).equal(false);
   });
 });
