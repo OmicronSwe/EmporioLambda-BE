@@ -85,16 +85,17 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
 
     // send email;
-    try {
-      Nodemailer.sendEmailProduct(
-        cart.getProducts(),
-        webhookStripe.customer_details.email,
-        cart.getTotalPrice(),
-        userName
-      );
+    const resp = await Nodemailer.sendEmailProduct(
+      cart.getProducts(),
+      webhookStripe.customer_details.email,
+      cart.getTotalPrice(),
+      userName
+    );
 
+    if (resp){
       return response({ data: { message: "Order recevied" } });
-    } catch (err) {
+    }
+    else{
       return badResponse("Failed to send email order");
     }
   }
