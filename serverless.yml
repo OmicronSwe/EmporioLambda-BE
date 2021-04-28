@@ -269,7 +269,7 @@ functions:
   listOfProduct:
     handler: src/endpoints/product/list.index
     events:
-      - http:
+      - https:
           path: product
           method: get
           cors:
@@ -279,6 +279,7 @@ functions:
               - Authorization
               - Content-Type
             allowCredentials: true
+
 
   searchOfProduct:
     handler: src/endpoints/product/search.index
