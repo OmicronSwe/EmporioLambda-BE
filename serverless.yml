@@ -1,6 +1,6 @@
 service: emporiolambda-be
 
-frameworkVersion: '2'
+frameworkVersion: "2"
 
 plugins:
   - serverless-plugin-typescript
@@ -40,29 +40,27 @@ provider:
   environment:
     NAMESPACE: ${opt:stage, self:provider.stage}
     STRIPE_SECRET_KEY: ${ssm:STRIPE_KEY}
-
+    EMAIL: ${ssm:EMAIL}
+    PASS_EMAIL: ${ssm:PASS_EMAIL}
+    REGION: ${opt:region, self:provider.region}
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
-
-functions:
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: hello
-          method: get
-          cors: true
+        - dynamodb:*
+        - s3:*
+        - cognito-idp:*
+      Resource: "*"
 
 resources:
   Resources:
+    #BUCKET
+    #Bucket for images
+    BucketImage:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.NAMESPACE}-imagebucket
+        AccessControl: PublicRead #da modificare forse
+
     #COGNITO
     #Cognito - User pool
     CognitoUserPool:
@@ -126,17 +124,6 @@ resources:
         #DefaultRedirectURI: da inserire forse
         GenerateSecret: false
 
-    #Cognito - ClienteGroup
-    CognitoGroupCliente:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        Description: Clienti che acquisteranno i prodotti
-        GroupName: Cliente
-        #Precedence: Double
-        #RoleArn: String
-        UserPoolId:
-          Ref: CognitoUserPool
-
     #Cognito - VenditoreAdminGroup
     CognitoGroupVenditoreAdmin:
       Type: AWS::Cognito::UserPoolGroup
@@ -150,7 +137,7 @@ resources:
 
     #DYNAMO_DB
     ProductTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         KeySchema:
@@ -179,18 +166,287 @@ resources:
               WriteCapacityUnits: 1
 
     CartTable:
-      Type: 'AWS::DynamoDB::Table'
+      Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         KeySchema:
-          - AttributeName: email
+          - AttributeName: username
             KeyType: HASH
 
         AttributeDefinitions:
-          - AttributeName: email
+          - AttributeName: username
             AttributeType: S
 
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.NAMESPACE}-EML-cart
+
+    CategoryTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NAMESPACE}-EML-category
+
+    OrderTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: username
+            AttributeType: S
+          - AttributeName: date
+            AttributeType: S
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.NAMESPACE}-EML-order
+        GlobalSecondaryIndexes:
+          - IndexName: username_date_index
+            KeySchema:
+              - AttributeName: username
+                KeyType: HASH
+              - AttributeName: date
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+functions:
+  auth:
+    handler: src/auth.handler
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+          authorizer:
+            name: auth
+          cors: true
+
+  #CHECKOUT
+  createSessionIDStripe:
+    handler: src/endpoints/checkout/createSessionStripe.index
+    events:
+      - http:
+          path: createSessionStripe
+          method: post
+          cors: true
+
+  #PRODUCT
+  createProduct:
+    handler: src/endpoints/product/create.index
+    events:
+      - http:
+          path: product
+          method: post
+          cors: true
+
+  listOfProduct:
+    handler: src/endpoints/product/list.index
+    events:
+      - http:
+          path: product
+          method: get
+          cors:
+            enabled: true
+            origin: "https://www.google.it" # <-- Specify allowed origin
+            headers: # <-- Specify allowed headers
+              - Authorization
+              - Content-Type
+            allowCredentials: true
+
+  searchOfProduct:
+    handler: src/endpoints/product/search.index
+    events:
+      - http:
+          path: product/search/{search}
+          method: get
+          cors: true
+
+  getByIdProduct:
+    handler: src/endpoints/product/getById.index
+    events:
+      - http:
+          path: product/{id}
+          method: get
+          cors: true
+
+  updateProduct:
+    handler: src/endpoints/product/update.index
+    events:
+      - http:
+          path: product/{id}
+          method: put
+          cors: true
+
+  deleteProduct:
+    handler: src/endpoints/product/delete.index
+    events:
+      - http:
+          path: product/{id}
+          method: delete
+          cors: true
+
+  #CATEGORY
+  listOfCategories:
+    handler: src/endpoints/category/list.index
+    events:
+      - http:
+          path: category
+          method: get
+          cors: true
+
+  createCategory:
+    handler: src/endpoints/category/create.index
+    events:
+      - http:
+          path: category
+          method: post
+          cors: true
+
+  deleteCategory:
+    handler: src/endpoints/category/delete.index
+    events:
+      - http:
+          path: category/{name}
+          method: delete
+          cors: true
+
+  #ORDER
+  createOrder:
+    handler: src/endpoints/order/create.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+    events:
+      - http:
+          path: order
+          method: post
+          cors: true
+
+  listOfOrder:
+    handler: src/endpoints/order/list.index
+    events:
+      - http:
+          path: order
+          method: get
+          cors: true
+
+  getByUsernameOrder:
+    handler: src/endpoints/order/getByUsername.index
+    events:
+      - http:
+          path: order/getByUsername/{username}
+          method: get
+          cors: true
+
+  getByIdOrder:
+    handler: src/endpoints/order/getById.index
+    events:
+      - http:
+          path: order/{id}
+          method: get
+          cors: true
+  #CART
+  createCart:
+    handler: src/endpoints/cart/create.index
+    events:
+      - http:
+          path: cart
+          method: post
+          cors: true
+
+  deleteCart:
+    handler: src/endpoints/cart/delete.index
+    events:
+      - http:
+          path: cart/{username}
+          method: delete
+          cors: true
+
+  removeProduct:
+    handler: src/endpoints/cart/removeProduct.index
+    events:
+      - http:
+          path: cart/removeProduct/{username}
+          method: put
+          cors: true
+
+  addProduct:
+    handler: src/endpoints/cart/addProduct.index
+    events:
+      - http:
+          path: cart/addProduct/{username}
+          method: put
+          cors: true
+
+  getByUsername:
+    handler: src/endpoints/cart/getByUsername.index
+    events:
+      - http:
+          path: cart/{username}
+          method: get
+          cors: true
+
+  toEmpty:
+    handler: src/endpoints/cart/toEmpty.index
+    events:
+      - http:
+          path: cart/toEmpty/{username}
+          method: put
+          cors: true
+
+  #USER
+  getUser:
+    handler: src/endpoints/user/getUser.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+    events:
+      - http:
+          path: user/{username}/
+          method: get
+          cors: true
+
+  deleteUser:
+    handler: src/endpoints/user/delete.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+    events:
+      - http:
+          path: user/{username}/delete
+          method: delete
+          cors: true
+
+  updateUser:
+    handler: src/endpoints/user/update.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+    events:
+      - http:
+          path: user/{username}/update
+          method: post
+          cors: true

@@ -1,2 +1,2 @@
-kill -9 $(lsof -t -i:8000)
+kill `cat .dynamodb.pid`
 rm .dynamodb.pid
