@@ -9,7 +9,7 @@ import { APIGatewayProxyResult } from "aws-lambda";
 export const response = ({
   statusCode = 200,
   data = {},
-  cors = true,
+  cors = false,
 }): APIGatewayProxyResult => {
   const response: APIGatewayProxyResult = {
     statusCode,
