@@ -19,6 +19,8 @@ export const response = ({
   if (cors) {
     response.headers = {
       "Access-Control-Allow-Origin": "https://www.google.it",
+      "Access-Control-Allow-Headers": "Content-Type,Authorization",
+      "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
       "Access-Control-Allow-Credentials": true,
     };
   }
