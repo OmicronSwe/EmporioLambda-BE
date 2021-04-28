@@ -16,12 +16,19 @@ export const response = ({
     body: JSON.stringify(data),
   };
 
+  /* eslint-disable no-console */
   if (cors) {
+    console.log(`cors: ${cors}`);
     response.headers = {
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
       "Access-Control-Allow-Origin": "http://localhot:3001",
       "Access-Control-Allow-Credentials": true,
     };
   }
+
+  console.log(response);
+
+  /* eslint-enable no-console */
 
   return response;
 };
