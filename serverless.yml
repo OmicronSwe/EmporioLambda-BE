@@ -280,7 +280,6 @@ functions:
               - Content-Type
             allowCredentials: true
 
-
   searchOfProduct:
     handler: src/endpoints/product/search.index
     events:
