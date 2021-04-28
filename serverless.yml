@@ -272,7 +272,11 @@ functions:
       - http:
           path: product
           method: get
-          cors: true
+          cors:
+            origin: 'http://localhost:3000' # <-- Specify allowed origin
+            headers: # <-- Specify allowed headers
+              - Authorization
+            allowCredentials: false
 
   searchOfProduct:
     handler: src/endpoints/product/search.index
