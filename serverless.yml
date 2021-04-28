@@ -269,7 +269,7 @@ functions:
   listOfProduct:
     handler: src/endpoints/product/list.index
     events:
-      - https:
+      - http:
           path: product
           method: get
           cors:
