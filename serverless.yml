@@ -273,7 +273,7 @@ functions:
           path: product
           method: get
           cors:
-            origin: "http://localhost:3000" # <-- Specify allowed origin
+            origin: "https://www.google.it" # <-- Specify allowed origin
             headers: # <-- Specify allowed headers
               - Authorization
             allowCredentials: false
