@@ -58,7 +58,7 @@ resources:
     BucketImage:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.NAMESPACE}-imagebucket
+        BucketName: ${self:provider.environment.NAMESPACE}-omicronswe_imagebucket
         AccessControl: PublicRead #da modificare forse
 
     #COGNITO
@@ -272,13 +272,7 @@ functions:
       - http:
           path: product
           method: get
-          cors:
-            enabled: true
-            origin: "https://www.google.it" # <-- Specify allowed origin
-            headers: # <-- Specify allowed headers
-              - Authorization
-              - Content-Type
-            allowCredentials: true
+          cors: true
 
   searchOfProduct:
     handler: src/endpoints/product/search.index
