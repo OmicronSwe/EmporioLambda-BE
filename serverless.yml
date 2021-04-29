@@ -53,12 +53,23 @@ provider:
 
 resources:
   Resources:
+    #APIGATEWAY
+    GatewayResponseDEfault4xx:
+      Type: "AWS::ApiGateway::GatewayResponse"
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
+
     #BUCKET
     #Bucket for images
     BucketImage:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
+        BucketName: ${self:provider.environment.NAMESPACE}-imagebucket
         AccessControl: PublicRead #da modificare forse
 
     #COGNITO
@@ -272,7 +283,16 @@ functions:
       - http:
           path: product
           method: get
-          cors: true
+          cors:
+            origin: "https://www.google.it/" # <-- Specify allowed origin
+            headers: # <-- Specify allowed headers
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+            allowCredentials: true
 
   searchOfProduct:
     handler: src/endpoints/product/search.index
