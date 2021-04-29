@@ -21,7 +21,7 @@ export const response = ({
 
   if (cors) {
     response.headers = {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": "https://www.google.it/",
       "Access-Control-Allow-Credentials": true,
     };
   }
