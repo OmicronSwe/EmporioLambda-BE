@@ -246,7 +246,7 @@ resources:
 functions:
   #testCors
   cors:
-    handler: src/cors.handler
+    handler: src/endpoints/cors.handler
     events:
       - http:
           path: cors

@@ -6,13 +6,9 @@ import { APIGatewayProxyResult } from "aws-lambda";
  * @param  {} cors=true} if is used cors (optional)
  * @returns APIGatewayProxyResult
  */
-export const response = ({
-  statusCode = 200,
-  data = {},
-  cors = true,
-}): APIGatewayProxyResult => {
+export const response = ({ statusCode = 200, data = {}, cors = true }) => {
   const response: APIGatewayProxyResult = {
-    statusCode,
+    statusCode: statusCode,
     body: JSON.stringify(data),
     headers: {
       "Content-Type": "application/json",
