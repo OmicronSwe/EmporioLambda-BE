@@ -180,7 +180,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.NAMESPACE}-EML-cart2
+        TableName: ${self:provider.environment.NAMESPACE}-EML-cart
 
     CategoryTable:
       Type: "AWS::DynamoDB::Table"
