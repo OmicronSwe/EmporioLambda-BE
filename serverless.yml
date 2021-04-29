@@ -54,7 +54,7 @@ provider:
 resources:
   Resources:
     #APIGATEWAY
-    GatewayResponseDEfault4xx:
+    GatewayResponseDefault4xx:
       Type: "AWS::ApiGateway::GatewayResponse"
       Properties:
         ResponseParameters:
@@ -244,6 +244,15 @@ resources:
               WriteCapacityUnits: 1
 
 functions:
+  #testCors
+  cors:
+    handler: src/cors.handler
+    events:
+      - http:
+          path: cors
+          method: get
+          cors: true
+
   auth:
     handler: src/auth.handler
     environment:
