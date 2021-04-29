@@ -333,7 +333,16 @@ functions:
       - http:
           path: category
           method: get
-          cors: true
+          cors:
+            origin: "https://www.google.it/" # <-- Specify allowed origin
+              headers: # <-- Specify allowed headers
+                - Content-Type
+                - X-Amz-Date
+                - Authorization
+                - X-Api-Key
+                - X-Amz-Security-Token
+                - X-Amz-User-Agent
+              allowCredentials: true
 
   createCategory:
     handler: src/endpoints/category/create.index
