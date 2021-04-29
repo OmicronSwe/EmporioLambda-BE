@@ -153,7 +153,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.NAMESPACE}-EML-product2
+        TableName: ${self:provider.environment.NAMESPACE}-EML-product
         GlobalSecondaryIndexes:
           - IndexName: name_index
             KeySchema:
