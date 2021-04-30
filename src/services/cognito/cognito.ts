@@ -87,7 +87,7 @@ const Cognito = {
       UserPoolId: process.env.USER_POOL_ID,
       Username: username,
       Password: password,
-      Permanent: true
+      Permanent: true,
     };
 
     return CognitoService.adminSetUserPassword(params)
