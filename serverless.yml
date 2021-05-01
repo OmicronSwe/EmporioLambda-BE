@@ -58,7 +58,7 @@ resources:
     BucketImage:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.NAMESPACE}-imagebucket
+        BucketName: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
         AccessControl: PublicRead #da modificare forse
 
     #COGNITO
