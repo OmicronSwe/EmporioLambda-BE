@@ -453,3 +453,13 @@ functions:
           path: user/{username}/update
           method: post
           cors: true
+
+  updateUserPassword:
+    handler: src/endpoints/user/updatePassword.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+    events:
+      - http:
+          path: user/{username}/updatePassword
+          method: post
+          cors: true

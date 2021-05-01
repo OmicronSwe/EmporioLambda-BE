@@ -79,6 +79,27 @@ const Cognito = {
       });
   },
 
+  updateUserPassword: (
+    password: string,
+    username: string
+  ): Promise<CognitoIdentityServiceProvider.AdminSetUserPasswordResponse> => {
+    const params: CognitoIdentityServiceProvider.AdminSetUserPasswordRequest = {
+      UserPoolId: process.env.USER_POOL_ID,
+      Username: username,
+      Password: password,
+      Permanent: true,
+    };
+
+    return CognitoService.adminSetUserPassword(params)
+      .promise()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(`Error in Cognito adminUpdateUserAttributes: ${err}`);
+      });
+  },
+
   /**
    * @param  {string} username: username of the user
    * @returns Promise
