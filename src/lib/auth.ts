@@ -140,21 +140,13 @@ function ValidateToken(pems, event, context) {
       policy.allowAllMethods();
     } else {
       // API Accessibili a utenti autenticati
-      policy.allowMethod("GET", "/product");
-      policy.allowMethod("GET", "/product/*");
-      policy.allowMethod("GET", "/category");
-      policy.allowMethod("GET", "/order");
-      policy.allowMethod(
-        "GET",
-        `/order/getByUsername/${decodedJwt.payload.sub}`
-      );
-      policy.allowMethod("*", `/user/${decodedJwt.payload.sub}/*`);
+      policy.allowMethod("GET", "/products");
+      policy.allowMethod("GET", "/products/*");
+      policy.allowMethod("GET", `/user/${decodedJwt.payload.sub}/*`);
     }
   } else {
     // API Accessibili a utenti non autenticati
-    policy.allowMethod("GET", "/product");
-    policy.allowMethod("GET", "/product/*");
-    policy.allowMethod("GET", "/category");
+    policy.allowMethod("GET", "/products");
   }
   context.succeed(policy.build());
 }

@@ -273,8 +273,6 @@ functions:
       - http:
           path: product
           method: post
-          authorizer:
-            name: auth
           cors: true
 
   listOfProduct:
@@ -283,8 +281,6 @@ functions:
       - http:
           path: product
           method: get
-          authorizer:
-            name: auth
           cors: true
 
   searchOfProduct:
@@ -293,8 +289,6 @@ functions:
       - http:
           path: product/search/{search}
           method: get
-          authorizer:
-            name: auth
           cors: true
 
   getByIdProduct:
@@ -303,8 +297,6 @@ functions:
       - http:
           path: product/{id}
           method: get
-          authorizer:
-            name: auth
           cors: true
 
   updateProduct:
@@ -313,8 +305,6 @@ functions:
       - http:
           path: product/{id}
           method: put
-          authorizer:
-            name: auth
           cors: true
 
   deleteProduct:
@@ -323,8 +313,6 @@ functions:
       - http:
           path: product/{id}
           method: delete
-          authorizer:
-            name: auth
           cors: true
 
   #CATEGORY
