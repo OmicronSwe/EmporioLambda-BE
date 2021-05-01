@@ -2,8 +2,8 @@ import jwt = require("jsonwebtoken");
 import https = require("https");
 import jwkToPem = require("jwk-to-pem");
 
-const userPoolId: string = "eu-central-1_GtoLzMQU8"; // process.env.USER_POOL_ID;
-const region: string = "eu-central-1"; // process.env.AWS_REGION;
+const userPoolId: string = process.env.USER_POOL_ID;
+const region: string = process.env.AWS_REGION;
 const iss: string = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
 let pems;
 
@@ -384,11 +384,13 @@ function ValidateToken(pems, event, context) {
     } else {
       // API Accessibili a utenti autenticati
       policy.allowMethod("GET", "/product/*");
-      policy.allowMethod("GET", `/user/${decodedJwt.payload.sub}/*`);
+      policy.allowMethod("GET", "/category/*");
+      policy.allowMethod("*", `/user/${decodedJwt.payload.sub}/*`);
     }
   } else {
     // API Accessibili a utenti non autenticati
     policy.allowMethod("GET", "/product/*");
+    policy.allowMethod("GET", "/category/*");
   }
   context.succeed(policy.build());
 }

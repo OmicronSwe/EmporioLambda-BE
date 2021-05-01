@@ -334,6 +334,8 @@ functions:
       - http:
           path: category
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   createCategory:
@@ -342,6 +344,8 @@ functions:
       - http:
           path: category
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   deleteCategory:
@@ -350,6 +354,8 @@ functions:
       - http:
           path: category/{name}
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   #ORDER
@@ -444,6 +450,8 @@ functions:
       - http:
           path: user/{username}/
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   deleteUser:
@@ -454,6 +462,8 @@ functions:
       - http:
           path: user/{username}/delete
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   updateUser:
@@ -464,6 +474,8 @@ functions:
       - http:
           path: user/{username}/update
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   updateUserPassword:
@@ -474,4 +486,6 @@ functions:
       - http:
           path: user/{username}/updatePassword
           method: post
+          authorizer:
+            name: auth
           cors: true
