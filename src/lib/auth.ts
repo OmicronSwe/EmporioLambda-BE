@@ -144,7 +144,10 @@ function ValidateToken(pems, event, context) {
       policy.allowMethod("GET", "/product/*");
       policy.allowMethod("GET", "/category");
       policy.allowMethod("GET", "/order");
-      policy.allowMethod("GET", `/order/getByUsername/${decodedJwt.payload.sub}`);
+      policy.allowMethod(
+        "GET",
+        `/order/getByUsername/${decodedJwt.payload.sub}`
+      );
       policy.allowMethod("*", `/user/${decodedJwt.payload.sub}/*`);
     }
   } else {
