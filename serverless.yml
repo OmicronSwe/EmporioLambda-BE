@@ -243,7 +243,7 @@ functions:
           cors: true
 
   auth:
-    handler: src/auth.handler
+    handler: src/lib/auth.handler
     environment:
       USER_POOL_ID: !Ref CognitoUserPool
 
