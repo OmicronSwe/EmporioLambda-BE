@@ -1,9 +1,9 @@
-import { decode, verify } from "jsonwebtoken";
-import { get, RequestOptions } from "https";
+import jwt = require("jsonwebtoken");
+import https = require("https");
 import jwkToPem = require("jwk-to-pem");
 
-const userPoolId: string = process.env.USER_POOL_ID;
-const region: string = process.env.AWS_REGION;
+const userPoolId: string = "eu-central-1_GtoLzMQU8"; // process.env.USER_POOL_ID;
+const region: string = "eu-central-1"; // process.env.AWS_REGION;
 const iss: string = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
 let pems;
 
@@ -69,155 +69,6 @@ function AuthPolicy(principal, awsAccountId, apiOptions) {
   }
 }
 
-function ValidateToken(pems, event, context) {
-  const token = event.authorizationToken;
-  let principalId;
-  let decodedJwt;
-
-  if (token != "dW5hdXRoZW50aWNhdGVk") {
-    // Fail if the token is not jwt
-    decodedJwt = decode(token, { complete: true });
-    if (!decodedJwt) {
-      // console.log('Not a valid JWT token');
-      context.fail("BadJWT");
-      return;
-    }
-
-    // Fail if token is not from your UserPool
-    if (decodedJwt.payload.iss != iss) {
-      // console.log('invalid issuer');
-      context.fail("BadIss");
-      return;
-    }
-
-    // Reject the jwt if it's not an 'Access Token'
-    if (decodedJwt.payload.token_use != "access") {
-      // console.log('Not an access token');
-      context.fail("BadTokenType");
-      return;
-    }
-
-    // Get the kid from the token and retrieve corresponding PEM
-    const { kid } = decodedJwt.header;
-    const pem = pems[kid];
-    // console.log(kid, pems);
-    if (!pem) {
-      // console.log('Invalid access token');
-      context.fail("InvalidToken");
-      return;
-    }
-
-    // Verify the signature of the JWT token to ensure it's really coming from your User Pool
-    verify(token, pem, { issuer: iss }, (err) => {
-      if (err) {
-        context.fail("ExpiredToken");
-      }
-    });
-    principalId = decodedJwt.payload.sub;
-  } else {
-    principalId = "unauthenticadedUser";
-  }
-
-  // Get AWS AccountId and API Options
-  const apiOptions: any = {};
-  const tmp = event.methodArn.split(":");
-  const apiGatewayArnTmp = tmp[5].split("/");
-  const awsAccountId = tmp[4];
-  apiOptions.region = tmp[3];
-  apiOptions.restApiId = apiGatewayArnTmp[0];
-  apiOptions.stage = apiGatewayArnTmp[1];
-  /* let resource = "/"; // root resource
-  if (apiGatewayArnTmp[3]) {
-    resource += apiGatewayArnTmp[3];
-  } */
-  // For more information on specifics of generating policy, refer to blueprint for API Gateway's Custom authorizer in Lambda console
-  const policy = new AuthPolicy(principalId, awsAccountId, apiOptions);
-  if (principalId != "unauthorizedUser") {
-    if (
-      decodedJwt &&
-      decodedJwt.payload["cognito:groups"] == "VenditoreAdmin"
-    ) {
-      policy.allowAllMethods();
-    } else {
-      // API Accessibili a utenti autenticati
-      policy.allowMethod("GET", "/products");
-      policy.allowMethod("GET", "/products/*");
-      policy.allowMethod("GET", `/user/${decodedJwt.payload.sub}/*`);
-    }
-  } else {
-    // API Accessibili a utenti non autenticati
-    policy.allowMethod("GET", "/products");
-  }
-  context.succeed(policy.build());
-}
-
-exports.handler = (event, context) => {
-  // Download PEM for your UserPool if not already downloaded
-  if (!pems) {
-    // Download the JWKs and save it as PEM
-    const options: RequestOptions = {
-      host: `cognito-idp.${region}.amazonaws.com`,
-      path: `/${userPoolId}/.well-known/jwks.json`,
-    };
-    get(options, (response) => {
-      if (response.statusCode === 200) {
-        pems = {};
-        let data = "";
-        response.setEncoding("utf8");
-        response
-          .on("data", (chunk) => {
-            data += chunk;
-          })
-          .on("end", () => {
-            const json = JSON.parse(data);
-            const { keys } = json;
-            for (let i = 0; i < keys.length; i++) {
-              // Convert each key to PEM
-              const keyId = keys[i].kid;
-              const modulus = keys[i].n;
-              const exponent = keys[i].e;
-              const keyType = keys[i].kty;
-              const jwk = { kty: keyType, n: modulus, e: exponent };
-              const pem = jwkToPem(jwk);
-              pems[keyId] = pem;
-            }
-            ValidateToken(pems, event, context);
-          });
-      } else {
-        // Unable to download JWKs, fail the call
-        context.fail("JWKDownloadFail");
-      }
-    }).on("error", () => {
-      // Unable to download JWKs, fail the call
-      context.fail("JWKDownloadFail");
-    });
-  } else {
-    // PEMs are already downloaded, continue with validating the token
-    ValidateToken(pems, event, context);
-  }
-};
-
-/**
- * AuthPolicy receives a set of allowed and denied methods and generates a valid
- * AWS policy for the API Gateway authorizer. The constructor receives the calling
- * user principal, the AWS account ID of the API owner, and an apiOptions object.
- * The apiOptions can contain an API Gateway RestApi Id, a region for the RestApi, and a
- * stage that calls should be allowed/denied for. For example
- * {
- *   restApiId: "xxxxxxxxxx",
- *   region: "us-east-1",
- *   stage: "dev"
- * }
- *
- * var testPolicy = new AuthPolicy("[principal user identifier]", "[AWS account id]", apiOptions);
- * testPolicy.allowMethod(AuthPolicy.HttpVerb.GET, "/users/username");
- * testPolicy.denyMethod(AuthPolicy.HttpVerb.POST, "/pets");
- * context.succeed(testPolicy.build());
- *
- * @class AuthPolicy
- * @constructor
- */
-
 /**
  * A set of existing HTTP verbs supported by API Gateway. This property is here
  * only to avoid spelling mistakes in the policy.
@@ -250,7 +101,7 @@ AuthPolicy.prototype = (() => {
    * @param {Object} The conditions object in the format specified by the AWS docs.
    * @return {void}
    */
-  const addMethod = (effect, verb, resource, conditions) => {
+  const addMethod = function addMethod(effect, verb, resource, conditions) {
     if (
       verb != "*" &&
       !Object.prototype.hasOwnProperty.call(AuthPolicy.HttpVerb, verb)
@@ -294,13 +145,12 @@ AuthPolicy.prototype = (() => {
    * @return {Object} An empty statement object with the Action, Effect, and Resource
    *                  properties prepopulated.
    */
-  const getEmptyStatement = (effect) => {
-    const effectStatement =
-      effect.substring(0, 1).toUpperCase() +
-      effect.substring(1, effect.length).toLowerCase();
+  const getEmptyStatement = function getEmptyStatement(effect) {
     const statement: any = {};
     statement.Action = "execute-api:Invoke";
-    statement.Effect = effectStatement;
+    statement.Effect =
+      effect.substring(0, 1).toUpperCase() +
+      effect.substring(1, effect.length).toLowerCase();
     statement.Resource = [];
 
     return statement;
@@ -316,7 +166,10 @@ AuthPolicy.prototype = (() => {
    *                and the conditions for the policy
    * @return {Array} an array of formatted statements for the policy.
    */
-  const getStatementsForEffect = (effect, methods) => {
+  const getStatementsForEffect = function getStatementsForEffect(
+    effect,
+    methods
+  ) {
     const statements: any[] = [];
 
     if (methods.length > 0) {
@@ -462,3 +315,128 @@ AuthPolicy.prototype = (() => {
     },
   };
 })();
+
+function ValidateToken(pems, event, context) {
+  const token = event.authorizationToken;
+  let principalId;
+  let decodedJwt;
+
+  if (token != "dW5hdXRoZW50aWNhdGVk") {
+    // Fail if the token is not jwt
+    decodedJwt = jwt.decode(token, { complete: true });
+    if (!decodedJwt) {
+      // console.log('Not a valid JWT token');
+      context.fail("BadJWT");
+      return;
+    }
+
+    // Fail if token is not from your UserPool
+    if (decodedJwt.payload.iss != iss) {
+      // console.log('invalid issuer');
+      context.fail("BadIss");
+      return;
+    }
+
+    // Reject the jwt if it's not an 'Access Token'
+    if (decodedJwt.payload.token_use != "access") {
+      // console.log('Not an access token');
+      context.fail("BadTokenType");
+      return;
+    }
+
+    // Get the kid from the token and retrieve corresponding PEM
+    const kid = decodedJwt.header.kid;
+    const pem = pems[kid];
+
+    if (!pem) {
+      // console.log('Invalid access token');
+      context.fail("InvalidToken");
+      return;
+    }
+
+    // Verify the signature of the JWT token to ensure it's really coming from your User Pool
+    jwt.verify(token, pem, { issuer: iss }, (err) => {
+      if (err) {
+        context.fail("ExpiredToken");
+      }
+    });
+    principalId = decodedJwt.payload.sub;
+  } else {
+    principalId = "unauthorizedUser";
+  }
+
+  // Get AWS AccountId and API Options
+  const apiOptions: any = {};
+  const tmp = event.methodArn.split(":");
+  const apiGatewayArnTmp = tmp[5].split("/");
+  const awsAccountId = tmp[4];
+  apiOptions.region = tmp[3];
+  apiOptions.restApiId = apiGatewayArnTmp[0];
+  apiOptions.stage = apiGatewayArnTmp[1];
+  // For more information on specifics of generating policy, refer to blueprint for API Gateway's Custom authorizer in Lambda console
+  const policy = new AuthPolicy(principalId, awsAccountId, apiOptions);
+  if (principalId != "unauthorizedUser") {
+    if (
+      decodedJwt &&
+      decodedJwt.payload["cognito:groups"] == "VenditoreAdmin"
+    ) {
+      policy.allowAllMethods();
+    } else {
+      // API Accessibili a utenti autenticati
+      policy.allowMethod("GET", "/product/*");
+      policy.allowMethod("GET", `/user/${decodedJwt.payload.sub}/*`);
+    }
+  } else {
+    // API Accessibili a utenti non autenticati
+    policy.allowMethod("GET", "/product/*");
+  }
+  context.succeed(policy.build());
+}
+
+exports.handler = (event, context) => {
+  // Download PEM for your UserPool if not already downloaded
+  if (!pems) {
+    // Download the JWKs and save it as PEM
+    const options: https.RequestOptions = {
+      host: `cognito-idp.${region}.amazonaws.com`,
+      path: `/${userPoolId}/.well-known/jwks.json`,
+    };
+    https
+      .get(options, (response) => {
+        if (response.statusCode === 200) {
+          pems = {};
+          let data = "";
+          response.setEncoding("utf8");
+          response
+            .on("data", (chunk) => {
+              data += chunk;
+            })
+            .on("end", () => {
+              const json = JSON.parse(data);
+              const keys = json.keys;
+              for (let i = 0; i < keys.length; i++) {
+                // Convert each key to PEM
+                const keyId = keys[i].kid;
+                const modulus = keys[i].n;
+                const exponent = keys[i].e;
+                const keyType = keys[i].kty;
+                const jwk = { kty: keyType, n: modulus, e: exponent };
+                const pem = jwkToPem(jwk);
+                pems[keyId] = pem;
+              }
+              ValidateToken(pems, event, context);
+            });
+        } else {
+          // Unable to download JWKs, fail the call
+          context.fail("JWKDownloadFail");
+        }
+      })
+      .on("error", () => {
+        // Unable to download JWKs, fail the call
+        context.fail("JWKDownloadFail");
+      });
+  } else {
+    // PEMs are already downloaded, continue with validating the token
+    ValidateToken(pems, event, context);
+  }
+};
