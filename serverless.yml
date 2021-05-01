@@ -53,17 +53,6 @@ provider:
 
 resources:
   Resources:
-    #APIGATEWAY
-    GatewayResponseDefault4xx:
-      Type: "AWS::ApiGateway::GatewayResponse"
-      Properties:
-        ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
-          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
-        ResponseType: DEFAULT_4XX
-        RestApiId:
-          Ref: "ApiGatewayRestApi"
-
     #BUCKET
     #Bucket for images
     BucketImage:
@@ -251,6 +240,7 @@ functions:
       - http:
           path: cors
           method: get
+          cors: true
 
   auth:
     handler: src/auth.handler
@@ -291,16 +281,7 @@ functions:
       - http:
           path: product
           method: get
-          cors:
-            origin: "https://www.google.it/" # <-- Specify allowed origin
-            headers: # <-- Specify allowed headers
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: true
+          cors: true
 
   searchOfProduct:
     handler: src/endpoints/product/search.index
@@ -341,16 +322,7 @@ functions:
       - http:
           path: category
           method: get
-          cors:
-            origin: "https://www.google.it/" # <-- Specify allowed origin
-            headers: # <-- Specify allowed headers
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-            allowCredentials: true
+          cors: true
 
   createCategory:
     handler: src/endpoints/category/create.index
