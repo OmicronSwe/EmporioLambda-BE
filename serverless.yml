@@ -374,6 +374,14 @@ functions:
           path: order/{id}
           method: get
           cors: true
+
+  getByUsernameAndIdOrder:
+    handler: src/endpoints/order/getByUsernameAndId.index
+    events:
+      - http:
+          path: order/getByUsername/{username}/{id}
+          method: get
+          cors: true
   #CART
   createCart:
     handler: src/endpoints/cart/create.index
