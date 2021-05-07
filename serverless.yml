@@ -273,6 +273,8 @@ functions:
       - http:
           path: product
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   listOfProduct:
@@ -281,6 +283,8 @@ functions:
       - http:
           path: product
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   searchOfProduct:
@@ -289,6 +293,8 @@ functions:
       - http:
           path: product/search/{search}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   getByIdProduct:
@@ -297,6 +303,8 @@ functions:
       - http:
           path: product/{id}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   updateProduct:
@@ -305,6 +313,8 @@ functions:
       - http:
           path: product/{id}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   deleteProduct:
@@ -313,6 +323,8 @@ functions:
       - http:
           path: product/{id}
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   #CATEGORY
@@ -322,6 +334,8 @@ functions:
       - http:
           path: category
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   createCategory:
@@ -330,6 +344,8 @@ functions:
       - http:
           path: category
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   deleteCategory:
@@ -338,6 +354,8 @@ functions:
       - http:
           path: category/{name}
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   #ORDER
@@ -440,6 +458,8 @@ functions:
       - http:
           path: user/{username}/
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   deleteUser:
@@ -450,6 +470,8 @@ functions:
       - http:
           path: user/{username}/delete
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   updateUser:
@@ -460,6 +482,8 @@ functions:
       - http:
           path: user/{username}/update
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   updateUserPassword:
@@ -470,4 +494,6 @@ functions:
       - http:
           path: user/{username}/updatePassword
           method: post
+          authorizer:
+            name: auth
           cors: true
