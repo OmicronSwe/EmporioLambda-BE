@@ -19,14 +19,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     const result = await Dynamo.query(
       tableName.order,
-      "username_date_index",
+      "username_id_index",
       ["username", "id"],
       [event.pathParameters.username, event.pathParameters.id],
       "#element0 = :Value0 AND #element1 = :Value1"
     );
 
-    if (Object.keys(result).length === 0) {
-      return notFound("Order not found");
+    if (result.items.length == 0) {
+      return notFound("Order not found for this user");
     }
 
     return response({ data: { result } });

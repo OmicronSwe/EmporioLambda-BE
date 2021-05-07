@@ -232,6 +232,18 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
 
+          - IndexName: username_id_index
+            KeySchema:
+              - AttributeName: username
+                KeyType: HASH
+              - AttributeName: id
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
 functions:
   #testCors
   cors:
