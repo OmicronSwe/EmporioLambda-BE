@@ -2,8 +2,8 @@ import jwt = require("jsonwebtoken");
 import https = require("https");
 import jwkToPem = require("jwk-to-pem");
 
-const userPoolId: string = process.env.USER_POOL_ID;
-const region: string = process.env.AWS_REGION;
+const userPoolId: string = "eu-central-1_GtoLzMQU8"; // process.env.USER_POOL_ID;
+const region: string = "eu-central-1"; // process.env.AWS_REGION;
 const iss: string = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
 let pems;
 
@@ -317,6 +317,10 @@ AuthPolicy.prototype = (() => {
 })();
 
 function ValidateToken(pems, event, context) {
+  if (!event.authorizationToken) {
+    context.fail("NoToken");
+    return;
+  }
   const token = event.authorizationToken;
   let principalId;
   let decodedJwt;
@@ -330,17 +334,17 @@ function ValidateToken(pems, event, context) {
       return;
     }
 
-    // Fail if token is not from your UserPool
-    if (decodedJwt.payload.iss != iss) {
-      // console.log('invalid issuer');
-      context.fail("BadIss");
-      return;
-    }
-
     // Reject the jwt if it's not an 'Access Token'
     if (decodedJwt.payload.token_use != "access") {
       // console.log('Not an access token');
       context.fail("BadTokenType");
+      return;
+    }
+
+    // Fail if token is not from your UserPool
+    if (decodedJwt.payload.iss != iss) {
+      // console.log('invalid issuer');
+      context.fail("BadIss");
       return;
     }
 
