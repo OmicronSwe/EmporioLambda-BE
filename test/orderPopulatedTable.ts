@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import "./testConfig/localDynamoDb";
 import Dynamo from "../src/services/dynamo/dynamo";
-
 import Order from "../src/model/order/order";
 import Cart from "../src/model/cart/cart";
 import { OrderDB } from "../src/model/order/interface";

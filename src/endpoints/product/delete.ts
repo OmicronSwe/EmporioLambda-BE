@@ -6,8 +6,6 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-
-import bucketName from "../../services/s3/bucketName";
 import S3services from "../../services/s3/s3";
 
 /**
@@ -32,7 +30,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     if (getProduct.imageUrl) {
       const keyImage: string = getProduct.imageUrl.split("/").pop();
 
-      await S3services.delete(bucketName.product_image, keyImage);
+      await S3services.delete(process.env.BUCKET_IMAGE, keyImage);
     }
   } catch (error) {
     return badResponse("Failed to delete product image");

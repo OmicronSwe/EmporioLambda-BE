@@ -48,6 +48,8 @@ provider:
     ORDER_TABLE: ${self:provider.environment.NAMESPACE}-EML-order
     CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart
     CATEGORY_TABLE: ${self:provider.environment.NAMESPACE}-EML-category
+    #BUCKET NAME S3
+    BUCKET_IMAGE: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -63,7 +65,7 @@ resources:
     BucketImage:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
+        BucketName: ${self:provider.environment.BUCKET_IMAGE}
         AccessControl: PublicRead #da modificare forse
 
     #COGNITO

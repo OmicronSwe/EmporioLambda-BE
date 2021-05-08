@@ -6,7 +6,6 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import bucketName from "../../services/s3/bucketName";
 import Product from "../../model/product/product";
 import { CreateProductRequest, ProductDB } from "../../model/product/interface";
 import { pushImage } from "../../lib/pushImage";
@@ -29,7 +28,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       imageUrl = await pushImage(
         body.imageFile.imageCode,
         body.imageFile.mime,
-        bucketName.product_image
+        process.env.BUCKET_IMAGE
       );
     } catch (err) {
       // handle logic error of push image
