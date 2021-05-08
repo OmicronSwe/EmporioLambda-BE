@@ -386,8 +386,6 @@ functions:
       - http:
           path: order
           method: post
-          authorizer:
-            name: auth
           cors: true
 
   listOfOrder:
