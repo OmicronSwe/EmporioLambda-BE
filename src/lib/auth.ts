@@ -2,8 +2,8 @@ import jwt = require("jsonwebtoken");
 import https = require("https");
 import jwkToPem = require("jwk-to-pem");
 
-const userPoolId: string = "eu-central-1_GtoLzMQU8"; // process.env.USER_POOL_ID;
-const region: string = "eu-central-1"; // process.env.AWS_REGION;
+const userPoolId: string = process.env.USER_POOL_ID;
+const region: string = process.env.AWS_REGION;
 const iss: string = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
 let pems;
 
