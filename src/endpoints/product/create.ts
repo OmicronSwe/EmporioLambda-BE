@@ -6,7 +6,6 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
 import bucketName from "../../services/s3/bucketName";
 import Product from "../../model/product/product";
 import { CreateProductRequest, ProductDB } from "../../model/product/interface";
@@ -58,7 +57,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   if (product.getCategory()) {
     try {
       const category = await Dynamo.get(
-        tableName.category,
+        process.env.CATEGORY_TABLE,
         "name",
         product.getCategory()
       );
@@ -72,7 +71,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   try {
-    await Dynamo.write(tableName.product, product.toJSON());
+    await Dynamo.write(process.env.PRODUCT_TABLE, product.toJSON());
     return response({
       data: { message: `Product "${product.name}" created correctly` },
     });

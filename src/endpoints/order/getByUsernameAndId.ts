@@ -6,7 +6,6 @@ import {
   badRequest,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -18,7 +17,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     const result = await Dynamo.query(
-      tableName.order,
+      process.env.ORDER_TABLE,
       "username_id_index",
       ["username", "id"],
       [event.pathParameters.username, event.pathParameters.id],

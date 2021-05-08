@@ -1,7 +1,6 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -13,7 +12,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     const scanCategory = await Dynamo.scan(
-      tableName.product,
+      process.env.PRODUCT_TABLE,
       "#element0 = :Value0",
       ["category"],
       [event.pathParameters.name]
@@ -28,7 +27,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     await Dynamo.delete(
-      tableName.category,
+      process.env.CATEGORY_TABLE,
       "name",
       decodeURIComponent(event.pathParameters.name)
     );

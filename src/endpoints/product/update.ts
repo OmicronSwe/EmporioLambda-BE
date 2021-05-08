@@ -6,7 +6,7 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import bucketName from "../../services/s3/bucketName";
 import S3services from "../../services/s3/s3";
 import { pushImage } from "../../lib/pushImage";
@@ -35,7 +35,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     // delete old image
     try {
       const getProduct = await Dynamo.get(
-        tableName.product,
+        process.env.PRODUCT_TABLE,
         "id",
         event.pathParameters.id
       );
@@ -75,7 +75,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     await Dynamo.update(
-      tableName.product,
+      process.env.PRODUCT_TABLE,
       "id",
       event.pathParameters.id,
       Object.keys(productUpdateDB),

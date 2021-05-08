@@ -6,7 +6,7 @@ import {
   badResponse,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import { decodeURI } from "../../lib/decodeURI";
 import { SearchProductRequest } from "../../model/product/interface";
 
@@ -98,7 +98,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     const result = await Dynamo.scan(
-      tableName.product,
+      process.env.PRODUCT_TABLE,
       filterExpression,
       keys,
       valueKeys,

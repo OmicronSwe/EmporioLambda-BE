@@ -2,7 +2,6 @@ import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Cognito from "../../services/cognito/cognito";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -16,7 +15,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     await Dynamo.delete(
-      tableName.cart,
+      process.env.CART_TABLE,
       "username",
       event.pathParameters.username
     );
@@ -26,7 +25,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     result = await Dynamo.query(
-      tableName.order,
+      process.env.ORDER_TABLE,
       "username_date_index",
       ["username"],
       [event.pathParameters.username],
@@ -40,7 +39,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   for (let i = 0; i < result.items.length; i++) {
     try {
       await Dynamo.update(
-        tableName.order,
+        process.env.ORDER_TABLE,
         "id",
         result.items[i].id,
         ["username"],

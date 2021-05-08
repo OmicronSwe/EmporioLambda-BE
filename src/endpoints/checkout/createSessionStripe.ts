@@ -6,7 +6,7 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import Stripe from "../../services/stripe/stripe";
@@ -26,7 +26,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
   let result;
 
   try {
-    result = await Dynamo.get(tableName.cart, "username", body.username);
+    result = await Dynamo.get(
+      process.env.CART_TABLE,
+      "username",
+      body.username
+    );
 
     if (Object.keys(result).length === 0) {
       return notFound("Cart not found");
@@ -42,7 +46,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   for (let i = 0; i < cartProductList.length; i++) {
     try {
       const result = await Dynamo.get(
-        tableName.product,
+        process.env.PRODUCT_TABLE,
         "id",
         cartProductList[i].getId()
       );

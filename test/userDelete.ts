@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import "./testConfig/localDynamoDb";
 import Dynamo from "../src/services/dynamo/dynamo";
-import tableName from "../src/services/dynamo/tableName";
+
 import Order from "../src/model/order/order";
 import Cart from "../src/model/cart/cart";
 import { OrderDB } from "../src/model/order/interface";
@@ -66,7 +66,7 @@ describe("User functions test", () => {
     await createCart.run(dataCart);
 
     const result = await Dynamo.get(
-      tableName.cart,
+      process.env.CART_TABLE,
       "username",
       "username-string-test-delete-user"
     ).catch(() => {
@@ -80,7 +80,7 @@ describe("User functions test", () => {
 
     const data: OrderDB = order.toJSON();
 
-    await Dynamo.write(tableName.order, data);
+    await Dynamo.write(process.env.ORDER_TABLE, data);
   });
 
   it('user delete function - should be "Failed to delete user"', async () => {

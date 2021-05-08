@@ -6,7 +6,7 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import bucketName from "../../services/s3/bucketName";
 import S3services from "../../services/s3/s3";
 
@@ -20,7 +20,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     const getProduct = await Dynamo.get(
-      tableName.product,
+      process.env.PRODUCT_TABLE,
       "id",
       event.pathParameters.id
     );
@@ -40,7 +40,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // delete product
   try {
-    await Dynamo.delete(tableName.product, "id", event.pathParameters.id);
+    await Dynamo.delete(
+      process.env.PRODUCT_TABLE,
+      "id",
+      event.pathParameters.id
+    );
     return response({ data: { message: "Product deleted correctly" } });
   } catch (error) {
     return badResponse("Failed to delete product");
