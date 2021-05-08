@@ -375,22 +375,35 @@ function ValidateToken(pems, event, context) {
   apiOptions.stage = apiGatewayArnTmp[1];
   // For more information on specifics of generating policy, refer to blueprint for API Gateway's Custom authorizer in Lambda console
   const policy = new AuthPolicy(principalId, awsAccountId, apiOptions);
-  if (principalId != "unauthorizedUser") {
-    if (
-      decodedJwt &&
-      decodedJwt.payload["cognito:groups"] == "VenditoreAdmin"
-    ) {
-      policy.allowAllMethods();
-    } else {
-      // API Accessibili a utenti autenticati
-      policy.allowMethod("GET", "/product");
-      policy.allowMethod("GET", "/product/*");
-      policy.allowMethod("GET", "/category");
-      policy.allowMethod("GET", "/category/*");
-      policy.allowMethod("*", `/user/${decodedJwt.payload.sub}/*`);
-    }
+  if (decodedJwt && decodedJwt.payload["cognito:groups"] == "VenditoreAdmin") {
+    policy.allowAllMethods();
   } else {
-    // API Accessibili a utenti non autenticati
+    if (principalId != "unauthorizedUser") {
+      // API Accessible only to authorized users
+
+      // PROFILE
+      policy.allowMethod("*", `/user/${decodedJwt.payload.sub}/*`);
+      // ORDERS
+      policy.allowMethod("POST", "/order");
+      policy.allowMethod(
+        "GET",
+        `/order/getByUsername/${decodedJwt.payload.sub}`
+      );
+      policy.allowMethod(
+        "GET",
+        `/order/getByUsername/${decodedJwt.payload.sub}/*`
+      );
+      // CART
+      policy.allowMethod("POST", "/cart");
+      policy.allowMethod("*", `/cart/${decodedJwt.payload.sub}`);
+      policy.allowMethod(
+        "PUT",
+        `/cart/removeProduct/${decodedJwt.payload.sub}`
+      );
+      policy.allowMethod("PUT", `/cart/addProduct/${decodedJwt.payload.sub}`);
+      policy.allowMethod("PUT", `/cart/toEmpty/${decodedJwt.payload.sub}`);
+    }
+    // API Accessible to all users
     policy.allowMethod("GET", "/product");
     policy.allowMethod("GET", "/product/*");
     policy.allowMethod("GET", "/category");

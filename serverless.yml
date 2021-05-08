@@ -386,6 +386,8 @@ functions:
       - http:
           path: order
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   listOfOrder:
@@ -394,6 +396,8 @@ functions:
       - http:
           path: order
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   getByUsernameOrder:
@@ -402,6 +406,8 @@ functions:
       - http:
           path: order/getByUsername/{username}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   getByIdOrder:
@@ -410,6 +416,8 @@ functions:
       - http:
           path: order/{id}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   getByUsernameAndIdOrder:
@@ -418,6 +426,8 @@ functions:
       - http:
           path: order/getByUsername/{username}/{id}
           method: get
+          authorizer:
+            name: auth
           cors: true
   #CART
   createCart:
@@ -426,6 +436,8 @@ functions:
       - http:
           path: cart
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   deleteCart:
@@ -434,6 +446,8 @@ functions:
       - http:
           path: cart/{username}
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   removeProduct:
@@ -442,6 +456,8 @@ functions:
       - http:
           path: cart/removeProduct/{username}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   addProduct:
@@ -450,6 +466,8 @@ functions:
       - http:
           path: cart/addProduct/{username}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   getByUsername:
@@ -458,6 +476,8 @@ functions:
       - http:
           path: cart/{username}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   toEmpty:
@@ -466,6 +486,8 @@ functions:
       - http:
           path: cart/toEmpty/{username}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   #USER
