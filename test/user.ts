@@ -19,19 +19,19 @@ describe("User functions test", () => {
     "index"
   );
 
-  const getUser= mochaPlugin.getWrapper(
+  const getUser = mochaPlugin.getWrapper(
     "index",
     "/src/endpoints/user/getUser.ts",
     "index"
   );
 
-  const updateUser= mochaPlugin.getWrapper(
+  const updateUser = mochaPlugin.getWrapper(
     "index",
     "/src/endpoints/user/update.ts",
     "index"
   );
 
-  const updatePassword= mochaPlugin.getWrapper(
+  const updatePassword = mochaPlugin.getWrapper(
     "index",
     "/src/endpoints/user/updatePassword.ts",
     "index"
@@ -100,7 +100,6 @@ describe("User functions test", () => {
     await Dynamo.write(process.env.ORDER_TABLE, data);
   });
 
-
   it('user getUser function - should be "PathParameters missing"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters_dummy: {
@@ -114,10 +113,7 @@ describe("User functions test", () => {
     expect(JSON.parse(response.body).error).to.be.equal(
       "PathParameters missing"
     );
-
-    
   });
-
 
   it('user getUser function - should be "Failed to get user data"', async () => {
     const data: APIGatewayProxyEvent = {
@@ -132,8 +128,6 @@ describe("User functions test", () => {
     expect(JSON.parse(response.body).error).to.be.equal(
       "Failed to get user data"
     );
-
-    
   });
 
   it('user delete function - should be "PathParameters missing"', async () => {
@@ -177,8 +171,6 @@ describe("User functions test", () => {
     expect(JSON.parse(response.body).error).to.be.equal(
       "PathParameters missing"
     );
-
-    
   });
 
   it('user update function - should be "Body missing"', async () => {
@@ -186,26 +178,21 @@ describe("User functions test", () => {
       pathParameters: {
         username: "username-string",
       },
-      body_dummy: "dummy"
+      body_dummy: "dummy",
     };
 
     const response = await updateUser.run(data);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal(
-      "Body missing"
-    );
-
-    
+    expect(JSON.parse(response.body).error).to.be.equal("Body missing");
   });
-
 
   it('user update function - should be "Failed to udpate user"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         username: "username-string",
       },
-      body: '{"username": "dummy"}'
+      body: '{"username": "dummy"}',
     };
 
     const response = await updateUser.run(data);
@@ -214,10 +201,7 @@ describe("User functions test", () => {
     expect(JSON.parse(response.body).error).to.be.equal(
       "Failed to udpate user"
     );
-
-    
   });
-
 
   it('user updatePassword function - should be "PathParameters missing"', async () => {
     const data: APIGatewayProxyEvent = {
@@ -232,8 +216,6 @@ describe("User functions test", () => {
     expect(JSON.parse(response.body).error).to.be.equal(
       "PathParameters missing"
     );
-
-    
   });
 
   it('user updatePassword function - should be "Body missing"', async () => {
@@ -241,26 +223,21 @@ describe("User functions test", () => {
       pathParameters: {
         username: "username-string",
       },
-      body_dummy: "dummy"
+      body_dummy: "dummy",
     };
 
     const response = await updatePassword.run(data);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
-    expect(JSON.parse(response.body).error).to.be.equal(
-      "Body missing"
-    );
-
-    
+    expect(JSON.parse(response.body).error).to.be.equal("Body missing");
   });
-
 
   it('user updatePassword function - should be "Failed to udpate password"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {
         username: "username-string",
       },
-      body: '{"password": "dummy"}'
+      body: '{"password": "dummy"}',
     };
 
     const response = await updatePassword.run(data);
@@ -269,8 +246,6 @@ describe("User functions test", () => {
     expect(JSON.parse(response.body).error).to.be.equal(
       "Failed to udpate password"
     );
-
-    
   });
 
   after(async () => {
