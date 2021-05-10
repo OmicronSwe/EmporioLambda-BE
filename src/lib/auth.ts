@@ -9,6 +9,9 @@ const region: string = process.env.AWS_REGION;
 let pems;
 const iss: string = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
 
+console.log(iss);
+console.log(process.env);
+
 function AuthPolicy(principal, awsAccountId, apiOptions) {
   /**
    * The AWS account id the policy will be generated for. This is used to create
