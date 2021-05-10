@@ -3,6 +3,9 @@ if [ -f .dynamodb.pid ]; then
     exit 1
 fi
 
+#sets env for authentication
+export AWS_REGION=test
+
 serverless dynamodb start &> DB_output.txt &
 PID=$!
 echo $PID > .dynamodb.pid &

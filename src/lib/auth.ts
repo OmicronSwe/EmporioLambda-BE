@@ -2,10 +2,12 @@ import jwt = require("jsonwebtoken");
 import https = require("https");
 import jwkToPem = require("jwk-to-pem");
 
-const userPoolId: string = process.env.USER_POOL_ID;
+const userPoolId: string =
+  process.env.USER_POOL_ID == "[object Object]" ? "" : process.env.USER_POOL_ID;
 const region: string = process.env.AWS_REGION;
-const iss: string = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
+
 let pems;
+const iss: string = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`;
 
 function AuthPolicy(principal, awsAccountId, apiOptions) {
   /**
@@ -316,48 +318,7 @@ AuthPolicy.prototype = (() => {
   };
 })();
 
-function getPems(context) {
-  const options: https.RequestOptions = {
-    host: `cognito-idp.${region}.amazonaws.com`,
-    path: `/${userPoolId}/.well-known/jwks.json`,
-  };
-  https
-    .get(options, (response) => {
-      if (response.statusCode === 200) {
-        pems = {};
-        let data = "";
-        response.setEncoding("utf8");
-        response
-          .on("data", (chunk) => {
-            data += chunk;
-          })
-          .on("end", () => {
-            const json = JSON.parse(data);
-            const keys = json.keys;
-            for (let i = 0; i < keys.length; i++) {
-              // Convert each key to PEM
-              const keyId = keys[i].kid;
-              const modulus = keys[i].n;
-              const exponent = keys[i].e;
-              const keyType = keys[i].kty;
-              const jwk = { kty: keyType, n: modulus, e: exponent };
-              const pem = jwkToPem(jwk);
-              pems[keyId] = pem;
-            }
-            return pems;
-          });
-      } else {
-        // Unable to download JWKs, fail the call
-        context.fail("JWKDownloadFail");
-      }
-    })
-    .on("error", () => {
-      // Unable to download JWKs, fail the call
-      context.fail("JWKDownloadFail");
-    });
-}
-
-function ValidateToken(event, context) {
+function ValidateToken(pems, event, context) {
   if (!event.authorizationToken) {
     context.fail("NoToken");
     return;
@@ -380,20 +341,6 @@ function ValidateToken(event, context) {
       // console.log('Not an access token');
       context.fail("BadTokenType");
       return;
-    }
-
-    if (
-      !userPoolId ||
-      !region ||
-      userPoolId == "[object Object]" ||
-      region == "[object Object]"
-    ) {
-      context.fail("BadEnv");
-      return;
-    }
-
-    if (!pems) {
-      pems = getPems(context);
     }
 
     // Fail if token is not from your UserPool
@@ -472,5 +419,48 @@ function ValidateToken(event, context) {
 }
 
 exports.handler = (event, context) => {
-  ValidateToken(event, context);
+  if (!pems) {
+    // Download the JWKs and save it as PEM
+    const options: https.RequestOptions = {
+      host: `cognito-idp.${region}.amazonaws.com`,
+      path: `/${userPoolId}/.well-known/jwks.json`,
+    };
+    https
+      .get(options, (response) => {
+        if (response.statusCode === 200) {
+          pems = {};
+          let data = "";
+          response.setEncoding("utf8");
+          response
+            .on("data", (chunk) => {
+              data += chunk;
+            })
+            .on("end", () => {
+              const json = JSON.parse(data);
+              const keys = json.keys;
+              for (let i = 0; i < keys.length; i++) {
+                // Convert each key to PEM
+                const keyId = keys[i].kid;
+                const modulus = keys[i].n;
+                const exponent = keys[i].e;
+                const keyType = keys[i].kty;
+                const jwk = { kty: keyType, n: modulus, e: exponent };
+                const pem = jwkToPem(jwk);
+                pems[keyId] = pem;
+              }
+              ValidateToken(pems, event, context);
+            });
+        } else {
+          // Unable to download JWKs, fail the call
+          context.fail("JWKDownloadFail");
+        }
+      })
+      .on("error", () => {
+        // Unable to download JWKs, fail the call
+        context.fail("JWKDownloadFail");
+      });
+  } else {
+    // PEMs are already downloaded, continue with validating the token
+    ValidateToken(pems, event, context);
+  }
 };
