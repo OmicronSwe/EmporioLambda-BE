@@ -25,7 +25,7 @@ describe("Authentication1 no jwk", () => {
 
 describe("Authentication2 mock jwk", () => {
   before(() => {
-    nock("https://cognito-idp.test.amazonaws.com")
+    nock("https://cognito-idp.undefined.amazonaws.com")
       .get("//.well-known/jwks.json")
       .reply(200, {
         keys: [
@@ -39,13 +39,13 @@ describe("Authentication2 mock jwk", () => {
             use: "sig",
           },
           {
+            kty: "RSA",
+            kid: "fVHIN_NtKKBMDIFh6Z79PshJ7ClOFW3JNTNNYH228Ik",
+            use: "sig",
             alg: "RS256",
             e: "AQAB",
-            kid: "QQzr1w9bcgDE03oOh61Y8pczTtkUK8Q5paJFBNw3424=",
-            kty: "RSA",
             n:
-              "tCNz6RoIyCYEK699qBp5vQF5Qfqs60JDwMwONyca_YKzUK1Wpw0RHiF7Xpz1fXrVrQZ-Qp0k2_f5tPCyg2lFxs2WN1HX8UcObBjr_PrjTAZeKplWR7VOcCc5PIvubxnp067OrWUn9yABwH7hfzWz31gEqyxohsRnqWmMyNbGTfdaeMAGVUIAKQYetIraJO_-78w75R9uoJlPOnfZ-x25kiGuqURuwSSLGcboFxxxWgC5BYYVwFdGMVJxrsii7JKJ_H3BBPDQnxOGiJk4ERiD_ZrxXZ9dkXoSeusVwdNwTRD0sLIX3ywmBssRFw0N6R5GLQlby-yEEqrFehlm73f9DQ",
-            use: "sig",
+              "sVFA1ArpDhSPtjiT8KPJgmm67vfb9LP4bYFUx-7MI4It3pBKPEcgNSLRpXCGRF-4KWYCB9idrAFJ-_SQQwiLKw",
           },
         ],
       });
@@ -60,6 +60,32 @@ describe("Authentication2 mock jwk", () => {
     };
     const response = JSON.stringify(await auth.run(data));
     expect(response).to.contain('{"principalId":"unauthorizedUser"');
+  });
+  it("Token authenticated user", async () => {
+    const data: APIGatewayProxyEvent = {
+      type: "TOKEN",
+      authorizationToken:
+        "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZWSElOX050S0tCTURJRmg2Wjc5UHNoSjdDbE9GVzNKTlROTllIMjI4SWsifQ.eyJzdWIiOiIzMTg0YTE0My01NThmLTQ0NjEtOWI5MS1kMDA0NzAzN2E1M2IiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVuZGVmaW5lZC5hbWF6b25hd3MuY29tLyIsInZlcnNpb24iOjIsImNsaWVudF9pZCI6ImVkZXVkdGtncW5oNHRiN2c4bGJuczJmYjUiLCJldmVudF9pZCI6ImY4NzQwYWZhLTJlYTUtNDNhNS05Y2YzLWExNTllNGZkNTZhOCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJqdGkiOiJjMTUzZjhlZS0yZDE4LTRjNmYtYTNmOS02ZDE2ZjIyMzUwOTIiLCJ1c2VybmFtZSI6IjMxODRhMTQzLTU1OGYtNDQ2MS05YjkxLWQwMDQ3MDM3YTUzYiJ9.OV-MkSISmPZVcQQJJHP0BHdkiW8ZMbgLv51sSsNpfxHH8XbN3qC75BsAuE5NL6C33_CSKR8ERpuPBnMh7Qph3A",
+      methodArn:
+        "arn:aws:execute-api:eu-central-1:123456789012:example/prod/POST/{proxy+}",
+    };
+    const response = JSON.stringify(await auth.run(data));
+    expect(response).to.contain(
+      '{"principalId":"3184a143-558f-4461-9b91-d0047037a53b"'
+    );
+  });
+  it("Token admin user", async () => {
+    const data: APIGatewayProxyEvent = {
+      type: "TOKEN",
+      authorizationToken:
+        "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZWSElOX050S0tCTURJRmg2Wjc5UHNoSjdDbE9GVzNKTlROTllIMjI4SWsifQ.eyJzdWIiOiIzMTg0YTE0My01NThmLTQ0NjEtOWI5MS1kMDA0NzAzN2E1M2EiLCJjb2duaXRvOmdyb3VwcyI6WyJWZW5kaXRvcmVBZG1pbiJdLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVuZGVmaW5lZC5hbWF6b25hd3MuY29tLyIsInZlcnNpb24iOjIsImNsaWVudF9pZCI6ImVkZXVkdGtncW5oNHRiN2c4bGJuczJmYjUiLCJldmVudF9pZCI6ImY4NzQwYWZhLTJlYTUtNDNhNS05Y2YzLWExNTllNGZkNTZhOCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJqdGkiOiJjMTUzZjhlZS0yZDE4LTRjNmYtYTNmOS02ZDE2ZjIyMzUwOTIiLCJ1c2VybmFtZSI6IjMxODRhMTQzLTU1OGYtNDQ2MS05YjkxLWQwMDQ3MDM3YTUzYSJ9.gl__sZkieOpdeb5C79QJYkmhS2YlEqt2WyiTkXWcylLd2woKFlk02IDD4MUudRpMVscCyzKKWLhw5IapODUHTQ",
+      methodArn:
+        "arn:aws:execute-api:eu-central-1:123456789012:example/prod/POST/{proxy+}",
+    };
+    const response = JSON.stringify(await auth.run(data));
+    expect(response).to.contain(
+      '"Resource":["arn:aws:execute-api:eu-central-1:123456789012:example/prod/*/*"]'
+    );
   });
   it("No token supplied", async () => {
     const data: APIGatewayProxyEvent = {
@@ -78,7 +104,6 @@ describe("Authentication2 mock jwk", () => {
     };
     await expect(auth.run(data)).to.be.rejectedWith("BadJWT");
   });
-
   it("Bad Iss", async () => {
     const data: APIGatewayProxyEvent = {
       type: "TOKEN",
@@ -89,7 +114,6 @@ describe("Authentication2 mock jwk", () => {
     };
     await expect(auth.run(data)).to.be.rejectedWith("BadIss");
   });
-
   it("Bad Token Type", async () => {
     const data: APIGatewayProxyEvent = {
       type: "TOKEN",
@@ -100,15 +124,24 @@ describe("Authentication2 mock jwk", () => {
     };
     await expect(auth.run(data)).to.be.rejectedWith("BadTokenType");
   });
-
   it("Invalid Kid", async () => {
     const data: APIGatewayProxyEvent = {
       type: "TOKEN",
       authorizationToken:
-        "eyJhbGciOiJIUzI1NiIsImtpZCI6ImhpZSIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC50ZXN0LmFtYXpvbmF3cy5jb20vIn0.wHk8DCGjyyo--ORGi1PWuHWloSQK8AmY_TN7Wt4Tzhs",
+        "eyJhbGciOiJIUzI1NiIsImtpZCI6ImhpZSIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidG9rZW5fdXNlIjoiYWNjZXNzIiwiaXNzIjoiaHR0cHM6Ly9jb2duaXRvLWlkcC51bmRlZmluZWQuYW1hem9uYXdzLmNvbS8ifQ.VkP3-_GAbXQZWiaQ0w7UHQnA6w9SJ8WAivF-zqFCNC4",
       methodArn:
         "arn:aws:execute-api:eu-central-1:123456789012:example/prod/POST/{proxy+}",
     };
     await expect(auth.run(data)).to.be.rejectedWith("InvalidToken");
+  });
+  it("Expired Token", async () => {
+    const data: APIGatewayProxyEvent = {
+      type: "TOKEN",
+      authorizationToken:
+        "eyJhbGciOiJSUzI1NiIsImtpZCI6ImZWSElOX050S0tCTURJRmg2Wjc5UHNoSjdDbE9GVzNKTlROTllIMjI4SWsifQ.eyJzdWIiOiIzMTg0YTE0My01NThmLTQ0NjEtOWI5MS1kMDA0NzAzN2E1M2IiLCJpc3MiOiJodHRwczovL2NvZ25pdG8taWRwLnVuZGVmaW5lZC5hbWF6b25hd3MuY29tLyIsInZlcnNpb24iOjIsImNsaWVudF9pZCI6ImVkZXVkdGtncW5oNHRiN2c4bGJuczJmYjUiLCJldmVudF9pZCI6ImY4NzQwYWZhLTJlYTUtNDNhNS05Y2YzLWExNTllNGZkNTZhOCIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJhdXRoX3RpbWUiOjE2MTY1OTQwMzUsImV4cCI6MTYxNjU5NzYzNSwiaWF0IjoxNjE2NTk0MDM1LCJqdGkiOiJjMTUzZjhlZS0yZDE4LTRjNmYtYTNmOS02ZDE2ZjIyMzUwOTIiLCJ1c2VybmFtZSI6IjMxODRhMTQzLTU1OGYtNDQ2MS05YjkxLWQwMDQ3MDM3YTUzYiJ9.qgQQZgQ26OG-sG4yDCxN9XvaOiVxKwq-ZUibUlhrA1DAtPmHFto5MK7GgfQLNnWAg77sVbqyVNko_bZVfBvOzw",
+      methodArn:
+        "arn:aws:execute-api:eu-central-1:123456789012:example/prod/POST/{proxy+}",
+    };
+    await expect(auth.run(data)).to.be.rejectedWith("ExpiredToken");
   });
 });
