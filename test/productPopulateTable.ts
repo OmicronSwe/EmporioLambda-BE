@@ -56,8 +56,7 @@ describe("Product populate table", () => {
 
   it('product create function - should be "Product "test" created correctly"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"name": "test", "description": "test_description", "price": 10, "category": "electric"}',
+      body: '{"name": "test", "description": "test_description", "price": 10, "category": "electric"}',
     };
 
     const response = await create.run(data);
@@ -69,8 +68,7 @@ describe("Product populate table", () => {
 
   it('product create function - should be "Category not exist"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"name": "test", "description": "test_description", "price": 10, "category": "domotic"}',
+      body: '{"name": "test", "description": "test_description", "price": 10, "category": "domotic"}',
     };
 
     const response = await create.run(data);
@@ -80,8 +78,7 @@ describe("Product populate table", () => {
 
   it('product create function - should be "Error mime or image not found" with image', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"name": "test", "description": "test_description", "price": 10, "category": "electric", "imageFile": {"mime":"image/png"}}',
+      body: '{"name": "test", "description": "test_description", "price": 10, "category": "electric", "imageFile": {"mime":"image/png"}}',
     };
 
     const response = await create.run(data);
@@ -93,8 +90,7 @@ describe("Product populate table", () => {
 
   it('product create function - should be "Error mime is not allowed" with image', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"name": "test", "description": "test_description", "price": 10, "category": "electric", "imageFile": {"mime":"image/gif", "imageCode":"base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}',
+      body: '{"name": "test", "description": "test_description", "price": 10, "category": "electric", "imageFile": {"mime":"image/gif", "imageCode":"base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}',
     };
 
     const response = await create.run(data);
@@ -106,8 +102,7 @@ describe("Product populate table", () => {
 
   it('product create function - should be "Error mime types don\'t match" with image', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"name": "test", "description": "test_description", "price": 10, "category": "electric", "imageFile": {"mime":"image/jpg", "imageCode":"base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}',
+      body: '{"name": "test", "description": "test_description", "price": 10, "category": "electric", "imageFile": {"mime":"image/jpg", "imageCode":"base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="}}',
     };
 
     const response = await create.run(data);
@@ -177,8 +172,7 @@ describe("Product populate table", () => {
     const id = JSON.parse(responseSearch.body).result.items[0].id;
 
     const dataSearch: APIGatewayProxyEvent = {
-      body:
-        '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
+      body: '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
       pathParameters: {
         id,
       },
