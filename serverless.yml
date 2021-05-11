@@ -252,15 +252,6 @@ resources:
               WriteCapacityUnits: 1
 
 functions:
-  #testCors
-  cors:
-    handler: src/endpoints/cors.handler
-    events:
-      - http:
-          path: cors
-          method: get
-          cors: true
-
   auth:
     handler: src/lib/auth.handler
     environment:
