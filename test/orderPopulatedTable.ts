@@ -56,8 +56,7 @@ describe("Order populated table", () => {
 
     // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     // create product
@@ -101,23 +100,7 @@ describe("Order populated table", () => {
   it('order list function - should return only order of "username-string-test"', async () => {
     const response = await listOrder.run();
 
-    const body = JSON.parse(response.body);
-
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
-
-    expect(body.result.items[0].email).to.be.equal("test@test.com");
-    expect(body.result.items[0].taxesApplied).to.be.equal(20);
-    expect(body.result.items[0].totalPrice).to.be.equal(52.8);
-
-    expect(body.result.items[0].products[0].id).to.be.equal(IDProduct1);
-    expect(body.result.items[0].products[0].name).to.be.equal("name product 1");
-    expect(body.result.items[0].products[0].description).to.be.equal(
-      "description product 1"
-    );
-    expect(body.result.items[0].products[0].price).to.be.equal(11);
-    expect(body.result.items[0].products[0].quantity).to.be.equal(4);
-    expect(body.result.items[0].products[0].category).to.be.null;
-    expect(body.result.items[0].products[0].imageUrl).to.be.null;
   });
 
   it('order getByUsername function - should return item "username-string-test"', async () => {

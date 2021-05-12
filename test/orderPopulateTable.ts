@@ -37,13 +37,11 @@ describe("Order populate table", () => {
 
     // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
-      body:
-        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
+      body: '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
     // create product
@@ -79,8 +77,7 @@ describe("Order populate table", () => {
 
   it('order create function - should be "Failed to get user data"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',
+      body: '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',
     };
 
     const response = await create.run(data);
@@ -94,8 +91,7 @@ describe("Order populate table", () => {
 
   it('order create function - should be "Failed to create order"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "not_paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',
+      body: '{"data": {"object": {"payment_status": "not_paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',
     };
 
     const response = await create.run(data);
@@ -109,8 +105,7 @@ describe("Order populate table", () => {
 
   it('order create function - should be "Failed to get cart"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference": "username-string"}}}',
+      body: '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference": "username-string"}}}',
     };
 
     const response = await create.run(data);
@@ -122,8 +117,7 @@ describe("Order populate table", () => {
 
   it('order create function - should be "Cart not found"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string_error"}}}',
+      body: '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string_error"}}}',
     };
 
     const response = await create.run(data);
@@ -135,8 +129,7 @@ describe("Order populate table", () => {
 
   it('order create function - should be "Error email value not found"', async () => {
     const data: APIGatewayProxyEvent = {
-      body:
-        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email_error": "test@test.com"}, "client_reference_id": "username-string"}}}',
+      body: '{"data": {"object": {"payment_status": "paid", "customer_details": {"email_error": "test@test.com"}, "client_reference_id": "username-string"}}}',
     };
 
     const response = await create.run(data);
