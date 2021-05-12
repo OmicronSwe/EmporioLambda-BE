@@ -63,12 +63,11 @@ const Cognito = {
     userAttributes: CognitoIdentityServiceProvider.AttributeListType,
     username: string
   ): Promise<CognitoIdentityServiceProvider.AdminUpdateUserAttributesResponse> => {
-    const params: CognitoIdentityServiceProvider.AdminUpdateUserAttributesRequest =
-      {
-        UserAttributes: userAttributes,
-        UserPoolId: process.env.USER_POOL_ID,
-        Username: username,
-      };
+    const params: CognitoIdentityServiceProvider.AdminUpdateUserAttributesRequest = {
+      UserAttributes: userAttributes,
+      UserPoolId: process.env.USER_POOL_ID,
+      Username: username,
+    };
 
     return CognitoService.adminUpdateUserAttributes(params)
       .promise()

@@ -153,8 +153,7 @@ class Cart {
   }
 
   public getProductsInfoCheckout(): Array<CartProductForCheckout> {
-    const lineItems: Array<CartProductForCheckout> =
-      new Array<CartProductForCheckout>();
+    const lineItems: Array<CartProductForCheckout> = new Array<CartProductForCheckout>();
 
     this.getProductsList().forEach((element) => {
       const prodCheckout = {
