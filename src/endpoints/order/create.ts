@@ -21,7 +21,26 @@ export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
     return badRequest("Body missing");
   }
-  console.log(event);
+
+  // If signing key is set, check the signature of the request.
+  if (
+    process.env.STRIPE_SECRET_SIGNING &&
+    process.env.STRIPE_SECRET_SIGNING != "undefined"
+  ) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2020-08-27",
+    });
+    const sig = event.headers["Stripe-Signature"];
+    try {
+      stripe.webhooks.constructEvent(
+        JSON.parse(event.body),
+        sig,
+        process.env.STRIPE_SECRET_SIGNING
+      );
+    } catch {
+      return badRequest("Request not signed by stripe");
+    }
+  }
 
   const webhookStripe: Stripe.Checkout.Session = JSON.parse(event.body).data
     .object;
