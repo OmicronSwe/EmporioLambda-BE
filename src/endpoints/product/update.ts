@@ -25,7 +25,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const body: UpdateProductRequest = JSON.parse(event.body);
+  const request = JSON.parse(event.body);
+
+  if (request.price && typeof request.price !== "number") {
+    return badRequest("Price must be a number");
+  }
+
+  const body: UpdateProductRequest = request;
+
   let imageUrl: string = null;
 
   // if image is present, get URL and push it to s3
