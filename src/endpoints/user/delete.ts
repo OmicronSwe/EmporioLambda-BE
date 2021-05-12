@@ -38,15 +38,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
   // set null username on order of user
   for (let i = 0; i < result.items.length; i++) {
     try {
-      await Dynamo.update(
+      await Dynamo.removeAttribute(
         process.env.ORDER_TABLE,
         "id",
         result.items[i].id,
-        ["username"],
-        [null]
+        ["username"]
       );
     } catch (error) {
-      return badResponse("Failed to set null order of user");
+      return badResponse("Failed to remove username in order");
     }
   }
 
