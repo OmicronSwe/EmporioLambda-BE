@@ -21,6 +21,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   if (!event.body) {
     return badRequest("Body missing");
   }
+  console.log(event);
 
   const webhookStripe: Stripe.Checkout.Session = JSON.parse(event.body).data
     .object;

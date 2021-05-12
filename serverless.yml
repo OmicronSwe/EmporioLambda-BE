@@ -274,6 +274,8 @@ functions:
       - http:
           path: createSessionStripe
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   #PRODUCT
