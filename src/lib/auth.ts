@@ -386,8 +386,6 @@ function ValidateToken(pems, event, context) {
   } else {
     if (principalId != "unauthorizedUser") {
       // API Accessible only to authorized users
-      // CHECKOUT
-      policy.allowMethod("POST", "/createSessionStripe");
       // PROFILE
       policy.allowMethod("*", `/user/${decodedJwt.payload.sub}/*`);
       // ORDERS
