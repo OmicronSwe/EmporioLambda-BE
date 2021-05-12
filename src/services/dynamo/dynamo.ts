@@ -89,12 +89,7 @@ const Dynamo = {
     // create element and value for update
     updateElement.forEach((element, index) => {
       AttriNameExpr[`#element${index}`] = element;
-
-      if (Number.isNaN(+updateValue[index])) {
-        AttriValueExpr[`:value${index}`] = updateValue[index];
-      } else {
-        AttriValueExpr[`:value${index}`] = Number(updateValue[index]);
-      }
+      AttriValueExpr[`:value${index}`] = updateValue[index];
     });
 
     const params: DynamoDB.DocumentClient.UpdateItemInput = {
@@ -113,6 +108,47 @@ const Dynamo = {
       })
       .catch((err) => {
         throw Error(`Error in Dynamo update in table ${tableName}: ${err}`);
+      });
+  },
+
+  removeAttribute: (
+    tableName: string,
+    primaryKey: string,
+    primaryKeyValue: string,
+    removeElement: Array<string>
+  ): Promise<DynamoDB.UpdateItemOutput> => {
+    let updateExpr: string = "REMOVE ";
+    const AttriNameExpr: { [k: string]: string } = {};
+
+    // create expression for update
+    for (let index = 0; index < removeElement.length; index++) {
+      updateExpr += `#element${index},`;
+    }
+
+    updateExpr = updateExpr.slice(0, -1);
+
+    // create element and value for update
+    removeElement.forEach((element, index) => {
+      AttriNameExpr[`#element${index}`] = element;
+    });
+
+    const params: DynamoDB.DocumentClient.UpdateItemInput = {
+      TableName: tableName,
+      Key: { [primaryKey]: primaryKeyValue },
+      ExpressionAttributeNames: AttriNameExpr,
+      UpdateExpression: updateExpr,
+    };
+
+    return dynamoDb
+      .update(params)
+      .promise()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(
+          `Error in Dynamo removeAttribute in table ${tableName}: ${err}`
+        );
       });
   },
 
