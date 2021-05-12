@@ -386,7 +386,6 @@ function ValidateToken(pems, event, context) {
   } else {
     if (principalId != "unauthorizedUser") {
       // API Accessible only to authorized users
-
       // PROFILE
       policy.allowMethod("*", `/user/${decodedJwt.payload.sub}/*`);
       // ORDERS
