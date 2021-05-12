@@ -56,8 +56,7 @@ describe("Order populated table", () => {
 
     // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     // create product
