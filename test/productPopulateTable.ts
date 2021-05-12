@@ -179,6 +179,7 @@ describe("Product populate table", () => {
     };
 
     const response = await update.run(dataSearch);
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(JSON.parse(response.body).message).to.be.equal(
       "Product updated correctly"
     );
@@ -217,6 +218,21 @@ describe("Product populate table", () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal(
       "PathParameters missing"
+    );
+  });
+
+  it('product update function - should be "Price must be a number"', async () => {
+    const errorData: APIGatewayProxyEvent = {
+      body: '{"name": "test_update", "description": "test_description_update", "price": "20", "category": "garden"}',
+      pathParameters: {
+        name: "dummy",
+      },
+    };
+
+    const response = await update.run(errorData);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Price must be a number"
     );
   });
 

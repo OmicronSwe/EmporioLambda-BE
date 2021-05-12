@@ -54,7 +54,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
         );
         cart.removeProductTotally(cartProductList[i]);
       } else {
-        // console.log(result);
         const productDb: ProductDB = {
           id: result.id,
           name: result.name,
