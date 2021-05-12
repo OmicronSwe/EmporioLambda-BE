@@ -33,7 +33,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     const sig = event.headers["Stripe-Signature"];
     try {
       stripe.webhooks.constructEvent(
-        JSON.parse(event.body),
+        event.body,
         sig,
         process.env.STRIPE_SECRET_SIGNING
       );
