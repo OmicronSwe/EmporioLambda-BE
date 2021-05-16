@@ -38,10 +38,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     return response({ data: { message: "User updated correctly" } });
   } catch (error) {
-    if (error.message.includes("AliasExistsException")){
+    if (error.message.includes("AliasExistsException")) {
       return badResponse("New email already in use");
-    }else{
-      return badResponse("Failed to udpate user");
     }
+    return badResponse("Failed to udpate user");
   }
 };
