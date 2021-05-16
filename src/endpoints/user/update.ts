@@ -38,6 +38,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     return response({ data: { message: "User updated correctly" } });
   } catch (error) {
+    console.log(error);
     return badResponse("Failed to udpate user");
   }
 };
