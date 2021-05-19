@@ -258,16 +258,6 @@ functions:
     environment:
       USER_POOL_ID: !Ref CognitoUserPool
 
-  hello:
-    handler: handler.hello
-    events:
-      - http:
-          path: hello
-          method: get
-          authorizer:
-            name: auth
-          cors: true
-
   #CHECKOUT
   createSessionIDStripe:
     handler: src/endpoints/checkout/createSessionStripe.index

@@ -17,7 +17,7 @@ export const response = ({ statusCode = 200, data = {}, cors = true }) => {
 
   if (cors) {
     response.headers = {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": "",
       "Access-Control-Allow-Credentials": true,
     };
   }
