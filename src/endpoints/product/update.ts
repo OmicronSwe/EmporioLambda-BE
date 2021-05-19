@@ -6,8 +6,6 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
-import bucketName from "../../services/s3/bucketName";
 import S3services from "../../services/s3/s3";
 import { pushImage } from "../../lib/pushImage";
 import {
@@ -27,7 +25,14 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badRequest("PathParameters missing");
   }
 
-  const body: UpdateProductRequest = JSON.parse(event.body);
+  const request = JSON.parse(event.body);
+
+  if (request.price && typeof request.price !== "number") {
+    return badRequest("Price must be a number");
+  }
+
+  const body: UpdateProductRequest = request;
+
   let imageUrl: string = null;
 
   // if image is present, get URL and push it to s3
@@ -35,7 +40,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     // delete old image
     try {
       const getProduct = await Dynamo.get(
-        tableName.product,
+        process.env.PRODUCT_TABLE,
         "id",
         event.pathParameters.id
       );
@@ -47,7 +52,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       if (getProduct.imageUrl) {
         const keyImage: string = getProduct.imageUrl.split("/").pop();
 
-        await S3services.delete(bucketName.product_image, keyImage);
+        await S3services.delete(process.env.BUCKET_IMAGE, keyImage);
       }
     } catch (error) {
       return badResponse("Failed to delete product image");
@@ -59,7 +64,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       imageUrl = await pushImage(
         body.imageFile.imageCode,
         body.imageFile.mime,
-        bucketName.product_image
+        process.env.BUCKET_IMAGE
       );
     } catch (err) {
       // handle logic error of push image
@@ -75,7 +80,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     await Dynamo.update(
-      tableName.product,
+      process.env.PRODUCT_TABLE,
       "id",
       event.pathParameters.id,
       Object.keys(productUpdateDB),

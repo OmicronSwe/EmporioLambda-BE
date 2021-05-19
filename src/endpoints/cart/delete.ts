@@ -1,7 +1,6 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -13,7 +12,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     await Dynamo.delete(
-      tableName.cart,
+      process.env.CART_TABLE,
       "username",
       event.pathParameters.username
     );

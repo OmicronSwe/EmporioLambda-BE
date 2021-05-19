@@ -7,7 +7,7 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import Order from "../../model/order/order";
 import Cart from "../../model/cart/cart";
 import Nodemailer from "../../services/nodemailer/nodemailer";
@@ -18,9 +18,28 @@ import Cognito from "../../services/cognito/cognito";
  * @param  {} event: event passed when lambda is triggered
  */
 export const index: APIGatewayProxyHandler = async (event) => {
-  // console.log(event);
   if (!event.body) {
     return badRequest("Body missing");
+  }
+
+  // If signing key is set, check the signature of the request.
+  if (
+    process.env.STRIPE_SECRET_SIGNING &&
+    process.env.STRIPE_SECRET_SIGNING != "undefined"
+  ) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2020-08-27",
+    });
+    const sig = event.headers["Stripe-Signature"];
+    try {
+      stripe.webhooks.constructEvent(
+        event.body,
+        sig,
+        process.env.STRIPE_SECRET_SIGNING
+      );
+    } catch {
+      return badRequest("Request not signed by stripe");
+    }
   }
 
   const webhookStripe: Stripe.Checkout.Session = JSON.parse(event.body).data
@@ -31,7 +50,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     try {
       result = await Dynamo.get(
-        tableName.cart,
+        process.env.CART_TABLE,
         "username",
         webhookStripe.client_reference_id
       );
@@ -57,7 +76,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     try {
       const data = order.toJSON();
-      await Dynamo.write(tableName.order, data);
+      await Dynamo.write(process.env.ORDER_TABLE, data);
     } catch (error) {
       return badResponse("Failed to receive order");
     }
@@ -69,7 +88,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     };
 
     try {
-      await Dynamo.write(tableName.cart, data);
+      await Dynamo.write(process.env.CART_TABLE, data);
     } catch (error) {
       return badResponse("Failed to empty the cart");
     }

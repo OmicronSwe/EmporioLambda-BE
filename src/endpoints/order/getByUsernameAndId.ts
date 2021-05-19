@@ -18,18 +18,18 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     const result = await Dynamo.query(
       process.env.ORDER_TABLE,
-      "username_date_index",
-      ["username"],
-      [event.pathParameters.username],
-      "#element0 = :Value0"
+      "username_id_index",
+      ["username", "id"],
+      [event.pathParameters.username, event.pathParameters.id],
+      "#element0 = :Value0 AND #element1 = :Value1"
     );
 
     if (result.items.length == 0) {
-      return notFound("Orders not found");
+      return notFound("Order not found for this user");
     }
 
     return response({ data: { result } });
   } catch (error) {
-    return badResponse("Failed to get orders");
+    return badResponse("Failed to get order");
   }
 };

@@ -63,13 +63,35 @@ const Cognito = {
     userAttributes: CognitoIdentityServiceProvider.AttributeListType,
     username: string
   ): Promise<CognitoIdentityServiceProvider.AdminUpdateUserAttributesResponse> => {
-    const params: CognitoIdentityServiceProvider.AdminUpdateUserAttributesRequest = {
-      UserAttributes: userAttributes,
-      UserPoolId: process.env.USER_POOL_ID,
-      Username: username,
-    };
+    const params: CognitoIdentityServiceProvider.AdminUpdateUserAttributesRequest =
+      {
+        UserAttributes: userAttributes,
+        UserPoolId: process.env.USER_POOL_ID,
+        Username: username,
+      };
 
     return CognitoService.adminUpdateUserAttributes(params)
+      .promise()
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(`Error in Cognito adminUpdateUserAttributes: ${err}`);
+      });
+  },
+
+  updateUserPassword: (
+    password: string,
+    username: string
+  ): Promise<CognitoIdentityServiceProvider.AdminSetUserPasswordResponse> => {
+    const params: CognitoIdentityServiceProvider.AdminSetUserPasswordRequest = {
+      UserPoolId: process.env.USER_POOL_ID,
+      Username: username,
+      Password: password,
+      Permanent: true,
+    };
+
+    return CognitoService.adminSetUserPassword(params)
       .promise()
       .then((data) => {
         return data;

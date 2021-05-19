@@ -40,9 +40,17 @@ provider:
   environment:
     NAMESPACE: ${opt:stage, self:provider.stage}
     STRIPE_SECRET_KEY: ${ssm:STRIPE_KEY}
+    STRIPE_SECRET_SIGNING: ${ssm:STRIPE_SIGN_${opt:stage, self:provider.stage}}
     EMAIL: ${ssm:EMAIL}
     PASS_EMAIL: ${ssm:PASS_EMAIL}
     REGION: ${opt:region, self:provider.region}
+    #TABLE NAME DYNAMODB
+    PRODUCT_TABLE: ${self:provider.environment.NAMESPACE}-EML-product
+    ORDER_TABLE: ${self:provider.environment.NAMESPACE}-EML-order
+    CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart
+    CATEGORY_TABLE: ${self:provider.environment.NAMESPACE}-EML-category
+    #BUCKET NAME S3
+    BUCKET_IMAGE: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -58,7 +66,7 @@ resources:
     BucketImage:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
+        BucketName: ${self:provider.environment.BUCKET_IMAGE}
         AccessControl: PublicRead #da modificare forse
 
     #COGNITO
@@ -153,7 +161,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.NAMESPACE}-EML-product
+        TableName: ${self:provider.environment.PRODUCT_TABLE}
         GlobalSecondaryIndexes:
           - IndexName: name_index
             KeySchema:
@@ -180,7 +188,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.NAMESPACE}-EML-cart
+        TableName: ${self:provider.environment.CART_TABLE}
 
     CategoryTable:
       Type: "AWS::DynamoDB::Table"
@@ -197,7 +205,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.NAMESPACE}-EML-category
+        TableName: ${self:provider.environment.CATEGORY_TABLE}
 
     OrderTable:
       Type: "AWS::DynamoDB::Table"
@@ -218,7 +226,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.NAMESPACE}-EML-order
+        TableName: ${self:provider.environment.ORDER_TABLE}
         GlobalSecondaryIndexes:
           - IndexName: username_date_index
             KeySchema:
@@ -232,9 +240,21 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
 
+          - IndexName: username_id_index
+            KeySchema:
+              - AttributeName: username
+                KeyType: HASH
+              - AttributeName: id
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
 functions:
   auth:
-    handler: src/auth.handler
+    handler: src/lib/auth.handler
     environment:
       USER_POOL_ID: !Ref CognitoUserPool
 
@@ -264,6 +284,8 @@ functions:
       - http:
           path: product
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   listOfProduct:
@@ -272,6 +294,8 @@ functions:
       - http:
           path: product
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   searchOfProduct:
@@ -280,6 +304,8 @@ functions:
       - http:
           path: product/search/{search}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   getByIdProduct:
@@ -288,6 +314,8 @@ functions:
       - http:
           path: product/{id}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   updateProduct:
@@ -296,6 +324,8 @@ functions:
       - http:
           path: product/{id}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   deleteProduct:
@@ -304,6 +334,8 @@ functions:
       - http:
           path: product/{id}
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   #CATEGORY
@@ -313,6 +345,8 @@ functions:
       - http:
           path: category
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   createCategory:
@@ -321,6 +355,8 @@ functions:
       - http:
           path: category
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   deleteCategory:
@@ -329,6 +365,8 @@ functions:
       - http:
           path: category/{name}
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   #ORDER
@@ -348,6 +386,8 @@ functions:
       - http:
           path: order
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   getByUsernameOrder:
@@ -356,6 +396,8 @@ functions:
       - http:
           path: order/getByUsername/{username}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   getByIdOrder:
@@ -364,6 +406,18 @@ functions:
       - http:
           path: order/{id}
           method: get
+          authorizer:
+            name: auth
+          cors: true
+
+  getByUsernameAndIdOrder:
+    handler: src/endpoints/order/getByUsernameAndId.index
+    events:
+      - http:
+          path: order/getByUsername/{username}/{id}
+          method: get
+          authorizer:
+            name: auth
           cors: true
   #CART
   createCart:
@@ -372,6 +426,8 @@ functions:
       - http:
           path: cart
           method: post
+          authorizer:
+            name: auth
           cors: true
 
   deleteCart:
@@ -380,6 +436,8 @@ functions:
       - http:
           path: cart/{username}
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   removeProduct:
@@ -388,6 +446,8 @@ functions:
       - http:
           path: cart/removeProduct/{username}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   addProduct:
@@ -396,6 +456,8 @@ functions:
       - http:
           path: cart/addProduct/{username}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   getByUsername:
@@ -404,6 +466,8 @@ functions:
       - http:
           path: cart/{username}
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   toEmpty:
@@ -412,6 +476,8 @@ functions:
       - http:
           path: cart/toEmpty/{username}
           method: put
+          authorizer:
+            name: auth
           cors: true
 
   #USER
@@ -423,6 +489,8 @@ functions:
       - http:
           path: user/{username}/
           method: get
+          authorizer:
+            name: auth
           cors: true
 
   deleteUser:
@@ -433,6 +501,8 @@ functions:
       - http:
           path: user/{username}/delete
           method: delete
+          authorizer:
+            name: auth
           cors: true
 
   updateUser:
@@ -443,4 +513,18 @@ functions:
       - http:
           path: user/{username}/update
           method: post
+          authorizer:
+            name: auth
+          cors: true
+
+  updateUserPassword:
+    handler: src/endpoints/user/updatePassword.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
+    events:
+      - http:
+          path: user/{username}/updatePassword
+          method: post
+          authorizer:
+            name: auth
           cors: true

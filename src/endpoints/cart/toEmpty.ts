@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import { CartDB } from "../../model/cart/interface";
 
 /**
@@ -18,7 +18,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   };
 
   try {
-    await Dynamo.write(tableName.cart, data);
+    await Dynamo.write(process.env.CART_TABLE, data);
     return response({ data: { message: "Cart emptied" } });
   } catch (error) {
     return badResponse("Failed to empty the cart");

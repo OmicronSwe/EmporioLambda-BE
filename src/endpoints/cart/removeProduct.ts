@@ -6,7 +6,7 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import { UpdateProductInCartRequest } from "../../model/cart/interface";
@@ -30,7 +30,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     resultGetCart = await Dynamo.get(
-      tableName.cart,
+      process.env.CART_TABLE,
       "username",
       event.pathParameters.username
     );
@@ -57,7 +57,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   try {
-    await Dynamo.write(tableName.cart, cartFromDB.toJSON());
+    await Dynamo.write(process.env.CART_TABLE, cartFromDB.toJSON());
     return response({
       data: { message: `Product "${prod.getName()}" removed from cart` },
     });

@@ -1,7 +1,6 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
 import "./testConfig/localDynamoDb";
 import Dynamo from "../src/services/dynamo/dynamo";
-import tableName from "../src/services/dynamo/tableName";
 import Order from "../src/model/order/order";
 import Cart from "../src/model/cart/cart";
 import { OrderDB } from "../src/model/order/interface";
@@ -25,6 +24,18 @@ describe("Order populated table", () => {
     "index"
   );
 
+  const getByUsernameAndId = mochaPlugin.getWrapper(
+    "index",
+    "/src/endpoints/order/getByUsernameAndId.ts",
+    "index"
+  );
+
+  const listOrder = mochaPlugin.getWrapper(
+    "index",
+    "/src/endpoints/order/list.ts",
+    "index"
+  );
+
   before(async () => {
     // functions
     const createProd = mochaPlugin.getWrapper(
@@ -45,8 +56,7 @@ describe("Order populated table", () => {
 
     // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     // create product
@@ -70,7 +80,7 @@ describe("Order populated table", () => {
     await createCart.run(dataCart);
 
     const result = await Dynamo.get(
-      tableName.cart,
+      process.env.CART_TABLE,
       "username",
       "username-string-test"
     ).catch(() => {
@@ -84,7 +94,13 @@ describe("Order populated table", () => {
 
     const data: OrderDB = order.toJSON();
 
-    await Dynamo.write(tableName.order, data);
+    await Dynamo.write(process.env.ORDER_TABLE, data);
+  });
+
+  it('order list function - should return only order of "username-string-test"', async () => {
+    const response = await listOrder.run();
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
   });
 
   it('order getByUsername function - should return item "username-string-test"', async () => {
@@ -96,7 +112,6 @@ describe("Order populated table", () => {
 
     const response = await getByUsername.run(data);
 
-    // console.log(response);
     const body = JSON.parse(response.body);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
@@ -142,6 +157,101 @@ describe("Order populated table", () => {
 
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal("Orders not found");
+  });
+
+  it('order getByUsernameAndId function - should return order by IdOrder and Username of "username-string-test"', async () => {
+    const dataUsername: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: "username-string-test",
+      },
+    };
+
+    const responseGetByUsername = await getByUsername.run(dataUsername);
+
+    const bodyGetByUsername = JSON.parse(responseGetByUsername.body);
+
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: "username-string-test",
+        id: bodyGetByUsername.result.items[0].id,
+      },
+    };
+
+    const response = await getByUsernameAndId.run(data);
+
+    const body = JSON.parse(response.body);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(200);
+
+    expect(body.result.items[0].email).to.be.equal("test@test.com");
+    expect(body.result.items[0].taxesApplied).to.be.equal(20);
+    expect(body.result.items[0].totalPrice).to.be.equal(52.8);
+
+    expect(body.result.items[0].products[0].id).to.be.equal(IDProduct1);
+    expect(body.result.items[0].products[0].name).to.be.equal("name product 1");
+    expect(body.result.items[0].products[0].description).to.be.equal(
+      "description product 1"
+    );
+    expect(body.result.items[0].products[0].price).to.be.equal(11);
+    expect(body.result.items[0].products[0].quantity).to.be.equal(4);
+    expect(body.result.items[0].products[0].category).to.be.null;
+    expect(body.result.items[0].products[0].imageUrl).to.be.null;
+  });
+
+  it('order getByUsernameAndId function - should return "Order not found for this user" (wrong IDOrder)', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: "username-string-test",
+        id: "dummyId",
+      },
+    };
+
+    const response = await getByUsernameAndId.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Order not found for this user"
+    );
+  });
+
+  it('order getByUsernameAndId function - should return "Order not found for this user" (wrong Username)', async () => {
+    const dataUsername: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: "username-string-test",
+      },
+    };
+
+    const responseGetByUsername = await getByUsername.run(dataUsername);
+
+    const bodyGetByUsername = JSON.parse(responseGetByUsername.body);
+
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: "dummy_username",
+        id: bodyGetByUsername.result.items[0].id,
+      },
+    };
+
+    const response = await getByUsernameAndId.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Order not found for this user"
+    );
+  });
+
+  it('order getByUsernameAndId function - should return "Failed to get order"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        username_wrong: "dummy_username",
+        id: "dummy_id",
+      },
+    };
+
+    const response = await getByUsernameAndId.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(502);
+    expect(JSON.parse(response.body).error).to.be.equal("Failed to get order");
   });
 
   it('order getById function - should return item "username-string-test"', async () => {

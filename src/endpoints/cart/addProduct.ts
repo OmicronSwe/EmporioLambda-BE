@@ -6,7 +6,7 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import Cart from "../../model/cart/cart";
 import Product from "../../model/product/product";
 import { UpdateProductInCartRequest } from "../../model/cart/interface";
@@ -31,7 +31,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   try {
     resultGetCart = await Dynamo.get(
-      tableName.cart,
+      process.env.CART_TABLE,
       "username",
       event.pathParameters.username
     );
@@ -45,7 +45,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   // get info from product id
   try {
-    resultGetProduct = await Dynamo.get(tableName.product, "id", body.id);
+    resultGetProduct = await Dynamo.get(
+      process.env.PRODUCT_TABLE,
+      "id",
+      body.id
+    );
 
     if (Object.keys(resultGetProduct).length === 0) {
       return notFound("Product not found");
@@ -61,7 +65,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   cartFromDB.addProduct(prod, body.quantity ? body.quantity : 1);
 
   try {
-    await Dynamo.write(tableName.cart, cartFromDB.toJSON());
+    await Dynamo.write(process.env.CART_TABLE, cartFromDB.toJSON());
     return response({
       data: { message: `Product "${prod.getName()}" added to cart` },
     });

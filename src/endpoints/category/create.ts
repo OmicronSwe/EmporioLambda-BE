@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badRequest, badResponse } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-import tableName from "../../services/dynamo/tableName";
+
 import Category from "../../model/category/category";
 import { CategoryDB } from "../../model/category/interface";
 /**
@@ -25,7 +25,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const name = category.getName();
 
   try {
-    const resultGet = await Dynamo.get(tableName.category, "name", name);
+    const resultGet = await Dynamo.get(
+      process.env.CATEGORY_TABLE,
+      "name",
+      name
+    );
 
     if (Object.keys(resultGet).length >= 1) {
       return badRequest("Category already exists");
@@ -37,7 +41,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   const data = category.toJSON();
 
   try {
-    await Dynamo.write(tableName.category, data);
+    await Dynamo.write(process.env.CATEGORY_TABLE, data);
     return response({
       data: { message: `Category "${category.name}" created correctly` },
     });
