@@ -397,7 +397,7 @@ functions:
           authorizer:
             name: auth
           cors: true
-          
+
   #ORDER
   createOrder:
     handler: src/endpoints/order/create.index
