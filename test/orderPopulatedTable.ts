@@ -117,8 +117,8 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
     expect(body.result.items[0].email).to.be.equal("test@test.com");
-    expect(body.result.items[0].taxesApplied).to.be.equal(20);
-    expect(body.result.items[0].totalPrice).to.be.equal(52.8);
+    expect(body.result.items[0].taxesApplied).to.be.equal(0);
+    expect(body.result.items[0].totalPrice).to.be.equal(44);
 
     expect(body.result.items[0].products[0].id).to.be.equal(IDProduct1);
     expect(body.result.items[0].products[0].name).to.be.equal("name product 1");
@@ -184,8 +184,8 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
     expect(body.result.items[0].email).to.be.equal("test@test.com");
-    expect(body.result.items[0].taxesApplied).to.be.equal(20);
-    expect(body.result.items[0].totalPrice).to.be.equal(52.8);
+    expect(body.result.items[0].taxesApplied).to.be.equal(0);
+    expect(body.result.items[0].totalPrice).to.be.equal(44);
 
     expect(body.result.items[0].products[0].id).to.be.equal(IDProduct1);
     expect(body.result.items[0].products[0].name).to.be.equal("name product 1");
@@ -278,8 +278,8 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
     expect(body.result.email).to.be.equal("test@test.com");
-    expect(body.result.taxesApplied).to.be.equal(20);
-    expect(body.result.totalPrice).to.be.equal(52.8);
+    expect(body.result.taxesApplied).to.be.equal(0);
+    expect(body.result.totalPrice).to.be.equal(44);
     expect(body.result.products[0].id).to.be.equal(IDProduct1);
     expect(body.result.products[0].name).to.be.equal("name product 1");
     expect(body.result.products[0].description).to.be.equal(

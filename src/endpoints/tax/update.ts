@@ -1,5 +1,6 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badRequest, badResponse } from "../../lib/APIResponses";
+import Cart from "../../model/cart/cart";
 import { TaxUpdateRequest } from "../../model/tax/interface";
 import Dynamo from "../../services/dynamo/dynamo";
 
@@ -33,6 +34,17 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   } catch (error) {
     return badResponse("Failed to check if tax exist");
+  }
+
+  // Update price in cart after update taxes
+
+  const cartList = await Dynamo.scan(process.env.CART_TABLE);
+
+  let cartFromDB: Cart;
+  for (let i = 0; i < cartList.items.length; i++) {
+    cartList.items[i].taxesApplied = taxUpdate.rate;
+    cartFromDB = new Cart(cartList.items[i]);
+    await Dynamo.write(process.env.CART_TABLE, cartFromDB.toJSON());
   }
 
   try {

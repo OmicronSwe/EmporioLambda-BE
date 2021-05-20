@@ -38,6 +38,9 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     if (Object.keys(resultGetCart).length === 0) {
       resultGetCart.username = event.pathParameters.username;
+      resultGetCart.taxesApplied = (
+        await Dynamo.get(process.env.TAX_TABLE, "name", "IVA")
+      ).rate;
     }
   } catch (error) {
     return badResponse("Failed to get cart");

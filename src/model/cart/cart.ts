@@ -19,7 +19,7 @@ class Cart {
     // console.log(data);
 
     this.products = new Map<Product, number>();
-    this.taxesApplied = 20;
+    this.taxesApplied = data.taxesApplied ? data.taxesApplied : 0;
     this.totalPrice = 0;
 
     if (data.products) {
