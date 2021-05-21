@@ -20,6 +20,7 @@ const Stripe = {
       line_items: cart.getProductsInfoCheckout(),
       success_url: successUrl,
       cancel_url: cancelUrl,
+      amount_total: cart.getTotalPrice(),
     };
 
     return stripe.checkout.sessions
