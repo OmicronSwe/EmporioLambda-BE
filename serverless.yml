@@ -279,6 +279,8 @@ functions:
   #CHECKOUT
   createSessionIDStripe:
     handler: src/endpoints/checkout/createSessionStripe.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
     events:
       - http:
           path: createSessionStripe
