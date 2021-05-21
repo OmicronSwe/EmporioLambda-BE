@@ -8,10 +8,12 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
 const Stripe = {
   createSession: (
     cart: Cart,
+    customerEmail: string,
     successUrl: string,
     cancelUrl: string
   ): Promise<string> => {
     const params = {
+      customer_email: customerEmail,
       payment_method_types: ["card"],
       mode: "payment",
       client_reference_id: cart.getUsername(),
