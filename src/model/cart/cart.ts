@@ -161,7 +161,7 @@ class Cart {
         name: element.getName(),
         description: element.getDescription(),
         images: [element.getImageUrl()],
-        amount: this.priceWithTaxes(element.getPrice() * 100),
+        amount: this.priceWithTaxes(element.getPrice()) * 100,
         currency: "EUR",
         quantity: this.getProductQuantity(element),
       };
