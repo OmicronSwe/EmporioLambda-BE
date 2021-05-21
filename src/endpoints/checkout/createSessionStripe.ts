@@ -93,11 +93,19 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badResponse("Failed to get user email");
   }
 
+  // create user on stripe
+  let idCustomer: string;
+  try {
+    idCustomer = await Stripe.createCustomer(user.getName(), user.getEmail());
+  } catch (error) {
+    return badResponse("Enable to create user on stripe");
+  }
+
   // create stripe session
   try {
     const idSession = await Stripe.createSession(
       cart,
-      user.getEmail(),
+      idCustomer,
       body.successurl,
       body.cancelurl
     );
