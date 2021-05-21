@@ -63,9 +63,9 @@ const Stripe = {
 
     return stripe.customers
       .list(params)
-      .then((data) => {
-        console.log(data); // eslint-disable-line no-console
-        if (data.length > 0) return data[0].id;
+      .then((response) => {
+        console.log(response.data); // eslint-disable-line no-console
+        if (response.data.length > 0) return response.data[0].id;
         return "";
       })
       .catch((err) => {
@@ -77,9 +77,9 @@ const Stripe = {
   deleteCustomer: (idCustomerInStripe: string): Promise<boolean> => {
     return stripe.customers
       .del(idCustomerInStripe)
-      .then((deleted) => {
-        console.log(deleted); // eslint-disable-line no-console
-        return deleted;
+      .then((data) => {
+        console.log(data.deleted); // eslint-disable-line no-console
+        return data.deleted;
       })
       .catch((err) => {
         throw Error(`Error in Stripe deleteCustomer: ${err}`);
