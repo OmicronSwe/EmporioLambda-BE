@@ -98,6 +98,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     idCustomer = await Stripe.createCustomer(user.getName(), user.getEmail());
   } catch (error) {
+    console.log(error); // eslint-disable-line no-console
     return badResponse("Enable to create user on stripe");
   }
 
