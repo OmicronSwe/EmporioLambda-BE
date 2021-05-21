@@ -60,13 +60,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const prod: Product = new Product(resultGetProduct);
 
-
-  //add taxes
-  const taxesApplied = await Dynamo.get(
-    process.env.TAX_TABLE,
-    "name",
-    "IVA"
-  );
+  // add taxes
+  const taxesApplied = await Dynamo.get(process.env.TAX_TABLE, "name", "IVA");
   resultGetCart.taxesApplied = taxesApplied.rate;
   const cartFromDB: Cart = new Cart(resultGetCart);
 
