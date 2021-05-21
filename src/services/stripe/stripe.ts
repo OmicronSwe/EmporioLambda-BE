@@ -34,11 +34,13 @@ const Stripe = {
 
   createCustomer: (
     nameCustomer: string,
-    emailCustomer: string
+    emailCustomer: string,
+    username: string
   ): Promise<string> => {
     const params = {
       name: nameCustomer,
       email: emailCustomer,
+      description: username,
     };
 
     return stripe.customers
@@ -48,6 +50,22 @@ const Stripe = {
       })
       .catch((err) => {
         throw Error(`Error in Stripe createCustomer: ${err}`);
+      });
+  },
+
+  getCustomerByEmail: (emailCustomer: string): Promise<string> => {
+    const params = {
+      email: emailCustomer,
+    };
+
+    return stripe.customers
+      .create(params)
+      .then((data) => {
+        if (data.length > 0) return data[0].id;
+        return "";
+      })
+      .catch((err) => {
+        throw Error(`Error in Stripe getCustomerByEmail: ${err}`);
       });
   },
 };
