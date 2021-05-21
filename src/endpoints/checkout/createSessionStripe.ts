@@ -85,8 +85,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     const result = await Cognito.getUserAttributes(body.username);
 
+    console.log(result); // eslint-disable-line no-console
+
     user = User.fromCognitoFormat(result);
   } catch (error) {
+    console.log(error); // eslint-disable-line no-console
     return badResponse("Failed to get user email");
   }
 
