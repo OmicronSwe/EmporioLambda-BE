@@ -98,6 +98,8 @@ export const index: APIGatewayProxyHandler = async (event) => {
     user.getEmail()
   );
 
+  console.log(`customerIDSTRIPE: ${customerIDStripe}`); // eslint-disable-line no-console
+
   if (customerIDStripe === "") {
     try {
       customerIDStripe = await Stripe.createCustomer(

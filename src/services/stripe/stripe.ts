@@ -61,6 +61,7 @@ const Stripe = {
     return stripe.customers
       .create(params)
       .then((data) => {
+        console.log(data); // eslint-disable-line no-console
         if (data.length > 0) return data[0].id;
         return "";
       })
