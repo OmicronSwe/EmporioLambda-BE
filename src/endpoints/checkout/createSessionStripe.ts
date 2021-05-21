@@ -85,8 +85,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
   try {
     const result = await Cognito.getUserAttributes(body.username);
 
-    console.log(result); // eslint-disable-line no-console
-
     user = User.fromCognitoFormat(result);
   } catch (error) {
     console.log(error); // eslint-disable-line no-console
@@ -94,9 +92,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
   }
 
   // check if User is present in stripe
+  console.log(" start getEmailFunction"); // eslint-disable-line no-console
   let customerIDStripe: string = await Stripe.getCustomerByEmail(
     user.getEmail()
   );
+  console.log("end getEmailFunction"); // eslint-disable-line no-console
 
   console.log(`customerIDSTRIPE: ${customerIDStripe}`); // eslint-disable-line no-console
 

@@ -56,7 +56,10 @@ const Stripe = {
   getCustomerByEmail: (emailCustomer: string): Promise<string> => {
     const params = {
       email: emailCustomer,
+      limit: 1,
     };
+
+    console.log(params); // eslint-disable-line no-console
 
     return stripe.customers
       .list(params)
@@ -66,7 +69,20 @@ const Stripe = {
         return "";
       })
       .catch((err) => {
+        console.log(err); // eslint-disable-line no-console
         throw Error(`Error in Stripe getCustomerByEmail: ${err}`);
+      });
+  },
+
+  deleteCustomer: (idCustomerInStripe: string): Promise<boolean> => {
+    return stripe.customers
+      .del(idCustomerInStripe)
+      .then((deleted) => {
+        console.log(deleted); // eslint-disable-line no-console
+        return deleted;
+      })
+      .catch((err) => {
+        throw Error(`Error in Stripe deleteCustomer: ${err}`);
       });
   },
 };
