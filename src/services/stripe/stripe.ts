@@ -41,7 +41,7 @@ const Stripe = {
       email: emailCustomer,
     };
 
-    return stripe.customers.create
+    return stripe.customers
       .create(params)
       .then((data) => {
         return data.id;
