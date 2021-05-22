@@ -44,7 +44,7 @@ class Cart {
   }
 
   public getTotalPrice(): number {
-    return this.totalPrice;
+    return Math.round(this.totalPrice * 100) / 100;
   }
 
   public getTaxesApplied(): number {
@@ -65,7 +65,7 @@ class Cart {
     return {
       username: this.username,
       products: productCartArray,
-      totalPrice: Math.round(this.totalPrice * 100) / 100,
+      totalPrice: this.getTotalPrice(),
       taxesApplied: this.taxesApplied,
     };
   }
