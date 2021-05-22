@@ -39,7 +39,7 @@ provider:
   region: eu-central-1
   environment:
     NAMESPACE: ${opt:stage, self:provider.stage}
-    STRIPE_SECRET_KEY: ${ssm:STRIPE_KEY}
+    STRIPE_SECRET_KEY: ${ssm:STRIPE_KEY_${opt:stage, self:provider.stage}}
     STRIPE_SECRET_SIGNING: ${ssm:STRIPE_SIGN_${opt:stage, self:provider.stage}}
     EMAIL: ${ssm:EMAIL}
     PASS_EMAIL: ${ssm:PASS_EMAIL}
