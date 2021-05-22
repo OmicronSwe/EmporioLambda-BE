@@ -33,11 +33,6 @@ describe("Checkout create session Stripe", () => {
       "/src/endpoints/product/search.ts",
       "index"
     );
-    const updateProd = mochaPlugin.getWrapper(
-      "index",
-      "/src/endpoints/product/update.ts",
-      "index"
-    );
 
     // data
     const dataProduct1: APIGatewayProxyEvent = {
@@ -77,16 +72,6 @@ describe("Checkout create session Stripe", () => {
 
     // create cart
     await createCart.run(dataCart);
-
-    // update product after create cart
-    const dataUpdate: APIGatewayProxyEvent = {
-      body: '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
-      pathParameters: {
-        id: IDProduct2,
-      },
-    };
-
-    await updateProd.run(dataUpdate);
   });
 
   it('checkout createSessionStripe function - should be "Body missing"', async () => {
@@ -113,7 +98,50 @@ describe("Checkout create session Stripe", () => {
     expect(JSON.parse(response.body).error).to.be.equal("Failed to get cart");
   });
 
+  it('checkout createSessionStripe function - should be "Cart not found"', async () => {
+    const data: APIGatewayProxyEvent = {
+      body: '{"username":"username_dummy"}',
+    };
+
+    const response = await createSessionStripe.run(data);
+
+    // console.log(response);
+    expect(JSON.parse(response.statusCode)).to.be.equal(404);
+    expect(JSON.parse(response.body).error).to.be.equal("Cart not found");
+  });
+
+  it('checkout createSessionStripe function - should be "Failed to get user email"', async () => {
+    const data: APIGatewayProxyEvent = {
+      body: '{"username":"username-string"}',
+    };
+
+    const response = await createSessionStripe.run(data);
+
+    // console.log(response);
+    expect(JSON.parse(response.statusCode)).to.be.equal(502);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Failed to get user email"
+    );
+  });
+
   it('checkout createSessionStripe function - should be "Some products have changed, please check your shopping cart before proceeding"', async () => {
+    // functions of product
+    const updateProd = mochaPlugin.getWrapper(
+      "index",
+      "/src/endpoints/product/update.ts",
+      "index"
+    );
+
+    // update product after create cart
+    const dataUpdate: APIGatewayProxyEvent = {
+      body: '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
+      pathParameters: {
+        id: IDProduct2,
+      },
+    };
+
+    await updateProd.run(dataUpdate);
+
     const data: APIGatewayProxyEvent = {
       body: '{"username":"username-string"}',
     };

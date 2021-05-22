@@ -159,6 +159,21 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.body).error).to.be.equal("Orders not found");
   });
 
+  it('order getByUsernameAndId function - should return "PathParameters missing"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters_error: {
+        username: "username-string-test",
+      },
+    };
+
+    const response = await getByUsernameAndId.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "PathParameters missing"
+    );
+  });
+
   it('order getByUsernameAndId function - should return order by IdOrder and Username of "username-string-test"', async () => {
     const dataUsername: APIGatewayProxyEvent = {
       pathParameters: {
