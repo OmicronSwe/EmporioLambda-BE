@@ -109,7 +109,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       );
     } catch (error) {
       console.log(error); // eslint-disable-line no-console
-      return badResponse("Enable to create user on stripe");
+      return badResponse("Unable to create user on stripe");
     }
   }
 
@@ -124,6 +124,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return response({ data: { sessionId: idSession } });
   } catch (error) {
     console.log(error); // eslint-disable-line no-console
-    return badResponse("Enable to create sessione of Stripe");
+    return badResponse("Unable to create payment");
   }
 };
