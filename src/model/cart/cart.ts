@@ -65,7 +65,7 @@ class Cart {
     return {
       username: this.username,
       products: productCartArray,
-      totalPrice: +this.totalPrice.toFixed(2),
+      totalPrice: Math.round(this.totalPrice * 100) / 100,
       taxesApplied: this.taxesApplied,
     };
   }
