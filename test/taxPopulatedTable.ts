@@ -48,11 +48,13 @@ describe("Tax populated table", () => {
 
     // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body:
+        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
-      body: '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
+      body:
+        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
     // create product

@@ -34,7 +34,8 @@ describe("Authentication2 mock jwk", () => {
             e: "AQAB",
             kid: "z7LZg5m4RVQxMkvLX5r8a3kMauxoSWOp5XCOYlqkFok=",
             kty: "RSA",
-            n: "1elNJjnW94MulJi1hjd_P8Y2jADoJDU5qNsz7Fj0soY0D7LSjsCCHiY_A34BYP0wkEO1GykG4AdGZkV86CGinCiShVsc4fIW6S2x_BdnNt7nb09IT3ftt1CXCGiOfNhwS9Ld0P8FuDXDHnCPWhcis-81q0GGazAVLsRt8zMp7XjOPRGdfbxCz-TmeVSgMg2WS1QOZl-D4cJbvnoUPCCOeVBK3okSRQOqLqP3NAVwabnazQVd7yBqA3nuL9wjk0KRF7y9UOdrSHFM4aW2jmjf_OOFzwWs6hNp7x7IooZvTKrYaABjAM7szh97nC9-ZLWA9JKSApL37QuYzlR7cV-iBQ",
+            n:
+              "1elNJjnW94MulJi1hjd_P8Y2jADoJDU5qNsz7Fj0soY0D7LSjsCCHiY_A34BYP0wkEO1GykG4AdGZkV86CGinCiShVsc4fIW6S2x_BdnNt7nb09IT3ftt1CXCGiOfNhwS9Ld0P8FuDXDHnCPWhcis-81q0GGazAVLsRt8zMp7XjOPRGdfbxCz-TmeVSgMg2WS1QOZl-D4cJbvnoUPCCOeVBK3okSRQOqLqP3NAVwabnazQVd7yBqA3nuL9wjk0KRF7y9UOdrSHFM4aW2jmjf_OOFzwWs6hNp7x7IooZvTKrYaABjAM7szh97nC9-ZLWA9JKSApL37QuYzlR7cV-iBQ",
             use: "sig",
           },
           {
@@ -43,7 +44,8 @@ describe("Authentication2 mock jwk", () => {
             use: "sig",
             alg: "RS256",
             e: "AQAB",
-            n: "sVFA1ArpDhSPtjiT8KPJgmm67vfb9LP4bYFUx-7MI4It3pBKPEcgNSLRpXCGRF-4KWYCB9idrAFJ-_SQQwiLKw",
+            n:
+              "sVFA1ArpDhSPtjiT8KPJgmm67vfb9LP4bYFUx-7MI4It3pBKPEcgNSLRpXCGRF-4KWYCB9idrAFJ-_SQQwiLKw",
           },
         ],
       });

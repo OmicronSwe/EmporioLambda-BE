@@ -42,7 +42,8 @@ describe("Category populated table", () => {
     };
 
     const dataProduct: APIGatewayProxyEvent = {
-      body: '{"name": "test", "description": "test_description", "price": 10, "category": "dummy"}',
+      body:
+        '{"name": "test", "description": "test_description", "price": 10, "category": "dummy"}',
     };
 
     // create category

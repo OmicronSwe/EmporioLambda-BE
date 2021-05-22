@@ -413,6 +413,7 @@ function ValidateToken(pems, event, context) {
     policy.allowMethod("GET", "/product/*");
     policy.allowMethod("GET", "/category");
     policy.allowMethod("GET", "/category/*");
+    policy.allowMethod("GET", "/tax/*");
   }
   context.succeed(policy.build());
 }
