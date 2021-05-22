@@ -117,7 +117,8 @@ class Cart {
   }
 
   private updateTotalPrice(price: number) {
-    this.totalPrice += price + this.priceWithTaxes(price);
+    this.totalPrice +=
+      Math.round((price + this.priceWithTaxes(price)) * 100) / 100;
 
     if (this.totalPrice < 0) {
       this.totalPrice = 0;
