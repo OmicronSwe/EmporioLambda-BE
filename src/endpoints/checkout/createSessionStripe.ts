@@ -87,30 +87,23 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     user = User.fromCognitoFormat(result);
   } catch (error) {
-    console.log(error); // eslint-disable-line no-console
     return badResponse("Failed to get user email");
   }
 
-  // check if User is present in stripe
-  console.log(" start getEmailFunction"); // eslint-disable-line no-console
-  let customerIDStripe: string = await Stripe.getCustomerByEmail(
-    user.getEmail()
-  );
-  console.log("end getEmailFunction"); // eslint-disable-line no-console
+  let customerIDStripe: string;
 
-  console.log(`customerIDSTRIPE: ${customerIDStripe}`); // eslint-disable-line no-console
+  try {
+    customerIDStripe = await Stripe.getCustomerByEmail(user.getEmail());
 
-  if (customerIDStripe === "") {
-    try {
+    if (customerIDStripe === "") {
       customerIDStripe = await Stripe.createCustomer(
         user.getName(),
         user.getEmail(),
         body.username
       );
-    } catch (error) {
-      console.log(error); // eslint-disable-line no-console
-      return badResponse("Unable to create user on stripe");
     }
+  } catch (error) {
+    return badResponse("Unable to create user on stripe");
   }
 
   // create stripe session
@@ -123,7 +116,6 @@ export const index: APIGatewayProxyHandler = async (event) => {
     );
     return response({ data: { sessionId: idSession } });
   } catch (error) {
-    console.log(error); // eslint-disable-line no-console
     return badResponse("Unable to create payment");
   }
 };

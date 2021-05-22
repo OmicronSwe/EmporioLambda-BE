@@ -59,17 +59,13 @@ const Stripe = {
       limit: 1,
     };
 
-    console.log(params); // eslint-disable-line no-console
-
     return stripe.customers
       .list(params)
       .then((response) => {
-        console.log(response.data); // eslint-disable-line no-console
         if (response.data.length > 0) return response.data[0].id;
         return "";
       })
       .catch((err) => {
-        console.log(err); // eslint-disable-line no-console
         throw Error(`Error in Stripe getCustomerByEmail: ${err}`);
       });
   },
@@ -78,7 +74,6 @@ const Stripe = {
     return stripe.customers
       .del(idCustomerInStripe)
       .then((data) => {
-        console.log(data.deleted); // eslint-disable-line no-console
         return data.deleted;
       })
       .catch((err) => {
