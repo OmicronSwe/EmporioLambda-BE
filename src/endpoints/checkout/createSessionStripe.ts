@@ -123,6 +123,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     );
     return response({ data: { sessionId: idSession } });
   } catch (error) {
+    console.log(error); // eslint-disable-line no-console
     return badResponse("Enable to create sessione of Stripe");
   }
 };
