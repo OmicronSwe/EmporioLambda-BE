@@ -41,13 +41,11 @@ describe("Checkout create session Stripe", () => {
 
     // data
     const dataProduct1: APIGatewayProxyEvent = {
-      body:
-        '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
+      body: '{"description": "description product 1" ,"name": "name product 1", "price" : 11}',
     };
 
     const dataProduct2: APIGatewayProxyEvent = {
-      body:
-        '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
+      body: '{"name": "name product 2 new", "price" : 21,"description": "description product 2"}',
     };
 
     // create product
@@ -82,8 +80,7 @@ describe("Checkout create session Stripe", () => {
 
     // update product after create cart
     const dataUpdate: APIGatewayProxyEvent = {
-      body:
-        '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
+      body: '{"name": "test_update", "description": "test_description_update", "price": 20, "category": "garden"}',
       pathParameters: {
         id: IDProduct2,
       },
