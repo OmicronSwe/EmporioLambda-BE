@@ -143,6 +143,20 @@ describe("User functions test", () => {
     );
   });
 
+  it('user delete function - should be "Failed to delete the cart of user"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        username_dummy: "username-string-test-delete-user",
+      },
+    };
+
+    const response = await deleteUser.run(data);
+    expect(JSON.parse(response.statusCode)).to.be.equal(502);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "Failed to delete the cart of user"
+    );
+  });
+
   it('user delete function - should be "Failed to delete user"', async () => {
     const data: APIGatewayProxyEvent = {
       pathParameters: {

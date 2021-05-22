@@ -75,6 +75,19 @@ describe("Order populate table", () => {
     await createCart.run(dataCart);
   });
 
+  it('order create function - should be "Body missing"', async () => {
+    const data: APIGatewayProxyEvent = {
+      body_dummy:
+        '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',
+    };
+
+    const response = await create.run(data);
+
+    // console.log(response);
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal("Body missing");
+  });
+
   it('order create function - should be "Failed to get user data"', async () => {
     const data: APIGatewayProxyEvent = {
       body: '{"data": {"object": {"payment_status": "paid", "customer_details": {"email": "test@test.com"}, "client_reference_id": "username-string"}}}',

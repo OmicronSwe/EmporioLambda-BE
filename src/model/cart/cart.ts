@@ -2,6 +2,10 @@ import { ProductDB } from "../product/interface";
 import Product from "../product/product";
 import { CartDB, CartProductForCheckout } from "./interface";
 
+const round2Decimal = (n: number): number => {
+  return Math.round(n * 100) / 100;
+};
+
 class Cart {
   private username: string;
 
@@ -19,7 +23,7 @@ class Cart {
     // console.log(data);
 
     this.products = new Map<Product, number>();
-    this.taxesApplied = 20;
+    this.taxesApplied = data.taxesApplied ? data.taxesApplied : 0;
     this.totalPrice = 0;
 
     if (data.products) {
@@ -44,7 +48,7 @@ class Cart {
   }
 
   public getTotalPrice(): number {
-    return this.totalPrice;
+    return round2Decimal(this.totalPrice);
   }
 
   public getTaxesApplied(): number {
@@ -65,7 +69,7 @@ class Cart {
     return {
       username: this.username,
       products: productCartArray,
-      totalPrice: +this.totalPrice.toFixed(2),
+      totalPrice: this.getTotalPrice(),
       taxesApplied: this.taxesApplied,
     };
   }
@@ -117,7 +121,7 @@ class Cart {
   }
 
   private updateTotalPrice(price: number) {
-    this.totalPrice += price + this.priceWithTaxes(price);
+    this.totalPrice += round2Decimal(price + this.priceWithTaxes(price));
 
     if (this.totalPrice < 0) {
       this.totalPrice = 0;
@@ -161,7 +165,10 @@ class Cart {
         name: element.getName(),
         description: element.getDescription(),
         images: [element.getImageUrl()],
-        amount: element.getPrice() * 100,
+        amount:
+          round2Decimal(
+            this.priceWithTaxes(element.getPrice()) + element.getPrice()
+          ) * 100,
         currency: "EUR",
         quantity: this.getProductQuantity(element),
       };

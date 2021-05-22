@@ -49,6 +49,7 @@ provider:
     ORDER_TABLE: ${self:provider.environment.NAMESPACE}-EML-order
     CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart
     CATEGORY_TABLE: ${self:provider.environment.NAMESPACE}-EML-category
+    TAX_TABLE: ${self:provider.environment.NAMESPACE}-EML-tax
     #BUCKET NAME S3
     BUCKET_IMAGE: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
   iamRoleStatements:
@@ -207,6 +208,23 @@ resources:
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.CATEGORY_TABLE}
 
+    TaxTable:
+      Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
+      Properties:
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.TAX_TABLE}
+
     OrderTable:
       Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
@@ -261,6 +279,8 @@ functions:
   #CHECKOUT
   createSessionIDStripe:
     handler: src/endpoints/checkout/createSessionStripe.index
+    environment:
+      USER_POOL_ID: !Ref CognitoUserPool
     events:
       - http:
           path: createSessionStripe
@@ -355,6 +375,27 @@ functions:
       - http:
           path: category/{name}
           method: delete
+          authorizer:
+            name: auth
+          cors: true
+
+  #TAX
+  getRateByNameTax:
+    handler: src/endpoints/tax/getRateByName.index
+    events:
+      - http:
+          path: tax/{name}
+          method: get
+          authorizer:
+            name: auth
+          cors: true
+
+  updateTax:
+    handler: src/endpoints/tax/update.index
+    events:
+      - http:
+          path: tax/{name}
+          method: post
           authorizer:
             name: auth
           cors: true

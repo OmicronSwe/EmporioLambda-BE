@@ -30,6 +30,10 @@ export default class User {
     return this.name;
   }
 
+  public getEmail(): string {
+    return this.email;
+  }
+
   public toJSON(): UserCognito {
     return {
       email: this.email,

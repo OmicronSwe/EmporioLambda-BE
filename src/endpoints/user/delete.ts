@@ -1,7 +1,9 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { response, badResponse, badRequest } from "../../lib/APIResponses";
+import User from "../../model/user/user";
 import Cognito from "../../services/cognito/cognito";
 import Dynamo from "../../services/dynamo/dynamo";
+import Stripe from "../../services/stripe/stripe";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -49,8 +51,22 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   }
 
-  // delete user on cognito
+  // delete user
   try {
+    const result = await Cognito.getUserAttributes(
+      event.pathParameters.username
+    );
+
+    const user = User.fromCognitoFormat(result);
+
+    // delete user on stripe
+    const customerIDStripe: string = await Stripe.getCustomerByEmail(
+      user.getEmail()
+    );
+
+    await Stripe.deleteCustomer(customerIDStripe);
+
+    // delete user on cognito
     await Cognito.deleteUser(event.pathParameters.username);
     return response({ data: { message: "User deleted correctly" } });
   } catch (error) {

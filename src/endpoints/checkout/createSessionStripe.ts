@@ -12,6 +12,8 @@ import Product from "../../model/product/product";
 import Stripe from "../../services/stripe/stripe";
 import { CreateSessionStripeRequest } from "../../model/checkout/interface";
 import { ProductDB } from "../../model/product/interface";
+import Cognito from "../../services/cognito/cognito";
+import User from "../../model/user/user";
 
 /**
  * @param  {} event: event passed when lambda is triggered
@@ -78,15 +80,42 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
   }
 
+  // get User email
+  let user: User;
+  try {
+    const result = await Cognito.getUserAttributes(body.username);
+
+    user = User.fromCognitoFormat(result);
+  } catch (error) {
+    return badResponse("Failed to get user email");
+  }
+
+  let customerIDStripe: string;
+
+  try {
+    customerIDStripe = await Stripe.getCustomerByEmail(user.getEmail());
+
+    if (customerIDStripe === "") {
+      customerIDStripe = await Stripe.createCustomer(
+        user.getName(),
+        user.getEmail(),
+        body.username
+      );
+    }
+  } catch (error) {
+    return badResponse("Unable to create user on stripe");
+  }
+
   // create stripe session
   try {
     const idSession = await Stripe.createSession(
       cart,
+      customerIDStripe,
       body.successurl,
       body.cancelurl
     );
     return response({ data: { sessionId: idSession } });
   } catch (error) {
-    return badResponse("Enable to create sessione of Stripe");
+    return badResponse("Unable to create payment");
   }
 };

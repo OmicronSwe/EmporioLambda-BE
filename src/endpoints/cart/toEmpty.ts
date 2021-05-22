@@ -14,6 +14,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
   const data: CartDB = {
     username: event.pathParameters.username,
+    taxesApplied: (await Dynamo.get(process.env.TAX_TABLE, "name", "IVA")).rate,
     products: [],
   };
 

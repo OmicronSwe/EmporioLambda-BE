@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
-
 import "./testConfig/localDynamoDb";
+import Dynamo from "../src/services/dynamo/dynamo";
 
 const mochaPlugin = require("serverless-mocha-plugin");
 
@@ -43,6 +43,12 @@ describe("Cart populate table", () => {
   );
 
   before(async () => {
+    const dataTax = {
+      name: "IVA",
+      rate: 20,
+    };
+    await Dynamo.write(process.env.TAX_TABLE, dataTax);
+
     const createProd = mochaPlugin.getWrapper(
       "index",
       "/src/endpoints/product/create.ts",
@@ -540,5 +546,17 @@ describe("Cart populate table", () => {
 
     await deleteProduct.run(dataProduct1);
     await deleteProduct.run(dataProduct2);
+
+    // delete cart created
+    const data: APIGatewayProxyEvent = {
+      pathParameters: {
+        username: "username-string2",
+      },
+    };
+
+    await deleteFun.run(data);
+
+    // delete tax
+    await Dynamo.delete(process.env.TAX_TABLE, "name", "IVA");
   });
 });

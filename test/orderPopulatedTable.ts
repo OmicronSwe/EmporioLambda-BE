@@ -117,8 +117,8 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
     expect(body.result.items[0].email).to.be.equal("test@test.com");
-    expect(body.result.items[0].taxesApplied).to.be.equal(20);
-    expect(body.result.items[0].totalPrice).to.be.equal(52.8);
+    expect(body.result.items[0].taxesApplied).to.be.equal(0);
+    expect(body.result.items[0].totalPrice).to.be.equal(44);
 
     expect(body.result.items[0].products[0].id).to.be.equal(IDProduct1);
     expect(body.result.items[0].products[0].name).to.be.equal("name product 1");
@@ -159,6 +159,21 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.body).error).to.be.equal("Orders not found");
   });
 
+  it('order getByUsernameAndId function - should return "PathParameters missing"', async () => {
+    const data: APIGatewayProxyEvent = {
+      pathParameters_error: {
+        username: "username-string-test",
+      },
+    };
+
+    const response = await getByUsernameAndId.run(data);
+
+    expect(JSON.parse(response.statusCode)).to.be.equal(400);
+    expect(JSON.parse(response.body).error).to.be.equal(
+      "PathParameters missing"
+    );
+  });
+
   it('order getByUsernameAndId function - should return order by IdOrder and Username of "username-string-test"', async () => {
     const dataUsername: APIGatewayProxyEvent = {
       pathParameters: {
@@ -184,8 +199,8 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
     expect(body.result.items[0].email).to.be.equal("test@test.com");
-    expect(body.result.items[0].taxesApplied).to.be.equal(20);
-    expect(body.result.items[0].totalPrice).to.be.equal(52.8);
+    expect(body.result.items[0].taxesApplied).to.be.equal(0);
+    expect(body.result.items[0].totalPrice).to.be.equal(44);
 
     expect(body.result.items[0].products[0].id).to.be.equal(IDProduct1);
     expect(body.result.items[0].products[0].name).to.be.equal("name product 1");
@@ -278,8 +293,8 @@ describe("Order populated table", () => {
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
     expect(body.result.email).to.be.equal("test@test.com");
-    expect(body.result.taxesApplied).to.be.equal(20);
-    expect(body.result.totalPrice).to.be.equal(52.8);
+    expect(body.result.taxesApplied).to.be.equal(0);
+    expect(body.result.totalPrice).to.be.equal(44);
     expect(body.result.products[0].id).to.be.equal(IDProduct1);
     expect(body.result.products[0].name).to.be.equal("name product 1");
     expect(body.result.products[0].description).to.be.equal(
