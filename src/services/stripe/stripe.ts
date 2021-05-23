@@ -70,6 +70,19 @@ const Stripe = {
       });
   },
 
+  updateCustomerEmail: (
+    idCustomerInStripe: string,
+    emailCustomer: string
+  ): void => {
+    const params = {
+      email: emailCustomer,
+    };
+
+    stripe.customers.update(idCustomerInStripe, params).catch((err) => {
+      throw Error(`Error in Stripe updateCustomerEmail: ${err}`);
+    });
+  },
+
   deleteCustomer: (idCustomerInStripe: string): Promise<boolean> => {
     return stripe.customers
       .del(idCustomerInStripe)
