@@ -116,7 +116,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
       console.log(webhookStripe.customer.toString()); // eslint-disable-line no-console
 
       console.log(user.getEmail()); // eslint-disable-line no-console
-      StripeService.updateCustomerEmail(
+      await StripeService.updateCustomerEmail(
         webhookStripe.customer.toString(),
         user.getEmail()
       );
