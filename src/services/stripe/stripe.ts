@@ -73,7 +73,7 @@ const Stripe = {
   updateCustomerEmail: (
     idCustomerInStripe: string,
     emailCustomer: string
-  ): Promise<boolean> => {
+  ): Promise<any> => {
     const params = {
       email: emailCustomer,
     };
@@ -81,11 +81,9 @@ const Stripe = {
     return stripe.customers
       .update(idCustomerInStripe, params)
       .then((data) => {
-        console.log(data); // eslint-disable-line no-console
-        return true;
+        return data;
       })
       .catch((err) => {
-        console.log(err); // eslint-disable-line no-console
         throw Error(`Error in Stripe updateCustomerEmail: ${err}`);
       });
   },
