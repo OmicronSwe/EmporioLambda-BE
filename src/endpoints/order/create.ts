@@ -113,17 +113,10 @@ export const index: APIGatewayProxyHandler = async (event) => {
 
     // modify email on stripe if is different
     if (webhookStripe.customer_details.email !== user.getEmail()) {
-      console.log(webhookStripe.customer.toString()); // eslint-disable-line no-console
-
-      console.log(user.getEmail()); // eslint-disable-line no-console
       await StripeService.updateCustomerEmail(
         webhookStripe.customer.toString(),
         user.getEmail()
       );
-    } else {
-      console.log("not different"); // eslint-disable-line no-console
-      console.log(`stripe email: ${webhookStripe.customer_details.email}`); // eslint-disable-line no-console
-      console.log(`BE email: ${user.getEmail()}`); // eslint-disable-line no-console
     }
 
     if (resp) {
