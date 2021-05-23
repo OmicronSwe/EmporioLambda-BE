@@ -165,10 +165,9 @@ class Cart {
         name: element.getName(),
         description: element.getDescription(),
         images: [element.getImageUrl()],
-        amount:
-          round2Decimal(
-            this.priceWithTaxes(element.getPrice()) + element.getPrice()
-          ) * 100,
+        amount: round2Decimal(
+          (this.priceWithTaxes(element.getPrice()) + element.getPrice()) * 100
+        ),
         currency: "EUR",
         quantity: this.getProductQuantity(element),
       };
