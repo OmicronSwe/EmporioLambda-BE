@@ -70,6 +70,24 @@ const Stripe = {
       });
   },
 
+  updateCustomerEmail: (
+    idCustomerInStripe: string,
+    emailCustomer: string
+  ): Promise<any> => {
+    const params = {
+      email: emailCustomer,
+    };
+
+    return stripe.customers
+      .update(idCustomerInStripe, params)
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw Error(`Error in Stripe updateCustomerEmail: ${err}`);
+      });
+  },
+
   deleteCustomer: (idCustomerInStripe: string): Promise<boolean> => {
     return stripe.customers
       .del(idCustomerInStripe)

@@ -7,7 +7,7 @@ import {
   notFound,
 } from "../../lib/APIResponses";
 import Dynamo from "../../services/dynamo/dynamo";
-
+import StripeService from "../../services/stripe/stripe";
 import Order from "../../model/order/order";
 import Cart from "../../model/cart/cart";
 import Nodemailer from "../../services/nodemailer/nodemailer";
@@ -94,11 +94,11 @@ export const index: APIGatewayProxyHandler = async (event) => {
     }
 
     // get user name
-    let userName: string;
+    let user: User;
     try {
       const resultUser = await Cognito.getUserAttributes(cart.getUsername());
 
-      userName = User.fromCognitoFormat(resultUser).getName();
+      user = User.fromCognitoFormat(resultUser);
     } catch (error) {
       return badResponse("Failed to get user data");
     }
@@ -108,8 +108,16 @@ export const index: APIGatewayProxyHandler = async (event) => {
       cart.getProducts(),
       webhookStripe.customer_details.email,
       cart.getTotalPrice(),
-      userName
+      user.getName()
     );
+
+    // modify email on stripe if is different
+    if (webhookStripe.customer_details.email !== user.getEmail()) {
+      await StripeService.updateCustomerEmail(
+        webhookStripe.customer.toString(),
+        user.getEmail()
+      );
+    }
 
     if (resp) {
       return response({ data: { message: "Order recevied" } });
