@@ -73,15 +73,16 @@ const Stripe = {
   updateCustomerEmail: (
     idCustomerInStripe: string,
     emailCustomer: string
-  ): void => {
+  ): Promise<boolean> => {
     const params = {
       email: emailCustomer,
     };
 
-    stripe.customers
+    return stripe.customers
       .update(idCustomerInStripe, params)
       .then((data) => {
         console.log(data); // eslint-disable-line no-console
+        return true;
       })
       .catch((err) => {
         console.log(err); // eslint-disable-line no-console
