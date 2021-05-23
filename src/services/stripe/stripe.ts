@@ -78,9 +78,15 @@ const Stripe = {
       email: emailCustomer,
     };
 
-    stripe.customers.update(idCustomerInStripe, params).catch((err) => {
-      throw Error(`Error in Stripe updateCustomerEmail: ${err}`);
-    });
+    stripe.customers
+      .update(idCustomerInStripe, params)
+      .then((data) => {
+        console.log(data); // eslint-disable-line no-console
+      })
+      .catch((err) => {
+        console.log(err); // eslint-disable-line no-console
+        throw Error(`Error in Stripe updateCustomerEmail: ${err}`);
+      });
   },
 
   deleteCustomer: (idCustomerInStripe: string): Promise<boolean> => {
