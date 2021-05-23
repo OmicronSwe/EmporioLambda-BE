@@ -116,6 +116,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     );
     return response({ data: { sessionId: idSession } });
   } catch (error) {
+    console.log(error) // eslint-disable-line no-console
     return badResponse("Unable to create payment");
   }
 };
