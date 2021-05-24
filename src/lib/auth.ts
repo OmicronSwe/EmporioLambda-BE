@@ -381,6 +381,9 @@ function ValidateToken(pems, event, context) {
   apiOptions.stage = apiGatewayArnTmp[1];
   // For more information on specifics of generating policy, refer to blueprint for API Gateway's Custom authorizer in Lambda console
   const policy = new AuthPolicy(principalId, awsAccountId, apiOptions);
+
+  // API Visibility
+
   if (decodedJwt && decodedJwt.payload["cognito:groups"] == "VenditoreAdmin") {
     policy.allowAllMethods();
   } else {

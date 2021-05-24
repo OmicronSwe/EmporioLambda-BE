@@ -51,7 +51,7 @@ provider:
     CATEGORY_TABLE: ${self:provider.environment.NAMESPACE}-EML-category
     TAX_TABLE: ${self:provider.environment.NAMESPACE}-EML-tax
     #BUCKET NAME S3
-    BUCKET_IMAGE: ${self:provider.environment.NAMESPACE}-omicronswe-imagebucket
+    BUCKET_IMAGE: ${self:provider.environment.NAMESPACE}-${ssm:IMGBUCKET_ID}-imagebucket
   iamRoleStatements:
     - Effect: Allow
       Action:
