@@ -81,7 +81,6 @@ describe("Checkout create session Stripe", () => {
 
     const response = await createSessionStripe.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal("Body missing");
   });
@@ -93,7 +92,6 @@ describe("Checkout create session Stripe", () => {
 
     const response = await createSessionStripe.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal("Failed to get cart");
   });
@@ -105,7 +103,6 @@ describe("Checkout create session Stripe", () => {
 
     const response = await createSessionStripe.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal("Cart not found");
   });
@@ -117,7 +114,6 @@ describe("Checkout create session Stripe", () => {
 
     const response = await createSessionStripe.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal(
       "Failed to get user email"
@@ -148,7 +144,6 @@ describe("Checkout create session Stripe", () => {
 
     const response = await createSessionStripe.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal(
       "Some products have changed, please check your shopping cart before proceeding"
@@ -175,7 +170,6 @@ describe("Checkout create session Stripe", () => {
 
     const response = await createSessionStripe.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal(
       "Some products are no longer available, please check your shopping cart before proceeding"

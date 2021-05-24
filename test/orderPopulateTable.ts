@@ -83,7 +83,6 @@ describe("Order populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal("Body missing");
   });
@@ -95,7 +94,6 @@ describe("Order populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal(
       "Failed to get user data"
@@ -109,7 +107,6 @@ describe("Order populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal(
       "Failed to create order"
@@ -123,7 +120,6 @@ describe("Order populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(502);
     expect(JSON.parse(response.body).error).to.be.equal("Failed to get cart");
   });
@@ -135,7 +131,6 @@ describe("Order populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(404);
     expect(JSON.parse(response.body).error).to.be.equal("Cart not found");
   });
@@ -147,7 +142,6 @@ describe("Order populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal(
       "Error email value not found"

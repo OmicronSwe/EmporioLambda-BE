@@ -331,21 +331,18 @@ function ValidateToken(pems, event, context) {
     // Fail if the token is not jwt
     decodedJwt = jwt.decode(token, { complete: true });
     if (!decodedJwt) {
-      // console.log('Not a valid JWT token');
       context.fail("BadJWT");
       return;
     }
 
     // Reject the jwt if it's not an 'Access Token'
     if (decodedJwt.payload.token_use != "access") {
-      // console.log('Not an access token');
       context.fail("BadTokenType");
       return;
     }
 
     // Fail if token is not from your UserPool
     if (decodedJwt.payload.iss != iss) {
-      // console.log('invalid issuer');
       context.fail("BadIss");
       return;
     }
@@ -355,7 +352,6 @@ function ValidateToken(pems, event, context) {
     const pem = pems[kid];
 
     if (!pem) {
-      // console.log('Invalid access token');
       context.fail("InvalidToken");
       return;
     }

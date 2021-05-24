@@ -278,7 +278,6 @@ describe("Order populated table", () => {
 
     const responseGetByUsername = await getByUsername.run(dataUsername);
 
-    // console.log(responseGetByUsername);
     const bodyGetByUsername = JSON.parse(responseGetByUsername.body);
 
     const data: APIGatewayProxyEvent = {

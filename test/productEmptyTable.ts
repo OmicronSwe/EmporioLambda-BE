@@ -60,7 +60,6 @@ describe("Product empty table", () => {
       },
     };
 
-    // console.log(data);
     const response = await search.run(data);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
