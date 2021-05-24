@@ -282,9 +282,7 @@ const Dynamo = {
     }
 
     if (startKey) {
-      // console.log(startKey);
       params.ExclusiveStartKey = startKey;
-      // console.log(params.ExclusiveStartKey.id);
     }
 
     if (limit) {

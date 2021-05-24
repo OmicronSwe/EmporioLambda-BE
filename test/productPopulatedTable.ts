@@ -110,7 +110,6 @@ describe("Product populated table", () => {
       },
     };
 
-    // console.log(data);
     const response = await search.run(data);
 
     const body = JSON.parse(response.body);
@@ -133,7 +132,6 @@ describe("Product populated table", () => {
       },
     };
 
-    // console.log(data);
     const response = await search.run(data);
 
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
@@ -177,7 +175,6 @@ describe("Product populated table", () => {
       },
     };
 
-    // console.log(data);
     const response = await search.run(data);
 
     const body = JSON.parse(response.body);
@@ -198,7 +195,6 @@ describe("Product populated table", () => {
       },
     };
 
-    // console.log(data);
     const response = await search.run(data);
 
     const body = JSON.parse(response.body);
@@ -219,7 +215,6 @@ describe("Product populated table", () => {
       },
     };
 
-    // console.log(data);
     const response = await search.run(data);
 
     const body = JSON.parse(response.body);
@@ -240,12 +235,9 @@ describe("Product populated table", () => {
       },
     };
 
-    // limit1
     const response = await search.run(data);
 
     const body = JSON.parse(response.body);
-
-    // console.log(response);
 
     expect(body.result.items.length).to.be.equal(1);
 
@@ -262,13 +254,9 @@ describe("Product populated table", () => {
       },
     };
 
-    // console.log(dataExclusiveStartKey)
-
     const responseExclusiveStartKey = await search.run(dataExclusiveStartKey);
 
     const bodyExclusiveStartKey = JSON.parse(responseExclusiveStartKey.body);
-
-    // console.log(responseExclusiveStartKey);
 
     expect(bodyExclusiveStartKey.result.items.length).to.be.equal(1);
     expect(bodyExclusiveStartKey.result.items[0].name).to.not.be.equal(
@@ -295,7 +283,7 @@ describe("Product populated table", () => {
 
     const response = await getById.run(dataSearch);
     const body = JSON.parse(response.body);
-    // console.log(response);
+
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
 
     expect(body.result.name).to.be.equal("test");
