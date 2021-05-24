@@ -97,7 +97,6 @@ describe("Cart populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(200);
     expect(JSON.parse(response.body).message).to.be.equal("Cart saved");
   });
@@ -109,7 +108,6 @@ describe("Cart populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal("Body missing");
   });
@@ -121,7 +119,6 @@ describe("Cart populate table", () => {
 
     const response = await create.run(data);
 
-    // console.log(response);
     expect(JSON.parse(response.statusCode)).to.be.equal(400);
     expect(JSON.parse(response.body).error).to.be.equal(
       "Error username value not found"

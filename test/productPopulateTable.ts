@@ -168,7 +168,6 @@ describe("Product populate table", () => {
 
     const responseSearch = await search.run(data2);
 
-    // console.log(responseSearch);
     const id = JSON.parse(responseSearch.body).result.items[0].id;
 
     const dataSearch: APIGatewayProxyEvent = {

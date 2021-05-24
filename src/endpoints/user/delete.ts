@@ -37,7 +37,7 @@ export const index: APIGatewayProxyHandler = async (event) => {
     return badResponse("Failed to get orders in order to set null");
   }
 
-  // set null username on order of user
+  // remove username attribute from old orders
   for (let i = 0; i < result.items.length; i++) {
     try {
       await Dynamo.removeAttribute(

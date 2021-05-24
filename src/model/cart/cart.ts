@@ -20,8 +20,6 @@ class Cart {
       throw Error("username value not found");
     }
 
-    // console.log(data);
-
     this.products = new Map<Product, number>();
     this.taxesApplied = data.taxesApplied ? data.taxesApplied : 0;
     this.totalPrice = 0;
@@ -130,14 +128,12 @@ class Cart {
 
   public removeProductTotally(product: Product) {
     this.updateTotalPrice(-(product.getPrice() * this.products.get(product)));
-    // manage taxes TO-DO
     this.products.delete(product);
   }
 
   public removeProductByQuantity(product: Product, quantity: number = 1) {
     if (this.products.get(product) - quantity > 0) {
       this.updateTotalPrice(-(product.getPrice() * quantity));
-      // manage taxes TO-DO
       this.products.set(product, this.products.get(product) - quantity);
     } else {
       this.removeProductTotally(product);

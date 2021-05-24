@@ -1,14 +1,5 @@
 import { CognitoIdentityServiceProvider } from "aws-sdk";
 
-/* let userPoolId: string = process.env.USER_POOL_ID;
-let region: string = process.env.AWS_REGION;
-
-const CognitoService = new CognitoIdentityServiceProvider({
-  endpoint: 'https://cognito-idp.' + region + '.amazonaws.com/' + userPoolId,
-  region: region,
-  apiVersion: '2016-04-18',
-}); */
-
 const CognitoService = new CognitoIdentityServiceProvider();
 
 const Cognito = {

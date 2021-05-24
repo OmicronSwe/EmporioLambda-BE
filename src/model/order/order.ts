@@ -27,8 +27,6 @@ class Order {
       throw Error("products list not found");
     }
 
-    // console.log(body);
-
     this.products = cart.getProducts();
     this.taxesApplied = cart.getTaxesApplied();
     this.totalPrice = cart.getTotalPrice();
