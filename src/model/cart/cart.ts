@@ -73,7 +73,7 @@ class Cart {
   }
 
   private priceWithTaxes(price: number): number {
-    return (this.taxesApplied * price) / 100;
+    return round2Decimal((this.taxesApplied * price) / 100);
   }
 
   public getProductsList(): Array<Product> {
