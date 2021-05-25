@@ -73,7 +73,7 @@ class Cart {
   }
 
   private priceWithTaxes(price: number): number {
-    return (this.taxesApplied * price) / 100;
+    return round2Decimal((this.taxesApplied * price) / 100);
   }
 
   public getProductsList(): Array<Product> {
@@ -161,9 +161,9 @@ class Cart {
         name: element.getName(),
         description: element.getDescription(),
         images: [element.getImageUrl()],
-        amount: round2Decimal(
-          (this.priceWithTaxes(element.getPrice()) + element.getPrice()) * 100
-        ),
+        amount: 
+          round2Decimal((this.priceWithTaxes(element.getPrice()) + element.getPrice()) * 100)
+        ,
         currency: "EUR",
         quantity: this.getProductQuantity(element),
       };
