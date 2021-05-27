@@ -47,7 +47,7 @@ provider:
     #TABLE NAME DYNAMODB
     PRODUCT_TABLE: ${self:provider.environment.NAMESPACE}-EML-product
     ORDER_TABLE: ${self:provider.environment.NAMESPACE}-EML-order
-    CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart_update
+    CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart
     CATEGORY_TABLE: ${self:provider.environment.NAMESPACE}-EML-category
     TAX_TABLE: ${self:provider.environment.NAMESPACE}-EML-tax
     #BUCKET NAME S3
