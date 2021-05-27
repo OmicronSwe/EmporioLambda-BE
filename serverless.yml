@@ -47,7 +47,7 @@ provider:
     #TABLE NAME DYNAMODB
     PRODUCT_TABLE: ${self:provider.environment.NAMESPACE}-EML-product
     ORDER_TABLE: ${self:provider.environment.NAMESPACE}-EML-order
-    CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart
+    CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart_update
     CATEGORY_TABLE: ${self:provider.environment.NAMESPACE}-EML-category
     TAX_TABLE: ${self:provider.environment.NAMESPACE}-EML-tax
     #BUCKET NAME S3
@@ -189,7 +189,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.CART_TABLE_update}
+        TableName: ${self:provider.environment.CART_TABLE}
 
     CategoryTable:
       Type: "AWS::DynamoDB::Table"
