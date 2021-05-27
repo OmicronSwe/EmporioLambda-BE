@@ -189,7 +189,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.CART_TABLE}
+        TableName: ${self:provider.environment.CART_TABLE_update}
 
     CategoryTable:
       Type: "AWS::DynamoDB::Table"
