@@ -45,7 +45,7 @@ provider:
     PASS_EMAIL: ${ssm:PASS_EMAIL}
     REGION: ${opt:region, self:provider.region}
     #TABLE NAME DYNAMODB
-    PRODUCT_TABLE: ${self:provider.environment.NAMESPACE}-EML-product
+    PRODUCT_TABLE: ${self:provider.environment.NAMESPACE}-EML-product_update
     ORDER_TABLE: ${self:provider.environment.NAMESPACE}-EML-order
     CART_TABLE: ${self:provider.environment.NAMESPACE}-EML-cart
     CATEGORY_TABLE: ${self:provider.environment.NAMESPACE}-EML-category
