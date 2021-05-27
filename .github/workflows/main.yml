@@ -22,13 +22,15 @@ jobs:
         run: npm run prettier-check
 
       - name: Test ESLint 🛂
-        run: npm run lint
+        run: npm run checkWithLint
 
       - name: Install Serverless
         run: npm install -g serverless
 
       - name: Install Java JRE for DynamoDB local
-        run: sudo apt install openjdk-8-jre
+        run: |
+          sudo apt-get update
+          sudo apt install openjdk-8-jre
 
       - name: Install DynamoDB local for test
         run: serverless dynamodb install
